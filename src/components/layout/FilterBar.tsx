@@ -1,0 +1,44 @@
+import styled from 'styled-components';
+import { Card } from '../ui';
+import { Funnel as _Funnel } from 'lucide-react';
+import { Badge, Button } from '../ui';
+
+const Wrapper = styled.div`
+  margin: 16px 0;
+  display: flex;
+  justify-content: center;
+  padding: 0 16px;
+  box-sizing: border-box;
+`;
+
+const Label = styled.label`
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-right: 25px;
+    font-weight: 600;
+`
+
+const Funnel = styled(_Funnel)`
+  stroke-width: 1.5px;
+  margin-right: 5px;
+`;
+
+export default function FilterBar() {
+  return (
+    <Wrapper>
+      <Card $width="1600px" $height="77px">
+        <Funnel />
+        <Label>Filter:</Label>
+        <Button className="filter">All Properties</Button>
+        <Button className="filter">
+          <Badge className="emerald">Q</Badge>Qualified
+        </Button>
+        <Button className="filter">
+          <Badge className="gray">P</Badge>Prospects
+        </Button>
+      </Card>
+    </Wrapper>
+  );
+}
