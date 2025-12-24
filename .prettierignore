@@ -1,0 +1,9 @@
+node_modules
+dist
+build
+target
+public
+*.min.js
+*.lock
+pnpm-lock.yaml
+.vscode
