@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Lease Management System",
+  "productName": "LeaseBook",
   "version": "0.1.0",
-  "identifier": "com.openworldapps.lms",
+  "identifier": "com.openworldapps.leasebook",
   "build": {
     "beforeDevCommand": "pnpm dev",
     "devUrl": "http://localhost:1420",
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "Lease Management System",
+        "title": "LeaseBook",
         "width": 800,
         "height": 600,
         "transparent": false,
@@ -24,7 +24,7 @@
       "csp": "default-src asset: https://asset.localhost data: https",
       "assetProtocol": {
           "enable": true,
-          "scope": ["$HOME/.local/share/com.openworld.lms/**"]
+          "scope": ["$HOME/.local/share/com.openworld.leasebook/**"]
         },
         "capabilities": [
             {
