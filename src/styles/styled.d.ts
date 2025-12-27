@@ -13,6 +13,7 @@ declare module 'styled-components' {
       success: string;
       danger: string;
       focus: string;
+      hover: string;
     };
     fonts: {
       body: string;
