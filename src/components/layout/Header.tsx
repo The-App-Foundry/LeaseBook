@@ -53,9 +53,8 @@ const HeaderLeft = styled.div`
   align-items: center;
 `;
 
-const Title = styled.h1`
-  margin: 0;
-  font-size: 24px;
+const Logo = styled.img`
+  width: 200px;
 `;
 
 export default function Header() {
@@ -63,7 +62,9 @@ export default function Header() {
     <OuterWrapper>
       <InnerWrapper>
         <HeaderLeft>
-          <Title>Lease Management System</Title>
+          <div>
+            <Logo src="/src/assets/leasebook.webp" alt="LeaseBook logo" />
+          </div>
         </HeaderLeft>
         <HeaderRight>
           <SearchBar />
