@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { Card, Sort } from '../ui';
+import { Card, Dropdown, Sort } from '../ui';
 import { Funnel as _Funnel } from 'lucide-react';
 import { Badge, Button } from '../ui';
 
@@ -47,6 +47,14 @@ export default function FilterBar() {
         </Wrapper>
         <Wrapper className="inner">
           <Sort />
+          <Dropdown
+            buttonLabel="Sort by"
+            items={[
+              { title: 'Expiration' },
+              { title: 'Address' },
+              { title: 'Type' }
+            ]}
+          />
         </Wrapper>
       </Card>
     </Wrapper>

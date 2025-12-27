@@ -5,10 +5,10 @@ import { ArrowUpDown, ArrowDownUp } from 'lucide-react';
 const SortButton = styled.button`
   display: flex;
   align-items: center;
-  padding: calc(var(--spacing) * 2) calc(var(--spacing) * 3);
   box-shadow: none;
   cursor: pointer;
   font-weight: 500;
+  padding: 0;
   color: ${({ theme }) => theme.colors.text};
 
   &:focus {
@@ -20,6 +20,14 @@ const SortButton = styled.button`
   }
 `;
 
+const AUpDown = styled(ArrowDownUp)`
+  height: 15px;
+`;
+
+const ADownUp = styled(ArrowUpDown)`
+  height: 15px;
+`;
+
 export default function Sort() {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
@@ -29,7 +37,7 @@ export default function Sort() {
 
   return (
     <SortButton onClick={toggleSortOrder}>
-      {sortOrder === 'asc' ? <ArrowUpDown /> : <ArrowDownUp />}
+      {sortOrder === 'asc' ? <AUpDown /> : <ADownUp />}
     </SortButton>
   );
 }
