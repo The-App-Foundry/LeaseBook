@@ -161,3 +161,15 @@ Avoid: Global state libraries until Context + useReducer becomes unwieldy. Keep 
 - Vite watch ignores `src-tauri/` to prevent recompile conflicts (see `vite.config.ts`)
 - Window size is 800x600 (defined in `tauri.conf.json`)
 - App identifier: `com.openworldapps.leasebook` (used in asset scope paths)
+
+
+## Generating commit messages
+
+When generating commit messages, format in the following format:
+
+```text
+type(scope): summary
+
+- change 1
+- change 2
+```
