@@ -13,8 +13,10 @@ const Card = styled.div<CardProps>`
     0 1px 3px 0 rgba(0, 0, 0, 0.1),
     0 1px 2px 0 rgba(0, 0, 0, 0.06);
   display: flex;
+  align-items: center;
+  justify-content: space-between;
   transition: box-shadow 0.2s ease;
-  padding: calc(0.25rem * 4);
+  padding: calc(var(--spacing) * 4);
   width: ${props => props.$width};
   height: ${props => props.$height};
 `;

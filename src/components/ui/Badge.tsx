@@ -19,6 +19,10 @@ const Badge = styled.span`
   &.gray {
     background: #b3bac2;
   }
+
+  &.trans {
+    background: transparent;
+  }
 `;
 
 export default Badge;
