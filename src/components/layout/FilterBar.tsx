@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { Card } from '../ui';
+import { Card, Sort } from '../ui';
 import { Funnel as _Funnel } from 'lucide-react';
 import { Badge, Button } from '../ui';
 
@@ -9,6 +9,11 @@ const Wrapper = styled.div`
   justify-content: center;
   padding: 0 16px;
   box-sizing: border-box;
+
+  &.inner {
+    padding: 0;
+    height: 100%;
+  }
 `;
 
 const Label = styled.label`
@@ -29,15 +34,20 @@ export default function FilterBar() {
   return (
     <Wrapper>
       <Card $width="1600px" $height="77px">
-        <Funnel />
-        <Label>Filter:</Label>
-        <Button className="filter">All Properties</Button>
-        <Button className="filter">
-          <Badge className="emerald">Q</Badge>Qualified
-        </Button>
-        <Button className="filter">
-          <Badge className="gray">P</Badge>Prospects
-        </Button>
+        <Wrapper className="inner">
+          <Funnel />
+          <Label>Filter:</Label>
+          <Button className="filter">All Properties</Button>
+          <Button className="filter">
+            <Badge className="emerald">Q</Badge>Qualified
+          </Button>
+          <Button className="filter">
+            <Badge className="gray">P</Badge>Prospects
+          </Button>
+        </Wrapper>
+        <Wrapper className="inner">
+          <Sort />
+        </Wrapper>
       </Card>
     </Wrapper>
   );
