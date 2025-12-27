@@ -3,7 +3,7 @@ import { createGlobalStyle } from 'styled-components';
 export const GlobalStyle = createGlobalStyle`
   /* Box sizing and root resets */
   *, *::before, *::after { box-sizing: border-box; }
-  html, body, main, #root { height: 100%; margin: 0; padding: 0; }
+  html, body, main, #root { height: 100%; margin: 0; padding: 0; --spacing: 0.25rem; }
   html { font-size: 16px; -webkit-text-size-adjust: 100%; }
 
   /* Base typography */

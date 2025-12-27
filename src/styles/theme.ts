@@ -2,23 +2,24 @@ import { DefaultTheme } from 'styled-components';
 
 export const theme: DefaultTheme = {
   colors: {
-    primary: '#2563eb',
-    background: '#f8fafc',
-    text: '#0f172a',
-    surface: '#ffffff',
-    muted: '#6b7280',
-    border: '#e6eef8',
+    primary: '#4a3ee7ff',
+    primaryForeground: '#ffffff',
+    background: '#ffffff',
+    text: '#030213', // Matches --foreground
+    surface: '#ffffff', // Matches --card
+    muted: '#ececf0', // Matches --muted
+    border: 'rgba(0, 0, 0, 0.1)', // Matches --border
     success: '#16a34a',
-    danger: '#ef4444',
-    focus: '#60a5fa',
+    danger: '#d4183d', // Matches --destructive
+    focus: '#030213',
   },
   fonts: {
-    body: "Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial",
-    mono: "Menlo, Monaco, 'Courier New', monospace",
+    body: 'ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
+    mono: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
   },
   radii: {
-    sm: '6px',
-    md: '8px',
-    lg: '12px',
+    sm: '0.375rem', // ≈ 6px
+    md: '0.5rem', // 8px (Standard Button Radius)
+    lg: '0.75rem', // 12px (Card Radius)
   },
 };
