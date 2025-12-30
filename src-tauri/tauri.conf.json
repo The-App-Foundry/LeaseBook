@@ -23,20 +23,16 @@
     "security": {
       "csp": "default-src asset: https://asset.localhost data: https",
       "assetProtocol": {
-          "enable": true,
-          "scope": ["$HOME/.local/share/com.openworld.leasebook/**"]
-        },
-        "capabilities": [
-            {
-                "identifier": "main-capability",
-                "windows": ["main"],
-                "permissions": [
-                    "core:default",
-                    "core:path:default",
-                    "core:app:default"
-                ]
-            }
-        ]
+        "enable": true,
+        "scope": ["$HOME/.local/share/com.openworld.leasebook/**"]
+      },
+      "capabilities": [
+        {
+          "identifier": "main-capability",
+          "windows": ["main"],
+          "permissions": ["core:default", "core:path:default", "core:app:default"]
+        }
+      ]
     }
   },
   "bundle": {
