@@ -7,6 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 LeaseBook is a cross-platform property management application built with Tauri v2, React 19, TypeScript, and styled-components. The application targets desktop (Linux, macOS, Windows), Android, and iOS platforms.
 
 **Tech Stack:**
+
 - **Frontend**: React 19 + TypeScript + Vite
 - **UI Styling**: styled-components with a custom theme system
 - **Backend**: Tauri v2 (Rust)
@@ -16,6 +17,7 @@ LeaseBook is a cross-platform property management application built with Tauri v
 ## Development Commands
 
 ### Frontend Development
+
 ```bash
 # Start Vite dev server only
 pnpm dev
@@ -31,6 +33,7 @@ pnpm preview
 ```
 
 ### Code Quality
+
 ```bash
 # Run ESLint
 pnpm lint
@@ -43,6 +46,7 @@ pnpm format
 ```
 
 ### Building
+
 ```bash
 # Build Tauri desktop app for production
 pnpm tauri:build
@@ -72,6 +76,7 @@ All components use styled-components with the following conventions:
 4. **Lucide Icons**: Import and wrap icons with styled-components for styling
 
 Example pattern:
+
 ```tsx
 const StyledIcon = styled(IconFromLucide)`
   height: 16px;
@@ -93,6 +98,7 @@ const StyledIcon = styled(IconFromLucide)`
 - **Configuration**: `src-tauri/tauri.conf.json` defines app metadata, build commands, window settings, and security policies
 
 The Tauri configuration specifies:
+
 - Dev server runs on port 1420
 - Frontend dist is `../dist` relative to `src-tauri/`
 - CSP policy: `default-src asset: https://asset.localhost data: https`
@@ -107,6 +113,7 @@ The Tauri configuration specifies:
 ## Theme Configuration
 
 The theme object (`src/styles/theme.ts`) provides:
+
 - **Colors**: primary, background, text, surface, muted, border, success, danger, focus
 - **Typography**: System font stacks for body and mono
 - **Radii**: sm (6px), md (8px), lg (12px)

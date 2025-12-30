@@ -12,7 +12,7 @@ export const theme: DefaultTheme = {
     success: '#16a34a',
     danger: '#d4183d', // Matches --destructive
     focus: '#030213',
-    hover: '#7a9bf5ff'
+    hover: '#7a9bf5ff',
   },
   fonts: {
     body: 'ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',

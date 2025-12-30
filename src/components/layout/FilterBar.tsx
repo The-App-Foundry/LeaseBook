@@ -17,13 +17,13 @@ const Wrapper = styled.div`
 `;
 
 const Label = styled.label`
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    margin-right: 25px;
-    font-weight: 600;
-`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-right: 25px;
+  font-weight: 600;
+`;
 
 const Funnel = styled(_Funnel)`
   stroke-width: 1.5px;
@@ -49,11 +49,7 @@ export default function FilterBar() {
           <Sort />
           <Dropdown
             buttonLabel="Sort by"
-            items={[
-              { title: 'Expiration' },
-              { title: 'Address' },
-              { title: 'Type' }
-            ]}
+            items={[{ title: 'Expiration' }, { title: 'Address' }, { title: 'Type' }]}
           />
         </Wrapper>
       </Card>
