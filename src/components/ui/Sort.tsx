@@ -35,9 +35,11 @@ export default function Sort() {
     setSortOrder(prevOrder => (prevOrder === 'asc' ? 'desc' : 'asc'));
   };
 
+  const tooltipText = `Sort: ${sortOrder === 'asc' ? 'ascending' : 'descending'}`;
+
   return (
-    <SortButton onClick={toggleSortOrder}>
-      {sortOrder === 'asc' ? <AUpDown /> : <ADownUp />}
+    <SortButton onClick={toggleSortOrder} title={tooltipText} aria-label={tooltipText}>
+      {sortOrder === 'asc' ? <AUpDown aria-hidden="true" /> : <ADownUp aria-hidden="true" />}
     </SortButton>
   );
 }

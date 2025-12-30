@@ -153,12 +153,7 @@ export default function Dropdown({ buttonLabel, items }: DropdownMenuProps) {
         <span>{open ? <ChevUp /> : <ChevDown />}</span>
       </Trigger>
       {open && (
-        <Menu
-          ref={menuDivRef}
-          $flipped={flipped}
-          role="menu"
-          aria-hidden={!open}
-        >
+        <Menu ref={menuDivRef} $flipped={flipped} role="menu" aria-hidden={!open}>
           <List>
             {items.map((item, idx) => (
               <Item key={idx} role="menuitem" tabIndex={0}>

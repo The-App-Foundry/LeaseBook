@@ -6,8 +6,8 @@ interface CardProps {
 }
 
 const Card = styled.div<CardProps>`
-  background-color: #fff;
-  border: 1px solid #edf2f7;
+  background: ${({ theme }) => theme.colors.surface};
+  border: 1px solid ${({ theme }) => theme.colors.border};
   border-radius: 0.5rem;
   box-shadow:
     0 1px 3px 0 rgba(0, 0, 0, 0.1),
