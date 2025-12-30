@@ -1,6 +1,7 @@
 import './App.css';
 import styled from 'styled-components';
 import { Header, FilterBar } from './components/layout';
+import GridContainer from './components/layout/GridContainer';
 
 const Content = styled.div`
   height: calc(100vh - var(--app-header-height));
@@ -17,6 +18,7 @@ function App() {
         <Header />
         <Content>
           <FilterBar />
+          <GridContainer />
         </Content>
       </>
     </main>
