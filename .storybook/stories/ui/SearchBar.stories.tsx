@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
 import { useState } from 'react';
 import { userEvent, within, expect } from 'storybook/test';
-import SearchBar from './SearchBar';
+import SearchBar from '../../../src/components/ui/SearchBar';
 
 const meta = {
   title: 'UI/SearchBar',
@@ -61,8 +61,9 @@ export const Interactive: Story = {
 };
 
 export const WithInteractionTest: Story = {
-  args: {
-    placeholder: 'Search properties...',
+  render: function InteractiveForTest() {
+    const [value, setValue] = useState('');
+    return <SearchBar value={value} onChange={setValue} placeholder="Search properties..." />;
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);

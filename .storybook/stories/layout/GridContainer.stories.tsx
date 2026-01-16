@@ -1,6 +1,16 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import GridContainer from './GridContainer';
-import Card from '../ui/Card';
+import GridContainer from '../../../src/components/layout/GridContainer';
+import Property from '../../../src/components/layout/Property';
+
+const sampleProperty = {
+  status: 'Active',
+  name: 'Harbor View Apartments',
+  businessAddr: '12 Harbor St, Portland, OR',
+  leaseExpiration: '2025-05-01',
+  decisionMaker: 'John Smith',
+  size: '2,100 sqft',
+  note: 'Recently renovated',
+};
 
 const meta = {
   title: 'Layout/GridContainer',
@@ -30,10 +40,10 @@ export const WithCards: Story = {
   args: {
     children: (
       <>
-        <Card>Item 1</Card>
-        <Card>Item 2</Card>
-        <Card>Item 3</Card>
-        <Card>Item 4</Card>
+        <Property data={sampleProperty} />
+        <Property data={{ ...sampleProperty, name: 'Corner Loft' }} />
+        <Property data={{ ...sampleProperty, name: 'Riverside Suite' }} />
+        <Property data={{ ...sampleProperty, name: 'Downtown Studio' }} />
       </>
     ),
   },
@@ -44,18 +54,15 @@ export const ManyItems: Story = {
     children: (
       <>
         {Array.from({ length: 12 }, (_, i) => (
-          <Card key={i} $height="100px">
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: '100%',
-              }}
-            >
-              Item {i + 1}
-            </div>
-          </Card>
+          <Property
+            key={i}
+            data={{
+              ...sampleProperty,
+              name: `Property ${i + 1}`,
+              businessAddr: `Address ${i + 1}`,
+              decisionMaker: `Contact ${i + 1}`,
+            }}
+          />
         ))}
       </>
     ),
@@ -75,12 +82,14 @@ export const WithContent: Story = {
     children: (
       <>
         {Array.from({ length: 6 }, (_, i) => (
-          <Card key={i}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <h4 style={{ margin: 0 }}>Card {i + 1}</h4>
-              <p style={{ margin: 0, fontSize: '14px' }}>Sample content for card {i + 1}</p>
-            </div>
-          </Card>
+          <Property
+            key={i}
+            data={{
+              ...sampleProperty,
+              name: `Card ${i + 1}`,
+              note: `Sample content for card ${i + 1}`,
+            }}
+          />
         ))}
       </>
     ),

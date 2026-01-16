@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { userEvent, within, expect } from 'storybook/test';
-import Sort from './Sort';
+import Sort from '../../../src/components/ui/Sort';
 
 const meta = {
   title: 'UI/Sort',
