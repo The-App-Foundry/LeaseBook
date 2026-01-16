@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
 import { Plus } from 'lucide-react';
-import Button from './Button';
+import Button from '../../../src/components/ui/Button';
 
 const meta = {
   title: 'UI/Button',

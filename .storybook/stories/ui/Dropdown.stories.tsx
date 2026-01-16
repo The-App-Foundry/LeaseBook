@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { userEvent, within, expect } from 'storybook/test';
 import { Home, Building, Factory } from 'lucide-react';
-import Dropdown from './Dropdown';
+import Dropdown from '../../../src/components/ui/Dropdown';
 
 const meta = {
   title: 'UI/Dropdown',

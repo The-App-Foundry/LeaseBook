@@ -20,6 +20,17 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", ".storybook", "vite.config.ts"],
+  "include": [
+    "src",
+    ".storybook",
+    "vite.config.ts",
+    ".storybook/stories/layout/FilterBar.stories.tsx",
+    ".storybook/stories/ui/Badge.stories.tsx",
+    ".storybook/stories/ui/Button.stories.tsx",
+    ".storybook/stories/ui/Card.stories.tsx",
+    ".storybook/stories/ui/Dropdown.stories.tsx",
+    ".storybook/stories/ui/SearchBar.stories.tsx",
+    ".storybook/stories/ui/Sort.stories.tsx"
+  ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

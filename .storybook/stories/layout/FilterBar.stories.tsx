@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import FilterBar from './FilterBar';
+import FilterBar from '../../../src/components/layout/FilterBar';
 
 const meta = {
   title: 'Layout/FilterBar',
