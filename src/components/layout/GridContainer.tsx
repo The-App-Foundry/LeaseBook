@@ -1,9 +1,6 @@
-import { useState } from 'react';
 import styled from 'styled-components';
-
-interface GridProps {
-  children?: React.ReactNode;
-}
+import Property from './Property';
+import { leases } from '../../data/leases';
 
 const Container = styled.div`
   display: grid;
@@ -16,6 +13,12 @@ const Container = styled.div`
   padding: 0 16px;
 `;
 
-export default function GridContainer({ children }: GridProps) {
-  return <Container>{children}</Container>;
+export default function GridContainer() {
+  return (
+    <Container>
+      {leases.map((l, i) => (
+        <Property key={i} data={l} />
+      ))}
+    </Container>
+  );
 }

@@ -1,19 +1,10 @@
 import styled from 'styled-components';
 import { Card } from '../ui';
 import { Building2, Calendar, User, Maximize2 } from 'lucide-react';
-
-type PropData = {
-  status: string;
-  name: string;
-  businessAddr: string;
-  leaseExpiration: string;
-  decisionMaker: string;
-  size: string;
-  note: string;
-};
+import { Lease } from '../../types/lease';
 
 interface PropertyProps {
-  data: PropData;
+  data: Lease;
 }
 
 // Overrides the base Card styles to ensure vertical stacking and uniform height
@@ -146,17 +137,16 @@ const NoteTitle = styled.div`
   margin-bottom: 2px;
 `;
 
-export default function Property({ data }: PropertyProps) {
+export default function Property({ data }: Readonly<PropertyProps>) {
   const { status, name, businessAddr, leaseExpiration, decisionMaker, size, note } = data;
   const initial = status ? status[0].toUpperCase() : '?';
 
-  // Logic to match colors from image_65c836
+  // Map statuses to colors (Qualified = green, Prospect = blue)
   const getStatusColor = (s: string) => {
-    if (s.toLowerCase().includes('prospect')) return '#10b981';
-    if (s.toLowerCase().includes('active')) return '#10b981';
-    if (s.toLowerCase().includes('warning')) return '#f59e0b';
-    if (s.toLowerCase().includes('expired')) return '#ef4444';
-    return '#10b981';
+    const v = s.toLowerCase();
+    if (v.includes('qualified')) return '#10b981'; // green
+    if (v.includes('prospect')) return '#3b82f6'; // blue
+    return '#6b7280'; // neutral gray fallback
   };
 
   return (
