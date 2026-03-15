@@ -22,12 +22,13 @@ fn parses_complex_workbook_from_unknown_extension() {
         .find(|sheet| sheet.name == "Leases")
         .expect("Leases sheet should exist");
 
-    assert!(matches!(leases_sheet.rows[0].cells[0], Cell::String(ref v) if v == "Property"));
-    assert!(matches!(leases_sheet.rows[1].cells[0], Cell::String(ref v) if v == "Sunset Villas"));
-    assert!(matches!(leases_sheet.rows[1].cells[1], Cell::Float(v) if (v - 1250.75).abs() < 0.001));
-    assert!(matches!(leases_sheet.rows[1].cells[2], Cell::Bool(true)));
-    assert!(matches!(leases_sheet.rows[1].cells[3], Cell::Date(_)));
-    assert!(matches!(leases_sheet.rows[2].cells[2], Cell::Bool(false)));
+    assert_eq!(leases_sheet.headers, vec!["Property", "Rent", "Active", "StartDate"]);
+    assert_eq!(leases_sheet.rows.len(), 2);
+    assert!(matches!(leases_sheet.rows[0].cells[0], Cell::String(ref v) if v == "Sunset Villas"));
+    assert!(matches!(leases_sheet.rows[0].cells[1], Cell::Float(v) if (v - 1250.75).abs() < 0.001));
+    assert!(matches!(leases_sheet.rows[0].cells[2], Cell::Bool(true)));
+    assert!(matches!(leases_sheet.rows[0].cells[3], Cell::Date(_)));
+    assert!(matches!(leases_sheet.rows[1].cells[2], Cell::Bool(false)));
 
     let metadata_sheet = parsed
         .sheets
@@ -35,9 +36,10 @@ fn parses_complex_workbook_from_unknown_extension() {
         .find(|sheet| sheet.name == "Metadata")
         .expect("Metadata sheet should exist");
 
-    assert!(matches!(metadata_sheet.rows[0].cells[0], Cell::String(ref v) if v == "Version"));
-    assert!(matches!(metadata_sheet.rows[0].cells[1], Cell::String(ref v) if v == "v0.1.0"));
-    assert!(matches!(metadata_sheet.rows[1].cells[1], Cell::Float(v) if (v - 42.0).abs() < 0.001));
+    assert_eq!(metadata_sheet.headers, vec!["Version", "v0.1.0"]);
+    assert_eq!(metadata_sheet.rows.len(), 1);
+    assert!(matches!(metadata_sheet.rows[0].cells[0], Cell::String(ref v) if v == "Records"));
+    assert!(matches!(metadata_sheet.rows[0].cells[1], Cell::Float(v) if (v - 42.0).abs() < 0.001));
 
     fs::remove_file(file_path).expect("test workbook should be removed");
 }
@@ -65,6 +67,66 @@ fn returns_open_workbook_error_for_missing_file() {
         matches!(result, Err(ParserError::OpenWorkbook(_))),
         "expected OpenWorkbook error for missing file path"
     );
+}
+
+#[test]
+fn prefers_top_text_header_over_late_dense_data_row() {
+    let mut workbook = Workbook::new();
+    let sheet = workbook.add_worksheet();
+    sheet
+        .set_name("Imported")
+        .expect("sheet name should be valid");
+
+    sheet
+        .write_string(1, 0, "Property")
+        .expect("write string should succeed");
+    sheet
+        .write_string(1, 1, "Address")
+        .expect("write string should succeed");
+    sheet
+        .write_string(1, 2, "Manager")
+        .expect("write string should succeed");
+
+    sheet
+        .write_string(2, 0, "Sunset Villas")
+        .expect("write string should succeed");
+    sheet
+        .write_string(2, 1, "120 Maple Ave")
+        .expect("write string should succeed");
+    sheet
+        .write_string(2, 2, "Alicia Gomez")
+        .expect("write string should succeed");
+
+    // Simulate a very dense data row much later in the sheet.
+    for col in 0..20 {
+        sheet
+            .write_number(2767, col, f64::from(col))
+            .expect("write number should succeed");
+    }
+
+    let bytes = workbook
+        .save_to_buffer()
+        .expect("workbook should serialize to bytes");
+
+    let file_path = unique_temp_path("header-detection", "xlsx");
+    fs::write(&file_path, bytes).expect("workbook bytes should be written");
+
+    let parsed = parse_spreadsheet_from_path(&file_path).expect("parser should parse workbook");
+    let imported = parsed
+        .sheets
+        .iter()
+        .find(|s| s.name == "Imported")
+        .expect("sheet should exist");
+
+    assert_eq!(imported.headers, vec!["Property", "Address", "Manager"]);
+    assert!(
+        imported.rows.iter().any(|row| {
+            matches!(row.cells.first(), Some(Cell::String(value)) if value == "Sunset Villas")
+        }),
+        "expected parsed data rows to start after the detected header"
+    );
+
+    fs::remove_file(file_path).expect("test workbook should be removed");
 }
 
 fn build_complex_workbook_file() -> std::path::PathBuf {

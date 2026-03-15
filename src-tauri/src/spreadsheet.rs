@@ -8,6 +8,7 @@ pub struct Spreadsheet {
 #[derive(Debug, Serialize)]
 pub struct Sheet {
     pub name: String,
+    pub headers: Vec<String>,
     pub rows: Vec<Row>,
 }
 

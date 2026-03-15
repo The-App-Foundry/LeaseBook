@@ -47,8 +47,23 @@ where
                 source,
             })?;
 
+        let header_row_index = detect_header_row_index(&range);
+        let headers = range
+            .rows()
+            .nth(header_row_index)
+            .map(|cells| {
+                let mut headers: Vec<String> = cells.iter().map(cell_to_header).collect();
+                // Some workbooks report header rows with trailing empty cells when later rows are wider.
+                while headers.last().is_some_and(|header| header.trim().is_empty()) {
+                    headers.pop();
+                }
+                headers
+            })
+            .unwrap_or_default();
+
         let rows = range
             .rows()
+            .skip(header_row_index.saturating_add(1))
             .map(|cells| Row {
                 cells: cells.iter().map(convert_cell).collect(),
             })
@@ -56,11 +71,58 @@ where
 
         sheets.push(Sheet {
             name: sheet_name,
+            headers,
             rows,
         });
     }
 
     Ok(Spreadsheet { sheets })
+}
+
+fn detect_header_row_index(range: &calamine::Range<Data>) -> usize {
+    let mut first_non_empty_row_index = None;
+
+    for (row_index, row) in range.rows().enumerate() {
+        let non_empty_count = row.iter().filter(|cell| !cell_is_empty(cell)).count();
+        if non_empty_count == 0 {
+            continue;
+        }
+
+        if first_non_empty_row_index.is_none() {
+            first_non_empty_row_index = Some(row_index);
+        }
+
+        let string_count = row
+            .iter()
+            .filter(|cell| matches!(cell, Data::String(value) if !value.trim().is_empty()))
+            .count();
+
+        // Prefer the first row that looks like headers: mostly text and at least two values.
+        if non_empty_count >= 2 && string_count * 2 >= non_empty_count {
+            return row_index;
+        }
+    }
+
+    first_non_empty_row_index.unwrap_or(0)
+}
+
+fn cell_is_empty(cell: &Data) -> bool {
+    match cell {
+        Data::Empty => true,
+        Data::String(value) => value.trim().is_empty(),
+        _ => false,
+    }
+}
+
+fn cell_to_header(cell: &Data) -> String {
+    match convert_cell(cell) {
+        Cell::Empty => String::new(),
+        Cell::String(value) => value,
+        Cell::Float(value) => value.to_string(),
+        Cell::Int(value) => value.to_string(),
+        Cell::Bool(value) => value.to_string(),
+        Cell::Date(value) => value.format("%Y-%m-%d %H:%M:%S").to_string(),
+    }
 }
 
 fn convert_cell(cell: &Data) -> Cell {
