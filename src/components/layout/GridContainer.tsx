@@ -1,6 +1,10 @@
 import styled from 'styled-components';
 import Property from './Property';
-import { leases } from '../../data/leases';
+import { Lease } from '../../types/lease';
+
+interface GridContainerProps {
+  leases: Lease[];
+}
 
 const Container = styled.div`
   display: grid;
@@ -13,7 +17,7 @@ const Container = styled.div`
   padding: 0 16px;
 `;
 
-export default function GridContainer() {
+export default function GridContainer({ leases }: Readonly<GridContainerProps>) {
   return (
     <Container>
       {leases.map((l, i) => (
