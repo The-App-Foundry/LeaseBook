@@ -2,9 +2,12 @@ use std::collections::HashMap;
 
 use serde::Serialize;
 use tauri::State;
+use tauri::State;
 
 use crate::models::{Lease as DbLease, LeaseManager, UpdateLease, UpdateLeaseInput, UpdateManager, UpdateManagerInput};
+use crate::models::{Lease as DbLease, LeaseManager, UpdateLease, UpdateLeaseInput, UpdateManager, UpdateManagerInput};
 use crate::parser::parse_spreadsheet_from_path;
+use crate::property::Lease;
 use crate::property::Lease;
 use crate::prop_map::map_spreadsheet_to_leases;
 use crate::spreadsheet::Spreadsheet;
@@ -37,41 +40,15 @@ impl From<Spreadsheet> for SpreadsheetPreview {
   }
 }
 
-#[derive(Serialize)]
-pub struct SpreadsheetPreview {
-    pub sheets: Vec<SheetPreview>,
-}
-
-#[derive(Serialize)]
-pub struct SheetPreview {
-    pub name: String,
-    pub headers: Vec<String>,
-}
-
-impl From<Spreadsheet> for SpreadsheetPreview {
-    fn from(spreadsheet: Spreadsheet) -> Self {
-        Self {
-            sheets: spreadsheet
-                .sheets
-                .into_iter()
-                .map(|sheet| SheetPreview {
-                    name: sheet.name,
-                    headers: sheet.headers,
-                })
-                .collect(),
-        }
-    }
-}
-
 #[tauri::command]
 pub fn parse_spreadsheet(path: String) -> Result<SpreadsheetPreview, String> {
   parse_spreadsheet_from_path(&path)
       .map(SpreadsheetPreview::from)
       .map_err(|error| error.to_string())
 pub fn parse_spreadsheet(path: String) -> Result<SpreadsheetPreview, String> {
-    parse_spreadsheet_from_path(&path)
-        .map(SpreadsheetPreview::from)
-        .map_err(|error| error.to_string())
+  parse_spreadsheet_from_path(&path)
+      .map(SpreadsheetPreview::from)
+      .map_err(|error| error.to_string())
 }
 
 #[tauri::command]
