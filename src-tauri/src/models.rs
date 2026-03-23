@@ -1,6 +1,7 @@
 use diesel::prelude::*;
+use serde::{Deserialize, Serialize};
 
-#[derive(Queryable, Selectable, Identifiable, PartialEq, Debug)]
+#[derive(Queryable, Selectable, Identifiable, PartialEq, Debug, Serialize)]
 #[diesel(table_name = crate::schema::leases)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
 pub struct Lease {
@@ -14,7 +15,7 @@ pub struct Lease {
   pub last_modified: Option<i32>
 }
 
-#[derive(Queryable, Selectable, Identifiable, PartialEq, Debug)]
+#[derive(Queryable, Selectable, Identifiable, PartialEq, Debug, Serialize)]
 #[diesel(table_name = crate::schema::lease_managers)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
 pub struct LeaseManager {
@@ -26,7 +27,7 @@ pub struct LeaseManager {
   pub last_modified: Option<i32>
 }
 
-#[derive(Identifiable, Selectable, Queryable, Associations, Debug)]
+#[derive(Identifiable, Selectable, Queryable, Associations, Debug, Insertable)]
 #[diesel(belongs_to(Lease, foreign_key = lease_id))]
 #[diesel(belongs_to(LeaseManager, foreign_key = manager_id))]
 #[diesel(table_name = crate::schema::leases_managers)]
@@ -67,4 +68,24 @@ pub struct UpdateManager<'a> {
   pub email: Option<&'a str>,
   pub last_modified: Option<&'a i32>,
   pub name: Option<&'a str>
+}
+
+/// Owned equivalent of [`UpdateLease`] used as a Tauri command argument.
+#[derive(Deserialize)]
+pub struct UpdateLeaseInput {
+  pub name: Option<String>,
+  pub address: Option<String>,
+  pub expiration_date: Option<i32>,
+  pub notes: Option<String>,
+  pub misc_data: Option<String>,
+  pub last_modified: Option<i32>,
+}
+
+/// Owned equivalent of [`UpdateManager`] used as a Tauri command argument.
+#[derive(Deserialize)]
+pub struct UpdateManagerInput {
+  pub phone_numbers: Option<String>,
+  pub email: Option<String>,
+  pub last_modified: Option<i32>,
+  pub name: Option<String>,
 }
