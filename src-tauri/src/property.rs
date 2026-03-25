@@ -1,7 +1,7 @@
 use chrono::{DateTime, Utc};
-use serde::Serialize;
+use serde::{Serialize, Deserialize};
 
-#[derive(Debug, Serialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Lease {
   pub name: String,
   pub address: String,
@@ -13,7 +13,7 @@ pub struct Lease {
   pub misc_data: String,
 }
 
-#[derive(Debug, Default, Serialize, Clone)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone)]
 pub struct LeaseManager {
   pub name: String,
   pub email: String,

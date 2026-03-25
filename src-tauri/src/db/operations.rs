@@ -1,11 +1,17 @@
 use diesel::{prelude::*};
 
-use crate::models::{NewLease, Lease, NewManager, LeaseManager, LeasesManagers, UpdateLease, UpdateManager};
+use crate::models::{Lease, LeaseManager, LeasesManagers, NewLease, NewManager, UpdateLease, UpdateManager};
 
 pub fn create_lease(conn: &mut SqliteConnection, name: &str, address: &str) -> Result<Lease, diesel::result::Error> {
   use crate::schema::leases;
 
-  let new_lease = NewLease { name, address };
+  let new_lease = NewLease { 
+    name,
+    address,
+    expiration_date: None,
+    notes: None,
+    misc_data: None
+  };
 
   diesel::insert_into(leases::table)
     .values(&new_lease)
@@ -203,4 +209,32 @@ pub fn delete_manager(conn: &mut SqliteConnection, manager_id: &i32) -> Result<u
       )
     ).execute(conn)
   })
+}
+
+pub fn import_leases(
+    conn: &mut SqliteConnection,
+    leases: &[crate::property::Lease],
+) -> Result<Vec<Lease>, diesel::result::Error> {
+    conn.transaction(|conn| {
+        leases.iter().map(|lease| {
+            let new_lease = NewLease {
+                name: &lease.name,
+                address: &lease.address,
+                expiration_date: lease.expiration_date.map(|dt| dt.timestamp() as i32),
+                notes: Some(&lease.notes).filter(|s| !s.is_empty()).map(|s| s.as_str()),
+                misc_data: Some(&lease.misc_data).filter(|s| !s.is_empty()).map(|s| s.as_str()),
+            };
+            let db_lease = diesel::insert_into(crate::schema::leases::table)
+                .values(&new_lease)
+                .returning(Lease::as_returning())
+                .get_result(conn)?;
+
+            // Insert manager if present
+            if !lease.lease_manager.name.is_empty() {
+                create_manager(conn, &lease.lease_manager.name, db_lease.id)?;
+                // optionally update phone/email on the returned manager
+            }
+            Ok(db_lease)
+        }).collect()
+    })
 }
