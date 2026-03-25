@@ -188,7 +188,7 @@ pub fn move_manager(
 }
 
 #[tauri::command]
-pub fn delete_manager(
+pub fn prune(
   pool: State<'_, DbPool>,
   manager_id: i32
 ) -> Result<(), String> {
@@ -209,4 +209,26 @@ pub fn remove_lease(
   let _ = delete_lease(&mut conn, lease_id);
 
   Ok(())
+}
+
+#[tauri::command]
+pub fn delete(
+  pool: State<'_, DbPool>,
+  manager_id: i32
+) -> Result<(), String> {
+  let mut conn = pool.get().map_err(|error| error.to_string())?;
+
+  let _ =  delete_manager(&mut conn, &manager_id);
+
+  Ok(())
+}
+
+#[tauri::command]
+pub fn import_parsed_leases(
+    pool: State<'_, DbPool>,
+    leases: Vec<crate::property::Lease>,
+) -> Result<Vec<crate::models::Lease>, String> {
+    let mut conn = pool.get().map_err(|e| e.to_string())?;
+
+    import_leases(&mut conn, &leases).map_err(|e| e.to_string())
 }

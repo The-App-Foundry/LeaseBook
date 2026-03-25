@@ -42,6 +42,9 @@ pub struct LeasesManagers {
 pub struct NewLease<'a> {
   pub name: &'a str,
   pub address: &'a str,
+  pub expiration_date: Option<i32>,
+  pub notes: Option<&'a str>,
+  pub misc_data: Option<&'a str>
 }
 
 #[derive(Insertable)]

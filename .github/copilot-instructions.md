@@ -2,169 +2,105 @@
 
 ## Quick Context
 
-LeaseBook is a **cross-platform desktop property management app** (Tauri v2 + React 19 + TypeScript). Early-stage (v0.1.0, branch: `2-ui---basic-components`). Build and test commands differ from typical React apps due to Tauri desktop integration.
+LeaseBook is a **cross-platform desktop property management app** (Tauri v2 + React 19 + TypeScript + Rust/Diesel). Full reference: [CLAUDE.md](../CLAUDE.md). Build/test commands differ from typical React apps due to Tauri desktop integration.
 
-## Critical Build & Test Commands
+## Build & Test Commands
 
-**Frontend only (no Tauri window):**
+**Frontend:**
 
-- `pnpm dev` - Vite dev server on port 1420
-- `pnpm build` - TypeScript + Vite build (outputs to `dist/`)
-- `pnpm lint` / `pnpm lint:fix` - ESLint check/fix
-- `pnpm format` - Prettier formatting
+- `pnpm dev` — Vite dev server (port 1420)
+- `pnpm build` — TypeScript + Vite build → `dist/`
+- `pnpm lint` / `pnpm lint:fix` — ESLint
+- `pnpm format` — Prettier
 
-**Full desktop app (with Tauri):**
+**Full desktop app:**
 
-- `pnpm tauri:dev` - Desktop app with hot-reload (filters Gdk warnings on Linux)
-- `pnpm tauri:build` - Bundled desktop app for distribution
+- `pnpm tauri:dev` — Desktop app with hot-reload (filters Gdk warnings on Linux)
+- `pnpm tauri:build` — Bundled desktop build
 
-## Architecture Essentials
+**Testing:**
+
+- `pnpm test:browser` — Vitest browser tests (Playwright/Chromium); place test files alongside components as `*.test.tsx`
+- `pnpm storybook` — Storybook dev server (port 6006); stories live alongside components as `*.stories.tsx`
+- `pnpm test:vis` — Chromatic visual regression tests (CI)
+- `pnpm build-storybook` — Build static Storybook
+
+## Architecture
 
 ### Frontend: styled-components + Theme System
 
-The app uses **styled-components exclusively** with a centralized theme, not CSS files.
+**No CSS files** — all styling goes in styled-components within `.tsx` files.
 
-**Critical patterns:**
+Critical patterns:
 
-1. **Transient props** with `$` prefix (e.g., `$variant`, `$width`) to prevent React DOM warnings
-2. **Theme access** via `${({ theme }) => theme.colors.primary}` from [src/styles/theme.ts](src/styles/theme.ts)
-3. **CSS Variables** for layout: `--app-header-height`, `--spacing: 0.25rem`
-4. **Lucide icons** wrapped with styled-components (see [src/components/ui/Button.tsx](src/components/ui/Button.tsx#L1-L30))
-
-**Component example:**
-
-```tsx
-const StyledIcon = styled(IconFromLucide)`
-  height: 16px;
-  width: 16px;
-  color: ${({ theme }) => theme.colors.primary};
-`;
-```
+1. **Transient props** — `$` prefix (e.g., `$variant`, `$width`) prevents React DOM warnings
+2. **Theme access** — `${({ theme }) => theme.colors.primary}` from [src/styles/theme.ts](src/styles/theme.ts)
+3. **CSS Variables** — `--app-header-height`, `--spacing: 0.25rem` for layout
+4. **Lucide icons** — wrap with `styled(IconName)` for sizing/color
 
 ### Component Organization
 
-- `src/components/ui/` - Reusable primitives (Button, Card, Badge, SearchBar, Sort)
-- `src/components/layout/` - Layout containers (Header, FilterBar)
-- **Barrel exports** via `index.ts` in each directory for clean imports
+- `src/components/ui/` — Reusable primitives (Button, Card, Badge, SearchBar, Sort, Dropdown)
+- `src/components/layout/` — Layout containers (Header, FilterBar, GridContainer)
+- **Barrel exports** via `index.ts` in each directory
+- **Fixed header**: `position: fixed`, `z-index: 20`, `--app-header-height` CSS var; content uses `padding-top: var(--app-header-height)`
 
-### Fixed Header Layout
+### State Management
 
-- Header is `position: fixed`, `z-index: 20`, defined via CSS variable `--app-header-height`
-- Content areas use `padding-top: var(--app-header-height)` and `calc(100vh - var(--app-header-height))` for height
-- See [src/App.tsx](src/App.tsx) for the pattern
+Use React Context for shared state. Pattern:
 
-### Tauri Backend Integration
+1. Create `src/context/FooContext.tsx` with `React.createContext<State>()`
+2. Wrap tree in [src/main.tsx](src/main.tsx) after `ThemeProvider`
+3. Consume via `useContext(FooContext)`
 
-- **Entry point**: [src-tauri/src/lib.rs](src-tauri/src/lib.rs) exports `run()`
-- **Custom commands**: Define in [src-tauri/src/commands.rs](src-tauri/src/commands.rs), register in `lib.rs`
-- **Dev server**: Tauri listens on port 1420 for frontend (`src-tauri/tauri.conf.json`)
-- **CSP policy**: `default-src asset: https://asset.localhost data: https`
-- **Asset scope**: `$HOME/.local/share/com.openworld.leasebook/**`
+Avoid global state libraries until Context + useReducer is insufficient.
 
-## Code Style & Tooling
+### Tauri Backend (Rust)
 
-| Tool           | Config              | Notes                                               |
-| -------------- | ------------------- | --------------------------------------------------- |
-| **ESLint**     | `eslint.config.cjs` | Flat config, TypeScript + React + a11y plugins      |
-| **Prettier**   | `.prettierrc`       | 100-char line width, single quotes, LF line endings |
-| **TypeScript** | `tsconfig.json`     | Strict mode, unused locals/params checked           |
+- **Commands**: Define in [src-tauri/src/commands.rs](src-tauri/src/commands.rs), register in [src-tauri/src/lib.rs](src-tauri/src/lib.rs) via `tauri::generate_handler![]`
+- **Database**: SQLite via Diesel ORM. Models in [src-tauri/src/models.rs](src-tauri/src/models.rs), schema in [src-tauri/src/schema.rs](src-tauri/src/schema.rs), CRUD in [src-tauri/src/db/operations.rs](src-tauri/src/db/operations.rs)
+- **Migrations**: [src-tauri/migrations/](src-tauri/migrations/) — run via `diesel migration run`
+- **Spreadsheet import**: calamine-based parser in [src-tauri/src/parser.rs](src-tauri/src/parser.rs); column→lease mapping in [src-tauri/src/prop_map.rs](src-tauri/src/prop_map.rs)
+- **Return types**: Use `Result<T, String>` — serde serializes to JSON automatically
+- **CSP**: `default-src asset: https://asset.localhost data: https`
 
-## Project-Specific Conventions
+## Conventions
 
-1. **No CSS files** - All styling goes in styled-components within `.tsx` files
-2. **Theme typing** - [src/styles/styled.d.ts](src/styles/styled.d.ts) extends `DefaultTheme` for autocomplete
-3. **Global styles** - [src/styles/global.ts](src/styles/global.ts) contains resets; injected via `GlobalStyle` in [src/main.tsx](src/main.tsx)
-4. **Branch workflow** - Feature branches merge to `base` (default), current dev is `2-ui---basic-components`
-
-## Developer Workflows
-
-### Testing
-
-- No test framework configured yet; add when needed for feature branches
-- ESLint validation runs during development; fix issues before committing
-- Type checking in strict mode ensures compile-time safety
-
-### Debugging
-
-**Frontend**: Open DevTools with `Ctrl+Shift+I` in dev mode (`pnpm tauri:dev`)
-**Tauri backend**: Add println! macros in Rust, output appears in terminal running `pnpm tauri:dev`
-**Desktop window**: Inspect element same as browser DevTools; respects CSP policy
-
-### Android/Mobile Builds
-
-- Gradle configs in `src-tauri/gen/android/` (auto-generated)
-- Build via `pnpm tauri:build` with appropriate target flags
-- Window size (800x600) may need responsive adjustments for mobile
-
-## Tauri Command Patterns
-
-Commands bridge frontend (TypeScript) and backend (Rust). Define and invoke like:
-
-**Backend** ([src-tauri/src/commands.rs](src-tauri/src/commands.rs)):
-
-```rust
-#[tauri::command]
-pub fn my_command(input: String) -> Result<String, String> {
-  // Process input
-  Ok(format!("Processed: {}", input))
-}
-```
-
-**Register in** [src-tauri/src/lib.rs](src-tauri/src/lib.rs):
-
-```rust
-.invoke_handler(tauri::generate_handler![my_command])
-```
-
-**Frontend invocation** (React component):
-
-```tsx
-import { invoke } from '@tauri-apps/api/core';
-
-const result = await invoke('my_command', { input: 'data' });
-```
-
-**Return types**: Use `Result<T, String>` for error handling; serde serializes to JSON automatically.
-
-## State Management with Context
-
-Use React Context for shared state when viable (properties, user settings, filtered data).
-
-**Pattern**:
-
-1. Create context: `src/context/PropertyContext.tsx` with `React.createContext<State>()`
-2. Provider component wraps tree in `src/main.tsx` after `ThemeProvider`
-3. Components consume via `useContext(PropertyContext)`
-4. Colocate state logic (reducers, effects) near context file
-
-Avoid: Global state libraries until Context + useReducer becomes unwieldy. Keep context-dependent components in their own sub-directories under `src/components/` for clarity.
+| Concern         | Rule                                                                                                    |
+| --------------- | ------------------------------------------------------------------------------------------------------- |
+| Styling         | styled-components only; theme values, never hardcoded colors                                            |
+| Theme types     | [src/styles/styled.d.ts](src/styles/styled.d.ts) extends `DefaultTheme`                                 |
+| Global styles   | [src/styles/global.ts](src/styles/global.ts) injected via `GlobalStyle` in [src/main.tsx](src/main.tsx) |
+| Branch workflow | Feature branches → PR → `base` (default branch)                                                         |
+| Commits         | `type(scope): summary\n\n- change 1\n- change 2`                                                        |
 
 ## When Adding Features
 
-- **New UI component?** → Create in `src/components/ui/`, add to barrel export
-- **Need Tauri backend command?** → Add to `src-tauri/src/commands.rs`, register in `lib.rs`, expose via `@tauri-apps/api`
-- **New layout?** → Create in `src/components/layout/`
-- **New colors/theme?** → Update [src/styles/theme.ts](src/styles/theme.ts) and rebuild (`pnpm dev` or `pnpm tauri:dev`)
-- **Shared state?** → Create Context in `src/context/`, wrap at `src/main.tsx`
+- **New UI component** → `src/components/ui/`, add to `index.ts` barrel
+- **New layout** → `src/components/layout/`
+- **New theme tokens** → [src/styles/theme.ts](src/styles/theme.ts)
+- **Shared state** → `src/context/`, wrap in [src/main.tsx](src/main.tsx)
+- **Tauri command** → [src-tauri/src/commands.rs](src-tauri/src/commands.rs) + register in `lib.rs`
+- **DB model change** → add Diesel migration, update [src-tauri/src/models.rs](src-tauri/src/models.rs) and [src-tauri/src/schema.rs](src-tauri/src/schema.rs)
 
 ## Key Dependencies
 
-- **@tauri-apps/api@2** - IPC and OS plugin APIs
-- **@tauri-apps/plugin-fs** - File system access
-- **@tauri-apps/plugin-opener** - Open URLs/files
-- **lucide-react** - Icon library
-- **styled-components@6** - CSS-in-JS (exclusive styling approach)
+- **@tauri-apps/api@2** — IPC and OS plugin APIs
+- **@tauri-apps/plugin-fs** — File system access
+- **@tauri-apps/plugin-dialog** — Native file/dialog pickers
+- **@tauri-apps/plugin-opener** — Open URLs/files
+- **lucide-react** — Icon library
+- **styled-components@6** — CSS-in-JS (exclusive)
+- **Diesel (Rust)** — SQLite ORM; `diesel_cli` needed for migrations
 
 ## Known Quirks
 
-- Tauri dev mode filters Gdk-CRITICAL warnings on Linux via grep in `pnpm tauri:dev` script
+- Tauri dev mode filters Gdk-CRITICAL warnings on Linux via grep in the `tauri:dev` script
 - Vite watch ignores `src-tauri/` to prevent recompile conflicts (see `vite.config.ts`)
-- Window size is 800x600 (defined in `tauri.conf.json`)
-- App identifier: `com.openworldapps.leasebook` (used in asset scope paths)
+- Window size 800×600 defined in `tauri.conf.json`; app identifier: `com.openworldapps.leasebook`
+- Vitest browser tests require Playwright installed (`pnpm exec playwright install`)
 
-## Generating commit messages
-
-When generating commit messages, format in the following format:
+## Generating Commit Messages
 
 ```text
 type(scope): summary

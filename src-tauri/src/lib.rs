@@ -41,10 +41,11 @@ pub fn run() {
             commands::edit_manager,
             commands::move_manager,
             commands::unassign_manager,
-            commands::delete_manager,
+            commands::prune,
             commands::remove_lease,
             commands::parse_spreadsheet,
-            commands::parse_spreadsheet_to_leases
+            commands::parse_spreadsheet_to_leases,
+            commands::import_parsed_leases
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
