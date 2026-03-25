@@ -2,12 +2,9 @@ use std::collections::HashMap;
 
 use serde::Serialize;
 use tauri::State;
-use tauri::State;
 
 use crate::models::{Lease as DbLease, LeaseManager, UpdateLease, UpdateLeaseInput, UpdateManager, UpdateManagerInput};
-use crate::models::{Lease as DbLease, LeaseManager, UpdateLease, UpdateLeaseInput, UpdateManager, UpdateManagerInput};
 use crate::parser::parse_spreadsheet_from_path;
-use crate::property::Lease;
 use crate::property::Lease;
 use crate::prop_map::map_spreadsheet_to_leases;
 use crate::spreadsheet::Spreadsheet;
@@ -41,10 +38,6 @@ impl From<Spreadsheet> for SpreadsheetPreview {
 }
 
 #[tauri::command]
-pub fn parse_spreadsheet(path: String) -> Result<SpreadsheetPreview, String> {
-  parse_spreadsheet_from_path(&path)
-      .map(SpreadsheetPreview::from)
-      .map_err(|error| error.to_string())
 pub fn parse_spreadsheet(path: String) -> Result<SpreadsheetPreview, String> {
   parse_spreadsheet_from_path(&path)
       .map(SpreadsheetPreview::from)
