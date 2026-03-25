@@ -42,6 +42,7 @@ pub fn run() {
             commands::move_manager,
             commands::unassign_manager,
             commands::prune,
+            commands::delete,
             commands::remove_lease,
             commands::parse_spreadsheet,
             commands::parse_spreadsheet_to_leases,
