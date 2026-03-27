@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import { Upload, Table2, Link2 } from 'lucide-react';
 import { Button, Card } from '../ui';
 import type { Lease } from '../../types/lease';
+import { detectManagers } from '../../utils/managerDetect';
 
 type LeaseFieldKey =
   | 'name'
@@ -163,15 +164,35 @@ function autoDetectHeaders(headers: string[]): Record<LeaseFieldKey, string> {
 }
 
 function convertBackendLeasesToUi(rows: BackendLease[]): Lease[] {
-  return rows.map(item => ({
-    status: item.expired ? 'prospect' : 'qualified',
-    name: item.name || 'Unnamed',
-    businessAddr: item.address || '-',
-    leaseExpiration: item.expiration_date ? item.expiration_date.slice(0, 10) : '-',
-    decisionMaker: item.lease_manager?.name || '-',
-    size: '-',
-    note: item.notes || item.misc_data || undefined,
-  }));
+  return rows.map(item => {
+    // Build a raw string from all available manager fields for auto-detection
+    const rawParts = [
+      item.lease_manager?.name,
+      item.lease_manager?.phone_number,
+      item.lease_manager?.email,
+    ].filter(Boolean);
+    const rawManagerStr = rawParts.join(' ');
+
+    const { managers } = detectManagers(rawManagerStr);
+    const displayName = managers.map(m => m.name).join(', ') || '-';
+
+    // If no managers were detected but backend had a name, create an unverified entry
+    const finalManagers =
+      managers.length === 0 && item.lease_manager?.name
+        ? [{ id: `mgr-${Date.now()}-fallback`, name: item.lease_manager.name, verified: false }]
+        : managers;
+
+    return {
+      status: item.expired ? 'prospect' : 'qualified',
+      name: item.name || 'Unnamed',
+      businessAddr: item.address || '-',
+      leaseExpiration: item.expiration_date ? item.expiration_date.slice(0, 10) : '-',
+      decisionMaker: displayName,
+      managers: finalManagers,
+      size: '-',
+      note: item.notes || item.misc_data || undefined,
+    };
+  });
 }
 
 function getFileName(path: string): string {

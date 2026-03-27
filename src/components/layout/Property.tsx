@@ -1,10 +1,13 @@
+import { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import { Card } from '../ui';
-import { Building2, Calendar, User, Maximize2 } from 'lucide-react';
-import { Lease } from '../../types/lease';
+import { Building2, Calendar, User, Maximize2, MoreVertical, Users } from 'lucide-react';
+import { Lease, Manager } from '../../types/lease';
+import DecisionMakersModal from './DecisionMakersModal';
 
 interface PropertyProps {
   data: Lease;
+  onManagersChange?: (managers: Manager[]) => void;
 }
 
 // Overrides the base Card styles to ensure vertical stacking and uniform height
@@ -137,9 +140,100 @@ const NoteTitle = styled.div`
   margin-bottom: 2px;
 `;
 
-export default function Property({ data }: Readonly<PropertyProps>) {
-  const { status, name, businessAddr, leaseExpiration, decisionMaker, size, note } = data;
+const CardHeader = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  position: relative;
+`;
+
+const MenuBtn = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  border: none;
+  background: transparent;
+  border-radius: ${({ theme }) => theme.radii.sm};
+  color: #6b7280;
+  cursor: pointer;
+
+  &:hover {
+    background: ${({ theme }) => theme.colors.muted};
+  }
+`;
+
+const MenuPanel = styled.div`
+  position: absolute;
+  right: 0;
+  top: 2rem;
+  z-index: 10;
+  min-width: 180px;
+  background: ${({ theme }) => theme.colors.surface};
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  border-radius: ${({ theme }) => theme.radii.md};
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  padding: 0.25rem 0;
+`;
+
+const MenuItem = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: none;
+  background: transparent;
+  font-size: 0.825rem;
+  color: ${({ theme }) => theme.colors.text};
+  cursor: pointer;
+  text-align: left;
+
+  &:hover {
+    background: ${({ theme }) => theme.colors.muted};
+  }
+`;
+
+const DecisionMakerValue = styled.div<{ $verified: boolean }>`
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: ${({ $verified, theme }) => ($verified ? '#1f2937' : theme.colors.danger)};
+`;
+
+export default function Property({ data, onManagersChange }: Readonly<PropertyProps>) {
+  const {
+    status,
+    name,
+    businessAddr,
+    leaseExpiration,
+    decisionMaker,
+    managers = [],
+    size,
+    note,
+  } = data;
   const initial = status ? status[0].toUpperCase() : '?';
+
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [dmModalOpen, setDmModalOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Determine verification status from managers array
+  const allVerified = managers.length > 0 && managers.every(m => m.verified);
+
+  // Close hamburger on outside click
+  useEffect(() => {
+    if (!menuOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [menuOpen]);
 
   // Map statuses to colors (Qualified = green, Prospect = blue)
   const getStatusColor = (s: string) => {
@@ -151,6 +245,31 @@ export default function Property({ data }: Readonly<PropertyProps>) {
 
   return (
     <StyledCard>
+      <CardHeader ref={menuRef}>
+        <MenuBtn
+          onClick={() => setMenuOpen(prev => !prev)}
+          aria-haspopup="menu"
+          aria-expanded={menuOpen}
+          aria-label="Card actions"
+        >
+          <MoreVertical size={16} />
+        </MenuBtn>
+        {menuOpen && (
+          <MenuPanel role="menu">
+            <MenuItem
+              role="menuitem"
+              onClick={() => {
+                setMenuOpen(false);
+                setDmModalOpen(true);
+              }}
+            >
+              <Users size={14} />
+              Manage Decision Makers
+            </MenuItem>
+          </MenuPanel>
+        )}
+      </CardHeader>
+
       <TopRow>
         <StatusColumn>
           <LargeBadge $color={getStatusColor(status)}>{initial}</LargeBadge>
@@ -178,7 +297,7 @@ export default function Property({ data }: Readonly<PropertyProps>) {
           <User size={16} color="#9ca3af" />
           <div>
             <DetailLabel>Decision Maker</DetailLabel>
-            <DetailValue>{decisionMaker}</DetailValue>
+            <DecisionMakerValue $verified={allVerified}>{decisionMaker}</DecisionMakerValue>
           </div>
         </DetailBlock>
         <DetailBlock>
@@ -194,6 +313,13 @@ export default function Property({ data }: Readonly<PropertyProps>) {
         <NoteTitle>Notes</NoteTitle>
         <div style={{ fontSize: '0.8rem', color: '#4b5563' }}>{note || ' '}</div>
       </NoteArea>
+
+      <DecisionMakersModal
+        isOpen={dmModalOpen}
+        onClose={() => setDmModalOpen(false)}
+        managers={managers}
+        onUpdate={updated => onManagersChange?.(updated)}
+      />
     </StyledCard>
   );
 }

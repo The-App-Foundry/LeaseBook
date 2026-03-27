@@ -3,8 +3,7 @@ import { useState } from 'react';
 import styled from 'styled-components';
 import { Header, FilterBar, WorkbookImportFlow } from './components/layout';
 import GridContainer from './components/layout/GridContainer';
-import { leases as initialLeases } from './data/leases';
-import type { Lease } from './types/lease';
+import type { Lease, Manager } from './types/lease';
 
 const Content = styled.div`
   height: calc(100vh - var(--app-header-height));
@@ -15,7 +14,20 @@ const Content = styled.div`
 `;
 
 function App() {
-  const [leases, setLeases] = useState<Lease[]>(initialLeases);
+  const [leases, setLeases] = useState<Lease[]>([]);
+
+  const handleManagersChange = (leaseIndex: number, managers: Manager[]) => {
+    setLeases(prev =>
+      prev.map((lease, i) => {
+        if (i !== leaseIndex) return lease;
+        return {
+          ...lease,
+          managers,
+          decisionMaker: managers.map(m => m.name).join(', ') || '-',
+        };
+      }),
+    );
+  };
 
   return (
     <main>
@@ -24,7 +36,7 @@ function App() {
         <Content>
           <WorkbookImportFlow onImported={setLeases} />
           <FilterBar />
-          <GridContainer leases={leases} />
+          <GridContainer leases={leases} onManagersChange={handleManagersChange} />
         </Content>
       </>
     </main>
