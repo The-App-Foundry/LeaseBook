@@ -38,7 +38,11 @@ const Input = styled.input`
   }
 `;
 
-export default function SearchBar({ value, onChange, placeholder = 'Search...' }: SearchBarProps) {
+export default function SearchBar({
+  value,
+  onChange,
+  placeholder = 'Search...',
+}: Readonly<SearchBarProps>) {
   return (
     <Container>
       <Search aria-hidden="true" />

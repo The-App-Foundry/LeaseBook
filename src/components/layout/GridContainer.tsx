@@ -1,9 +1,10 @@
 import styled from 'styled-components';
 import Property from './Property';
-import { Lease } from '../../types/lease';
+import { Lease, Manager } from '../../types/lease';
 
 interface GridContainerProps {
   leases: Lease[];
+  onManagersChange?: (leaseIndex: number, managers: Manager[]) => void;
 }
 
 const Container = styled.div`
@@ -17,11 +18,11 @@ const Container = styled.div`
   padding: 0 16px;
 `;
 
-export default function GridContainer({ leases }: Readonly<GridContainerProps>) {
+export default function GridContainer({ leases, onManagersChange }: Readonly<GridContainerProps>) {
   return (
     <Container>
       {leases.map((l, i) => (
-        <Property key={i} data={l} />
+        <Property key={i} data={l} onManagersChange={managers => onManagersChange?.(i, managers)} />
       ))}
     </Container>
   );
