@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import { Card } from '../ui';
 import { Building2, Calendar, User, Maximize2, MoreVertical, Users } from 'lucide-react';
@@ -139,6 +139,31 @@ const NoteTitle = styled.div`
   color: #9ca3af;
   margin-bottom: 2px;
 `;
+
+const NoteText = styled.div`
+  font-size: 0.8rem;
+  color: #4b5563;
+  overflow-wrap: break-word;
+  word-break: break-word;
+`;
+
+// Matches common phone number formats, e.g. +1 (800) 555-1234, 555.867.5309, etc.
+const PHONE_REGEX = /(\+?\b\d[\d\s\-().]{6,}\d\b)/g;
+
+function formatNoteText(text: string): React.ReactNode[] {
+  // split() with a capturing group interleaves non-matches and captures:
+  // [non-match, phone, non-match, phone, ...]
+  const parts = text.split(PHONE_REGEX);
+  return parts.map((part, i) =>
+    i % 2 === 1 ? (
+      <span key={i} style={{ whiteSpace: 'nowrap' }}>
+        {part}
+      </span>
+    ) : (
+      <React.Fragment key={i}>{part}</React.Fragment>
+    ),
+  );
+}
 
 const CardHeader = styled.div`
   display: flex;
@@ -311,7 +336,7 @@ export default function Property({ data, onManagersChange }: Readonly<PropertyPr
 
       <NoteArea>
         <NoteTitle>Notes</NoteTitle>
-        <div style={{ fontSize: '0.8rem', color: '#4b5563' }}>{note || ' '}</div>
+        <NoteText>{note ? formatNoteText(note) : ' '}</NoteText>
       </NoteArea>
 
       <LeaseManagersModal
