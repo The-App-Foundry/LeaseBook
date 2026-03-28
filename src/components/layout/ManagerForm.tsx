@@ -53,7 +53,7 @@ export default function ManagerForm({ initial, onSave, onCancel }: Readonly<Mana
   const [phone, setPhone] = useState(initial?.phone ?? '');
   const [email, setEmail] = useState(initial?.email ?? '');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.SubmitEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
     onSave({
