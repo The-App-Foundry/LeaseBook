@@ -163,6 +163,14 @@ function autoDetectHeaders(headers: string[]): Record<LeaseFieldKey, string> {
   return next;
 }
 
+function formatExpirationDate(isoDateStr: string): string {
+  const datePart = isoDateStr.slice(0, 10); // "2026-03-15"
+  const parts = datePart.split('-');
+  if (parts.length !== 3) return datePart;
+  const [year, month, day] = parts;
+  return `${month}/${day}/${year}`;
+}
+
 function convertBackendLeasesToUi(rows: BackendLease[]): Lease[] {
   return rows.map(item => {
     // Build a raw string from all available manager fields for auto-detection
@@ -186,7 +194,7 @@ function convertBackendLeasesToUi(rows: BackendLease[]): Lease[] {
       status: item.expired ? 'prospect' : 'qualified',
       name: item.name || 'Unnamed',
       businessAddr: item.address || '-',
-      leaseExpiration: item.expiration_date ? item.expiration_date.slice(0, 10) : '-',
+      leaseExpiration: item.expiration_date ? formatExpirationDate(item.expiration_date) : '-',
       leaseManager: displayName,
       managers: finalManagers,
       size: '-',
