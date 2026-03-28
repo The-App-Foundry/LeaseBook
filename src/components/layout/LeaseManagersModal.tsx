@@ -6,7 +6,7 @@ import Modal from '../ui/Modal';
 import { Button } from '../ui';
 import ManagerForm from './ManagerForm';
 
-interface DecisionMakersModalProps {
+interface LeaseManagersModalProps {
   isOpen: boolean;
   onClose: () => void;
   managers: Manager[];
@@ -70,12 +70,12 @@ const EmptyState = styled.p`
   padding: 1rem 0;
 `;
 
-export default function DecisionMakersModal({
+export default function LeaseManagersModal({
   isOpen,
   onClose,
   managers,
   onUpdate,
-}: Readonly<DecisionMakersModalProps>) {
+}: Readonly<LeaseManagersModalProps>) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isAdding, setIsAdding] = useState(false);
 
@@ -104,7 +104,7 @@ export default function DecisionMakersModal({
   // Show form when editing or adding
   if (editingId && editingManager) {
     return (
-      <Modal isOpen={isOpen} onClose={handleClose} title="Edit Decision Maker">
+      <Modal isOpen={isOpen} onClose={handleClose} title="Edit Lease Manager">
         <ManagerForm
           initial={editingManager}
           onSave={handleSave}
@@ -116,7 +116,7 @@ export default function DecisionMakersModal({
 
   if (isAdding) {
     return (
-      <Modal isOpen={isOpen} onClose={handleClose} title="Add Decision Maker">
+      <Modal isOpen={isOpen} onClose={handleClose} title="Add Lease Manager">
         <ManagerForm onSave={handleSave} onCancel={() => setIsAdding(false)} />
       </Modal>
     );
@@ -126,7 +126,7 @@ export default function DecisionMakersModal({
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
-      title="Decision Makers"
+      title="Lease Managers"
       footer={
         <Button onClick={() => setIsAdding(true)}>
           <Plus size={15} /> Add
@@ -134,7 +134,7 @@ export default function DecisionMakersModal({
       }
     >
       {managers.length === 0 ? (
-        <EmptyState>No decision makers yet.</EmptyState>
+        <EmptyState>No lease managers yet.</EmptyState>
       ) : (
         <List>
           {managers.map(m => (

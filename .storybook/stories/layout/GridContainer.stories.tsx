@@ -7,7 +7,7 @@ const sampleProperty = {
   name: 'Harbor View Apartments',
   businessAddr: '12 Harbor St, Portland, OR',
   leaseExpiration: '2025-05-01',
-  decisionMaker: 'John Smith',
+  leaseManager: 'John Smith',
   size: '2,100 sqft',
   note: 'Recently renovated',
 };
@@ -60,7 +60,7 @@ export const ManyItems: Story = {
               ...sampleProperty,
               name: `Property ${i + 1}`,
               businessAddr: `Address ${i + 1}`,
-              decisionMaker: `Contact ${i + 1}`,
+              leaseManager: `Contact ${i + 1}`,
             }}
           />
         ))}

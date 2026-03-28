@@ -12,7 +12,7 @@ export interface Lease {
   name: string;
   businessAddr: string;
   leaseExpiration: string; // ISO date preferred, or friendly string
-  decisionMaker: string;
+  leaseManager: string;
   managers: Manager[];
   size: string;
   note?: string;

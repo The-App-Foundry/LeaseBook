@@ -187,7 +187,7 @@ function convertBackendLeasesToUi(rows: BackendLease[]): Lease[] {
       name: item.name || 'Unnamed',
       businessAddr: item.address || '-',
       leaseExpiration: item.expiration_date ? item.expiration_date.slice(0, 10) : '-',
-      decisionMaker: displayName,
+      leaseManager: displayName,
       managers: finalManagers,
       size: '-',
       note: item.notes || item.misc_data || undefined,

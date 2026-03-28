@@ -26,18 +26,18 @@ function splitEntries(raw: string): string[] {
 function parseEntry(entry: string): Pick<Manager, 'name' | 'phone' | 'email'> {
   let remaining = entry;
 
-  const emailMatch = remaining.match(EMAIL_RE);
+  const emailMatch = EMAIL_RE.exec(remaining);
   const email = emailMatch?.[0];
   if (email) remaining = remaining.replace(email, '');
 
-  const phoneMatch = remaining.match(PHONE_RE);
+  const phoneMatch = PHONE_RE.exec(remaining);
   const phone = phoneMatch?.[0]?.trim();
   if (phone) remaining = remaining.replace(phone, '');
 
   // Clean leftover punctuation / separators around the name
   const name = remaining
-    .replace(/[,\-|/]+/g, ' ')
-    .replace(/\s{2,}/g, ' ')
+    .replaceAll(/[,\-|/]+/g, ' ')
+    .replaceAll(/\s{2,}/g, ' ')
     .trim();
 
   return { name, phone, email };
@@ -60,7 +60,7 @@ export interface DetectionResult {
  *  - Name + email: "Jane Doe jane@acme.com"
  */
 export function detectManagers(raw: string): DetectionResult {
-  if (!raw || !raw.trim()) {
+  if (!raw?.trim()) {
     return { managers: [], allVerified: false };
   }
 

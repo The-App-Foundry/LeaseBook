@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Card } from '../ui';
 import { Building2, Calendar, User, Maximize2, MoreVertical, Users } from 'lucide-react';
 import { Lease, Manager } from '../../types/lease';
-import DecisionMakersModal from './DecisionMakersModal';
+import LeaseManagersModal from './LeaseManagersModal';
 
 interface PropertyProps {
   data: Lease;
@@ -197,7 +197,7 @@ const MenuItem = styled.button`
   }
 `;
 
-const DecisionMakerValue = styled.div<{ $verified: boolean }>`
+const LeaseManagerValue = styled.div<{ $verified: boolean }>`
   font-size: 0.9rem;
   font-weight: 500;
   color: ${({ $verified, theme }) => ($verified ? '#1f2937' : theme.colors.danger)};
@@ -209,7 +209,7 @@ export default function Property({ data, onManagersChange }: Readonly<PropertyPr
     name,
     businessAddr,
     leaseExpiration,
-    decisionMaker,
+    leaseManager,
     managers = [],
     size,
     note,
@@ -264,7 +264,7 @@ export default function Property({ data, onManagersChange }: Readonly<PropertyPr
               }}
             >
               <Users size={14} />
-              Manage Decision Makers
+              Manage Lease Managers
             </MenuItem>
           </MenuPanel>
         )}
@@ -296,8 +296,8 @@ export default function Property({ data, onManagersChange }: Readonly<PropertyPr
         <DetailBlock>
           <User size={16} color="#9ca3af" />
           <div>
-            <DetailLabel>Decision Maker</DetailLabel>
-            <DecisionMakerValue $verified={allVerified}>{decisionMaker}</DecisionMakerValue>
+            <DetailLabel>Lease&nbsp;Manager</DetailLabel>
+            <LeaseManagerValue $verified={allVerified}>{leaseManager}</LeaseManagerValue>
           </div>
         </DetailBlock>
         <DetailBlock>
@@ -314,7 +314,7 @@ export default function Property({ data, onManagersChange }: Readonly<PropertyPr
         <div style={{ fontSize: '0.8rem', color: '#4b5563' }}>{note || ' '}</div>
       </NoteArea>
 
-      <DecisionMakersModal
+      <LeaseManagersModal
         isOpen={dmModalOpen}
         onClose={() => setDmModalOpen(false)}
         managers={managers}

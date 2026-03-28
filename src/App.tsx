@@ -16,6 +16,10 @@ const Content = styled.div`
 function App() {
   const [leases, setLeases] = useState<Lease[]>([]);
 
+  const formatManagerNames = (managers: Manager[]): string => {
+    return managers.map(m => m.name).join(', ') || '-';
+  };
+
   const handleManagersChange = (leaseIndex: number, managers: Manager[]) => {
     setLeases(prev =>
       prev.map((lease, i) => {
@@ -23,7 +27,7 @@ function App() {
         return {
           ...lease,
           managers,
-          decisionMaker: managers.map(m => m.name).join(', ') || '-',
+          leaseManager: formatManagerNames(managers),
         };
       }),
     );
@@ -31,14 +35,12 @@ function App() {
 
   return (
     <main>
-      <>
-        <Header />
-        <Content>
-          <WorkbookImportFlow onImported={setLeases} />
-          <FilterBar />
-          <GridContainer leases={leases} onManagersChange={handleManagersChange} />
-        </Content>
-      </>
+      <Header />
+      <Content>
+        <WorkbookImportFlow onImported={setLeases} />
+        <FilterBar />
+        <GridContainer leases={leases} onManagersChange={handleManagersChange} />
+      </Content>
     </main>
   );
 }

@@ -28,7 +28,7 @@ const defaultData = {
   name: 'Sample Property LLC',
   businessAddr: '123 Main St, City, ST 12345',
   leaseExpiration: '2026-12-31',
-  decisionMaker: 'John Doe',
+  leaseManager: 'John Doe',
   size: '5,000 sq ft',
   note: 'Sample note',
 };
@@ -120,7 +120,7 @@ export const Expired: Story = {
 
 export const MultipleProperties: Story = {
   args: {
-    data: defaultData
+    data: defaultData,
   },
   render: () => (
     <GridContainer>
@@ -130,7 +130,7 @@ export const MultipleProperties: Story = {
           name: 'Acme Industries',
           businessAddr: '100 Business Park Dr, Dallas, TX 75201',
           leaseExpiration: '2026-12-31',
-          decisionMaker: 'Jane Smith',
+          leaseManager: 'Jane Smith',
           size: '10,000 sq ft',
           note: '',
         }}
@@ -141,7 +141,7 @@ export const MultipleProperties: Story = {
           name: 'Tech Solutions Ltd',
           businessAddr: '200 Innovation Way, San Jose, CA 95101',
           leaseExpiration: '2025-09-30',
-          decisionMaker: 'Bob Johnson',
+          leaseManager: 'Bob Johnson',
           size: '7,500 sq ft',
           note: '',
         }}
@@ -152,7 +152,7 @@ export const MultipleProperties: Story = {
           name: 'Retail Store Co',
           businessAddr: '300 Shopping Center Blvd, Miami, FL 33101',
           leaseExpiration: '2027-03-15',
-          decisionMaker: 'Alice Williams',
+          leaseManager: 'Alice Williams',
           size: '15,000 sq ft',
           note: '',
         }}
@@ -163,7 +163,7 @@ export const MultipleProperties: Story = {
           name: 'Small Business Inc',
           businessAddr: '400 Commerce St, Portland, OR 97201',
           leaseExpiration: '2025-02-28',
-          decisionMaker: 'Charlie Brown',
+          leaseManager: 'Charlie Brown',
           size: '3,000 sq ft',
           note: '',
         }}
@@ -174,7 +174,7 @@ export const MultipleProperties: Story = {
           name: 'Old Tenant LLC',
           businessAddr: '500 Historic Ave, Philadelphia, PA 19101',
           leaseExpiration: '2023-12-31',
-          decisionMaker: 'David Wilson',
+          leaseManager: 'David Wilson',
           size: '8,000 sq ft',
           note: '',
         }}
@@ -185,7 +185,7 @@ export const MultipleProperties: Story = {
           name: 'New Prospect Corp',
           businessAddr: '600 Future Lane, Denver, CO 80201',
           leaseExpiration: '2028-06-01',
-          decisionMaker: 'Eva Martinez',
+          leaseManager: 'Eva Martinez',
           size: '12,000 sq ft',
           note: '',
         }}
