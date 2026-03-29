@@ -1,8 +1,8 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { invoke } from '@tauri-apps/api/core';
 import { open } from '@tauri-apps/plugin-dialog';
 import styled from 'styled-components';
-import { Upload, Table2, Link2 } from 'lucide-react';
+import { ChevronLeft, Upload, Table2, Link2 } from 'lucide-react';
 import { Button, Card } from '../ui';
 import type { Lease } from '../../types/lease';
 import { detectManagers } from '../../utils/managerDetect';
@@ -20,6 +20,8 @@ type LeaseFieldKey =
 
 interface WorkbookImportFlowProps {
   onImported: (leases: Lease[]) => void;
+  onCancel?: () => void;
+  autoOpen?: boolean;
 }
 
 interface ParsedSheet {
@@ -230,7 +232,11 @@ function getErrorMessage(error: unknown, fallback: string): string {
   return fallback;
 }
 
-export default function WorkbookImportFlow({ onImported }: Readonly<WorkbookImportFlowProps>) {
+export default function WorkbookImportFlow({
+  onImported,
+  onCancel,
+  autoOpen,
+}: Readonly<WorkbookImportFlowProps>) {
   const [workbookPath, setWorkbookPath] = useState('');
   const [workbookName, setWorkbookName] = useState('');
   const [spreadsheet, setSpreadsheet] = useState<ParsedSpreadsheet | null>(null);
@@ -238,6 +244,15 @@ export default function WorkbookImportFlow({ onImported }: Readonly<WorkbookImpo
   const [mappingByKey, setMappingByKey] = useState<Record<LeaseFieldKey, string> | null>(null);
   const [isBusy, setIsBusy] = useState(false);
   const [error, setError] = useState('');
+  const autoOpenFired = useRef(false);
+
+  useEffect(() => {
+    if (autoOpen && !autoOpenFired.current) {
+      autoOpenFired.current = true;
+      void handleUpload();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const selectedSheet = useMemo(() => {
     if (!spreadsheet || !selectedSheetName) return null;
@@ -330,6 +345,12 @@ export default function WorkbookImportFlow({ onImported }: Readonly<WorkbookImpo
       });
 
       onImported(convertBackendLeasesToUi(imported));
+      // Reset form state so the mapping UI collapses after a successful import
+      setWorkbookPath('');
+      setWorkbookName('');
+      setSpreadsheet(null);
+      setSelectedSheetName('');
+      setMappingByKey(null);
     } catch (importError) {
       setError(getErrorMessage(importError, 'Failed to import leases.'));
     } finally {
@@ -340,6 +361,16 @@ export default function WorkbookImportFlow({ onImported }: Readonly<WorkbookImpo
   return (
     <Wrapper>
       <ImportCard>
+        {onCancel && (
+          <Button
+            $variant="ghost"
+            onClick={onCancel}
+            style={{ marginRight: 0, paddingLeft: '0.25rem' }}
+          >
+            <ChevronLeft size={14} />
+            Back
+          </Button>
+        )}
         <Title>Workbook Import</Title>
         <Hint>Upload workbook, select a sheet, confirm column mapping, and import.</Hint>
 
