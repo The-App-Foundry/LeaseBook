@@ -1,6 +1,6 @@
 use std::collections::{HashMap, HashSet};
 
-use chrono::{DateTime, NaiveDate, NaiveDateTime, Timelike, Utc};
+use chrono::{DateTime, Datelike, NaiveDate, NaiveDateTime, Timelike, Utc};
 
 use crate::property::Lease;
 use crate::spreadsheet::{Cell, Sheet, Spreadsheet};
@@ -195,29 +195,172 @@ fn parse_datetime_from_cell(cell: &Cell) -> Option<DateTime<Utc>> {
     match cell {
         Cell::Date(value) => Some(DateTime::from_naive_utc_and_offset(*value, Utc)),
         Cell::String(value) => parse_datetime_from_string(value),
+        Cell::Float(value) => parse_excel_serial_date(*value),
+        Cell::Int(value) => {
+            if *value >= 1900 && *value <= 2200 {
+                NaiveDate::from_ymd_opt(*value as i32, 1, 1)
+                    .and_then(|d| d.and_hms_opt(0, 0, 0))
+                    .map(|naive| DateTime::from_naive_utc_and_offset(naive, Utc))
+            } else if *value > 0 {
+                parse_excel_serial_date(*value as f64)
+            } else {
+                None
+            }
+        }
         _ => None,
     }
 }
 
 fn parse_datetime_from_string(value: &str) -> Option<DateTime<Utc>> {
-    if let Ok(parsed) = DateTime::parse_from_rfc3339(value) {
+    let trimmed = value.trim();
+    if trimmed.is_empty() {
+        return None;
+    }
+
+    if let Ok(parsed) = DateTime::parse_from_rfc3339(trimmed) {
         return Some(parsed.with_timezone(&Utc));
     }
 
-    if let Ok(parsed) = NaiveDate::parse_from_str(value, "%Y-%m-%d") {
+    if let Ok(parsed) = NaiveDate::parse_from_str(trimmed, "%Y-%m-%d") {
         return parsed
             .and_hms_opt(0, 0, 0)
             .map(|naive| DateTime::from_naive_utc_and_offset(naive, Utc));
     }
 
-    if let Ok(parsed) = NaiveDate::parse_from_str(value, "%m/%d/%Y") {
+    // MM/DD/YY (e.g., "03/15/26") — must check before MM/DD/YYYY since chrono's
+    // %Y happily consumes 2-digit years as year 0028 etc.
+    if let Some(date) = parse_mm_dd_yy(trimmed) {
+        return date
+            .and_hms_opt(0, 0, 0)
+            .map(|naive| DateTime::from_naive_utc_and_offset(naive, Utc));
+    }
+
+    if let Ok(parsed) = NaiveDate::parse_from_str(trimmed, "%m/%d/%Y") {
         return parsed
             .and_hms_opt(0, 0, 0)
             .map(|naive| DateTime::from_naive_utc_and_offset(naive, Utc));
     }
 
-    NaiveDateTime::parse_from_str(value, "%Y-%m-%d %H:%M:%S")
-        .ok()
+    if let Ok(parsed) = NaiveDateTime::parse_from_str(trimmed, "%Y-%m-%d %H:%M:%S") {
+        return Some(DateTime::from_naive_utc_and_offset(parsed, Utc));
+    }
+
+    // MM/YYYY (e.g., "03/2026") — must check before MM/DD since both have 2 slash-parts
+    if let Some(date) = parse_mm_yyyy(trimmed) {
+        return date
+            .and_hms_opt(0, 0, 0)
+            .map(|naive| DateTime::from_naive_utc_and_offset(naive, Utc));
+    }
+
+    // MM/DD (e.g., "03/15") — assumes current year
+    if let Some(date) = parse_mm_dd(trimmed) {
+        return date
+            .and_hms_opt(0, 0, 0)
+            .map(|naive| DateTime::from_naive_utc_and_offset(naive, Utc));
+    }
+
+    // Quarter notation: Q1 2026, Q2 2026, etc.
+    if let Some(date) = parse_quarter_year(trimmed) {
+        return date
+            .and_hms_opt(0, 0, 0)
+            .map(|naive| DateTime::from_naive_utc_and_offset(naive, Utc));
+    }
+
+    // Bare year: "2026"
+    if let Some(date) = parse_bare_year(trimmed) {
+        return date
+            .and_hms_opt(0, 0, 0)
+            .map(|naive| DateTime::from_naive_utc_and_offset(naive, Utc));
+    }
+
+    None
+}
+
+/// Parse "MM/DD/YY" (e.g., "03/15/26") with a pivot: 00-99 → 2000-2099.
+fn parse_mm_dd_yy(value: &str) -> Option<NaiveDate> {
+    let parts: Vec<&str> = value.split('/').collect();
+    if parts.len() != 3 {
+        return None;
+    }
+    let month = parts[0].parse::<u32>().ok()?;
+    let day = parts[1].parse::<u32>().ok()?;
+    let short_year = parts[2].parse::<i32>().ok()?;
+    // Only match 1- or 2-digit year values (0–99)
+    if short_year < 0 || short_year > 99 {
+        return None;
+    }
+    let year = 2000 + short_year;
+    NaiveDate::from_ymd_opt(year, month, day)
+}
+
+/// Parse "MM/YYYY" (e.g., "03/2026") → 1st of that month.
+fn parse_mm_yyyy(value: &str) -> Option<NaiveDate> {
+    let parts: Vec<&str> = value.split('/').collect();
+    if parts.len() != 2 {
+        return None;
+    }
+    let month = parts[0].parse::<u32>().ok()?;
+    let year = parts[1].parse::<i32>().ok()?;
+    if year < 1900 || year > 2200 {
+        return None;
+    }
+    NaiveDate::from_ymd_opt(year, month, 1)
+}
+
+/// Parse "MM/DD" (e.g., "03/15" or "3/5") → that date in the current year.
+fn parse_mm_dd(value: &str) -> Option<NaiveDate> {
+    let parts: Vec<&str> = value.split('/').collect();
+    if parts.len() != 2 {
+        return None;
+    }
+    let month = parts[0].parse::<u32>().ok()?;
+    let day = parts[1].parse::<u32>().ok()?;
+    if day > 31 {
+        return None;
+    }
+    let year = Utc::now().year();
+    NaiveDate::from_ymd_opt(year, month, day)
+}
+
+/// Parse quarter notation: "Q2 2026", "q1 2025", etc.
+fn parse_quarter_year(value: &str) -> Option<NaiveDate> {
+    let lower = value.to_lowercase();
+    let lower = lower.trim();
+    if !lower.starts_with('q') {
+        return None;
+    }
+    let rest = lower[1..].trim();
+    let mut parts = rest.split_whitespace();
+    let quarter = parts.next()?.parse::<u32>().ok()?;
+    let year = parts.next()?.parse::<i32>().ok()?;
+    if parts.next().is_some() || quarter < 1 || quarter > 4 || year < 1900 || year > 2200 {
+        return None;
+    }
+    let month = (quarter - 1) * 3 + 1; // Q1→Jan, Q2→Apr, Q3→Jul, Q4→Oct
+    NaiveDate::from_ymd_opt(year, month, 1)
+}
+
+/// Parse a bare 4-digit year: "2026" → January 1 of that year.
+fn parse_bare_year(value: &str) -> Option<NaiveDate> {
+    let year = value.parse::<i32>().ok()?;
+    if year < 1900 || year > 2200 {
+        return None;
+    }
+    NaiveDate::from_ymd_opt(year, 1, 1)
+}
+
+/// Convert an Excel serial date number to a DateTime.
+/// Excel epoch: serial 1 = January 1, 1900. Accounts for the 1900 leap-year bug.
+fn parse_excel_serial_date(serial: f64) -> Option<DateTime<Utc>> {
+    if serial < 1.0 || serial > 2_958_465.0 {
+        return None;
+    }
+    let days = serial.floor() as i64;
+    let base = NaiveDate::from_ymd_opt(1899, 12, 31)?;
+    // Excel erroneously counts Feb 29, 1900.  For serial >= 60 subtract 1 to compensate.
+    let adjusted = if days >= 60 { days - 1 } else { days };
+    base.checked_add_signed(chrono::Duration::days(adjusted))
+        .and_then(|d| d.and_hms_opt(0, 0, 0))
         .map(|naive| DateTime::from_naive_utc_and_offset(naive, Utc))
 }
 
