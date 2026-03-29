@@ -76,9 +76,9 @@ const AddressRow = styled.div`
   line-height: 1.3;
 `;
 
-const ExpirationHighlight = styled.div`
-  background-color: #fff1f2;
-  border: 1px solid #fecaca;
+const ExpirationHighlight = styled.div<{ $expired: boolean }>`
+  background-color: ${({ $expired }) => ($expired ? '#fff1f2' : '#f0fdf4')};
+  border: 1px solid ${({ $expired }) => ($expired ? '#fecaca' : '#bbf7d0')};
   border-radius: 0.6rem;
   padding: 0.6rem 0.8rem;
   display: flex;
@@ -86,11 +86,11 @@ const ExpirationHighlight = styled.div`
   justify-content: space-between;
 `;
 
-const ExpDate = styled.div`
+const ExpDate = styled.div<{ $expired: boolean }>`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: #b91c1c;
+  color: ${({ $expired }) => ($expired ? '#b91c1c' : '#065f46')};
   font-weight: 700;
   font-size: 1rem;
 `;
@@ -241,6 +241,8 @@ export default function Property({ data, onManagersChange }: Readonly<PropertyPr
   } = data;
   const initial = status ? status[0].toUpperCase() : '?';
 
+  const isExpired = status === 'prospect';
+
   const [menuOpen, setMenuOpen] = useState(false);
   const [dmModalOpen, setDmModalOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -309,12 +311,12 @@ export default function Property({ data, onManagersChange }: Readonly<PropertyPr
         </InfoColumn>
       </TopRow>
 
-      <ExpirationHighlight>
-        <ExpDate>
+      <ExpirationHighlight $expired={isExpired}>
+        <ExpDate $expired={isExpired}>
           <Calendar size={16} />
           {leaseExpiration}
         </ExpDate>
-        <ExpPill>EXPIRED</ExpPill>
+        {isExpired && <ExpPill>EXPIRED</ExpPill>}
       </ExpirationHighlight>
 
       <GridDetails>
