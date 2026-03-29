@@ -156,11 +156,11 @@ function formatNoteText(text: string): React.ReactNode[] {
   const parts = text.split(PHONE_REGEX);
   return parts.map((part, i) =>
     i % 2 === 1 ? (
-      <span key={i} style={{ whiteSpace: 'nowrap' }}>
+      <span key={`phone-${part}`} style={{ whiteSpace: 'nowrap' }}>
         {part}
       </span>
     ) : (
-      <React.Fragment key={i}>{part}</React.Fragment>
+      <React.Fragment key={`text-${part}-${i}`}>{part}</React.Fragment>
     ),
   );
 }

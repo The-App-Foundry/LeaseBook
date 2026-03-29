@@ -159,3 +159,260 @@ fn parses_expiration_date_from_m_d_yyyy_string_without_leading_zeros() {
     assert_eq!(expiry.day(), 5);
     assert_eq!(lease.expired, Some(false));
 }
+
+#[test]
+fn parses_expiration_date_from_mm_dd_yy_string() {
+    let spreadsheet = Spreadsheet {
+        sheets: vec![Sheet {
+            name: "Leases".to_string(),
+            headers: vec!["name".to_string(), "expiration_date".to_string()],
+            rows: vec![Row {
+                cells: vec![
+                    Cell::String("Test Property".to_string()),
+                    Cell::String("12/31/28".to_string()),
+                ],
+            }],
+        }],
+    };
+
+    let mapping = HashMap::from([
+        ("expiration_date".to_string(), "expiration_date".to_string()),
+    ]);
+
+    let leases = map_spreadsheet_to_leases(&spreadsheet, &mapping, None);
+    let lease = &leases[0];
+    let expiry = lease.expiration_date.expect("mm/dd/yy should be parsed");
+    assert_eq!(expiry.year(), 2028);
+    assert_eq!(expiry.month(), 12);
+    assert_eq!(expiry.day(), 31);
+}
+
+#[test]
+fn parses_expiration_date_from_mm_dd_string_using_current_year() {
+    let spreadsheet = Spreadsheet {
+        sheets: vec![Sheet {
+            name: "Leases".to_string(),
+            headers: vec!["name".to_string(), "expiration_date".to_string()],
+            rows: vec![Row {
+                cells: vec![
+                    Cell::String("Test Property".to_string()),
+                    Cell::String("06/15".to_string()),
+                ],
+            }],
+        }],
+    };
+
+    let mapping = HashMap::from([
+        ("expiration_date".to_string(), "expiration_date".to_string()),
+    ]);
+
+    let leases = map_spreadsheet_to_leases(&spreadsheet, &mapping, None);
+    let lease = &leases[0];
+    let expiry = lease.expiration_date.expect("mm/dd should be parsed");
+    assert_eq!(expiry.month(), 6);
+    assert_eq!(expiry.day(), 15);
+    assert_eq!(expiry.year(), Utc::now().year());
+}
+
+#[test]
+fn parses_expiration_date_from_mm_yyyy_string() {
+    let spreadsheet = Spreadsheet {
+        sheets: vec![Sheet {
+            name: "Leases".to_string(),
+            headers: vec!["name".to_string(), "expiration_date".to_string()],
+            rows: vec![Row {
+                cells: vec![
+                    Cell::String("Test Property".to_string()),
+                    Cell::String("09/2028".to_string()),
+                ],
+            }],
+        }],
+    };
+
+    let mapping = HashMap::from([
+        ("expiration_date".to_string(), "expiration_date".to_string()),
+    ]);
+
+    let leases = map_spreadsheet_to_leases(&spreadsheet, &mapping, None);
+    let lease = &leases[0];
+    let expiry = lease.expiration_date.expect("mm/yyyy should be parsed");
+    assert_eq!(expiry.year(), 2028);
+    assert_eq!(expiry.month(), 9);
+    assert_eq!(expiry.day(), 1);
+}
+
+#[test]
+fn parses_expiration_date_from_quarter_year_string() {
+    let spreadsheet = Spreadsheet {
+        sheets: vec![Sheet {
+            name: "Leases".to_string(),
+            headers: vec!["name".to_string(), "expiration_date".to_string()],
+            rows: vec![Row {
+                cells: vec![
+                    Cell::String("Test Property".to_string()),
+                    Cell::String("Q2 2027".to_string()),
+                ],
+            }],
+        }],
+    };
+
+    let mapping = HashMap::from([
+        ("expiration_date".to_string(), "expiration_date".to_string()),
+    ]);
+
+    let leases = map_spreadsheet_to_leases(&spreadsheet, &mapping, None);
+    let lease = &leases[0];
+    let expiry = lease.expiration_date.expect("Q2 2027 should be parsed");
+    assert_eq!(expiry.year(), 2027);
+    assert_eq!(expiry.month(), 4); // Q2 starts in April
+    assert_eq!(expiry.day(), 1);
+}
+
+#[test]
+fn parses_expiration_date_from_lowercase_quarter_year() {
+    let spreadsheet = Spreadsheet {
+        sheets: vec![Sheet {
+            name: "Leases".to_string(),
+            headers: vec!["name".to_string(), "expiration_date".to_string()],
+            rows: vec![Row {
+                cells: vec![
+                    Cell::String("Test Property".to_string()),
+                    Cell::String("q4 2030".to_string()),
+                ],
+            }],
+        }],
+    };
+
+    let mapping = HashMap::from([
+        ("expiration_date".to_string(), "expiration_date".to_string()),
+    ]);
+
+    let leases = map_spreadsheet_to_leases(&spreadsheet, &mapping, None);
+    let lease = &leases[0];
+    let expiry = lease.expiration_date.expect("q4 2030 should be parsed");
+    assert_eq!(expiry.year(), 2030);
+    assert_eq!(expiry.month(), 10); // Q4 starts in October
+    assert_eq!(expiry.day(), 1);
+}
+
+#[test]
+fn parses_expiration_date_from_bare_year_string() {
+    let spreadsheet = Spreadsheet {
+        sheets: vec![Sheet {
+            name: "Leases".to_string(),
+            headers: vec!["name".to_string(), "expiration_date".to_string()],
+            rows: vec![Row {
+                cells: vec![
+                    Cell::String("Test Property".to_string()),
+                    Cell::String("2029".to_string()),
+                ],
+            }],
+        }],
+    };
+
+    let mapping = HashMap::from([
+        ("expiration_date".to_string(), "expiration_date".to_string()),
+    ]);
+
+    let leases = map_spreadsheet_to_leases(&spreadsheet, &mapping, None);
+    let lease = &leases[0];
+    let expiry = lease.expiration_date.expect("bare year should be parsed");
+    assert_eq!(expiry.year(), 2029);
+    assert_eq!(expiry.month(), 1);
+    assert_eq!(expiry.day(), 1);
+}
+
+#[test]
+fn parses_expiration_date_from_int_cell_as_year() {
+    let spreadsheet = Spreadsheet {
+        sheets: vec![Sheet {
+            name: "Leases".to_string(),
+            headers: vec!["name".to_string(), "expiration_date".to_string()],
+            rows: vec![Row {
+                cells: vec![
+                    Cell::String("Test Property".to_string()),
+                    Cell::Int(2027),
+                ],
+            }],
+        }],
+    };
+
+    let mapping = HashMap::from([
+        ("expiration_date".to_string(), "expiration_date".to_string()),
+    ]);
+
+    let leases = map_spreadsheet_to_leases(&spreadsheet, &mapping, None);
+    let lease = &leases[0];
+    let expiry = lease.expiration_date.expect("int year should be parsed");
+    assert_eq!(expiry.year(), 2027);
+    assert_eq!(expiry.month(), 1);
+    assert_eq!(expiry.day(), 1);
+}
+
+#[test]
+fn parses_expiration_date_from_excel_serial_float() {
+    // 45658.0 is Excel serial for 2024-12-31
+    let spreadsheet = Spreadsheet {
+        sheets: vec![Sheet {
+            name: "Leases".to_string(),
+            headers: vec!["name".to_string(), "expiration_date".to_string()],
+            rows: vec![Row {
+                cells: vec![
+                    Cell::String("Test Property".to_string()),
+                    Cell::Float(45658.0),
+                ],
+            }],
+        }],
+    };
+
+    let mapping = HashMap::from([
+        ("expiration_date".to_string(), "expiration_date".to_string()),
+    ]);
+
+    let leases = map_spreadsheet_to_leases(&spreadsheet, &mapping, None);
+    let lease = &leases[0];
+    let expiry = lease.expiration_date.expect("excel serial should be parsed");
+    // 45658 = 2025-01-01 in Excel
+    assert_eq!(expiry.year(), 2025);
+    assert_eq!(expiry.month(), 1);
+    assert_eq!(expiry.day(), 1);
+}
+
+#[test]
+fn none_and_empty_produce_no_expiration() {
+    let spreadsheet = Spreadsheet {
+        sheets: vec![Sheet {
+            name: "Leases".to_string(),
+            headers: vec!["name".to_string(), "expiration_date".to_string()],
+            rows: vec![
+                Row {
+                    cells: vec![
+                        Cell::String("Empty".to_string()),
+                        Cell::Empty,
+                    ],
+                },
+                Row {
+                    cells: vec![
+                        Cell::String("Blank".to_string()),
+                        Cell::String("".to_string()),
+                    ],
+                },
+                Row {
+                    cells: vec![
+                        Cell::String("None text".to_string()),
+                        Cell::String("none".to_string()),
+                    ],
+                },
+            ],
+        }],
+    };
+
+    let mapping = HashMap::from([
+        ("expiration_date".to_string(), "expiration_date".to_string()),
+    ]);
+
+    let leases = map_spreadsheet_to_leases(&spreadsheet, &mapping, None);
+    assert!(leases[0].expiration_date.is_none(), "Empty cell should yield None");
+    assert!(leases[1].expiration_date.is_none(), "Blank string should yield None");
+    assert!(leases[2].expiration_date.is_none(), "\"none\" should yield None");
+}
