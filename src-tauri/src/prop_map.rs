@@ -210,6 +210,12 @@ fn parse_datetime_from_string(value: &str) -> Option<DateTime<Utc>> {
             .map(|naive| DateTime::from_naive_utc_and_offset(naive, Utc));
     }
 
+    if let Ok(parsed) = NaiveDate::parse_from_str(value, "%m/%d/%Y") {
+        return parsed
+            .and_hms_opt(0, 0, 0)
+            .map(|naive| DateTime::from_naive_utc_and_offset(naive, Utc));
+    }
+
     NaiveDateTime::parse_from_str(value, "%Y-%m-%d %H:%M:%S")
         .ok()
         .map(|naive| DateTime::from_naive_utc_and_offset(naive, Utc))

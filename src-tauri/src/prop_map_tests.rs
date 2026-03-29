@@ -2,6 +2,8 @@
 
 use std::collections::HashMap;
 
+use chrono::{Datelike, TimeZone, Utc};
+
 use crate::prop_map::map_spreadsheet_to_leases;
 use crate::spreadsheet::{Cell, Row, Sheet, Spreadsheet};
 
@@ -97,4 +99,63 @@ fn filters_to_selected_sheet_name() {
     let leases = map_spreadsheet_to_leases(&spreadsheet, &mapping, Some("Leases"));
     assert_eq!(leases.len(), 1);
     assert_eq!(leases[0].name, "Right");
+}
+
+#[test]
+fn parses_expiration_date_from_mm_dd_yyyy_string() {
+    let spreadsheet = Spreadsheet {
+        sheets: vec![Sheet {
+            name: "Leases".to_string(),
+            headers: vec!["name".to_string(), "expiration_date".to_string()],
+            rows: vec![Row {
+                cells: vec![
+                    Cell::String("Test Property".to_string()),
+                    Cell::String("12/31/2099".to_string()),
+                ],
+            }],
+        }],
+    };
+
+    let mut mapping = HashMap::new();
+    mapping.insert("expiration_date".to_string(), "expiration_date".to_string());
+
+    let leases = map_spreadsheet_to_leases(&spreadsheet, &mapping, None);
+    assert_eq!(leases.len(), 1);
+
+    let lease = &leases[0];
+    let expiry = lease.expiration_date.expect("expiration_date should be parsed");
+    let expected = Utc.with_ymd_and_hms(2099, 12, 31, 0, 0, 0).unwrap();
+    assert_eq!(expiry.year(), expected.year());
+    assert_eq!(expiry.month(), expected.month());
+    assert_eq!(expiry.day(), expected.day());
+    assert_eq!(lease.expired, Some(false), "a far-future date should not be expired");
+}
+
+#[test]
+fn parses_expiration_date_from_m_d_yyyy_string_without_leading_zeros() {
+    let spreadsheet = Spreadsheet {
+        sheets: vec![Sheet {
+            name: "Leases".to_string(),
+            headers: vec!["name".to_string(), "expiration_date".to_string()],
+            rows: vec![Row {
+                cells: vec![
+                    Cell::String("Test Property".to_string()),
+                    Cell::String("3/5/2099".to_string()),
+                ],
+            }],
+        }],
+    };
+
+    let mut mapping = HashMap::new();
+    mapping.insert("expiration_date".to_string(), "expiration_date".to_string());
+
+    let leases = map_spreadsheet_to_leases(&spreadsheet, &mapping, None);
+    assert_eq!(leases.len(), 1);
+
+    let lease = &leases[0];
+    let expiry = lease.expiration_date.expect("expiration_date should be parsed");
+    assert_eq!(expiry.year(), 2099);
+    assert_eq!(expiry.month(), 3);
+    assert_eq!(expiry.day(), 5);
+    assert_eq!(lease.expired, Some(false));
 }
