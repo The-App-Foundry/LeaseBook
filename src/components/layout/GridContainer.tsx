@@ -9,9 +9,9 @@ interface GridContainerProps {
 
 const Container = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  align-items: start;
   gap: calc(var(--spacing) * 4);
-  padding: 1rem;
   width: 100%;
   box-sizing: border-box;
   margin: 16px 0;

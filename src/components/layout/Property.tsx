@@ -1,7 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react';
-import styled from 'styled-components';
+import styled, { keyframes, css } from 'styled-components';
 import { Card } from '../ui';
-import { Building2, Calendar, User, Maximize2, MoreVertical, Users } from 'lucide-react';
+import {
+  Building2,
+  Calendar,
+  User,
+  Maximize2,
+  Maximize,
+  MoreVertical,
+  Users,
+  X,
+  NotebookPen,
+} from 'lucide-react';
 import { Lease, Manager } from '../../types/lease';
 import LeaseManagersModal from './LeaseManagersModal';
 
@@ -10,14 +20,71 @@ interface PropertyProps {
   onManagersChange?: (managers: Manager[]) => void;
 }
 
+const COLLAPSED_HEIGHT = '340px';
+
+const flyIn = keyframes`
+  from {
+    opacity: 0;
+    transform: translate(-50%, -46%) scale(0.86);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+`;
+
+const Backdrop = styled.div`
+  position: fixed;
+  inset: 0;
+  z-index: 49;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(2px);
+`;
+
+/* Maintains the grid cell footprint while the card is floating */
+const CardSlot = styled.div<{ $expanded: boolean }>`
+  ${({ $expanded }) => $expanded && `min-height: ${COLLAPSED_HEIGHT};`}
+`;
+
 // Overrides the base Card styles to ensure vertical stacking and uniform height
-const StyledCard = styled(Card)`
+const StyledCard = styled(Card)<{ $expanded: boolean }>`
   flex-direction: column;
   align-items: stretch;
   justify-content: flex-start;
-  height: 100%;
+  overflow: ${({ $expanded }) => ($expanded ? 'auto' : 'hidden')};
   padding: 1.25rem;
   gap: 1rem;
+  max-height: ${({ $expanded }) => ($expanded ? '85vh' : COLLAPSED_HEIGHT)};
+  ${({ $expanded }) =>
+    $expanded &&
+    css`
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      width: min(580px, 90vw);
+      z-index: 50;
+      border-radius: 1rem;
+      animation: ${flyIn} 0.22s ease forwards;
+    `}
+`;
+
+const ExpandIconBtn = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  border: none;
+  background: transparent;
+  border-radius: ${({ theme }) => theme.radii.sm};
+  color: #6b7280;
+  cursor: pointer;
+
+  &:hover {
+    background: ${({ theme }) => theme.colors.muted};
+    color: #111827;
+  }
 `;
 
 const TopRow = styled.div`
@@ -59,6 +126,9 @@ const InfoColumn = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
 `;
 
 const PropertyTitle = styled.h3`
@@ -66,6 +136,9 @@ const PropertyTitle = styled.h3`
   font-size: 1.05rem;
   font-weight: 600;
   color: #111827;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;
 
 const AddressRow = styled.div`
@@ -74,6 +147,9 @@ const AddressRow = styled.div`
   color: #6b7280;
   font-size: 0.85rem;
   line-height: 1.3;
+  overflow: hidden;
+  overflow-wrap: break-word;
+  word-break: break-word;
 `;
 
 const ExpirationHighlight = styled.div<{ $expired: boolean }>`
@@ -113,17 +189,40 @@ const GridDetails = styled.div`
 const DetailBlock = styled.div`
   display: flex;
   gap: 0.6rem;
+  min-width: 0;
+  overflow: hidden;
+`;
+
+const DetailContent = styled.div`
+  min-width: 0;
+  overflow: hidden;
+  flex: 1;
 `;
 
 const DetailLabel = styled.div`
   font-size: 0.7rem;
   color: #6b7280;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;
 
 const DetailValue = styled.div`
   font-size: 0.9rem;
   font-weight: 500;
   color: #1f2937;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`;
+
+const NoteIndicator = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.7rem;
+  color: #9ca3af;
+  margin-top: 0.25rem;
 `;
 
 const NoteArea = styled.div`
@@ -167,7 +266,8 @@ function formatNoteText(text: string): React.ReactNode[] {
 
 const CardHeader = styled.div`
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: center;
   position: relative;
 `;
 
@@ -226,6 +326,9 @@ const LeaseManagerValue = styled.div<{ $verified: boolean }>`
   font-size: 0.9rem;
   font-weight: 500;
   color: ${({ $verified, theme }) => ($verified ? '#1f2937' : theme.colors.danger)};
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;
 
 export default function Property({ data, onManagersChange }: Readonly<PropertyProps>) {
@@ -245,6 +348,7 @@ export default function Property({ data, onManagersChange }: Readonly<PropertyPr
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [dmModalOpen, setDmModalOpen] = useState(false);
+  const [expanded, setExpanded] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   // Determine verification status from managers array
@@ -271,82 +375,100 @@ export default function Property({ data, onManagersChange }: Readonly<PropertyPr
   };
 
   return (
-    <StyledCard>
-      <CardHeader ref={menuRef}>
-        <MenuBtn
-          onClick={() => setMenuOpen(prev => !prev)}
-          aria-haspopup="menu"
-          aria-expanded={menuOpen}
-          aria-label="Card actions"
-        >
-          <MoreVertical size={16} />
-        </MenuBtn>
-        {menuOpen && (
-          <MenuPanel role="menu">
-            <MenuItem
-              role="menuitem"
-              onClick={() => {
-                setMenuOpen(false);
-                setDmModalOpen(true);
-              }}
-            >
-              <Users size={14} />
-              Manage Lease Managers
-            </MenuItem>
-          </MenuPanel>
+    <CardSlot $expanded={expanded}>
+      {expanded && <Backdrop onClick={() => setExpanded(false)} />}
+      <StyledCard $expanded={expanded}>
+        <CardHeader ref={menuRef}>
+          <ExpandIconBtn
+            onClick={() => setExpanded(prev => !prev)}
+            aria-label={expanded ? 'Collapse card' : 'Expand card'}
+          >
+            {expanded ? <X size={14} /> : <Maximize size={14} />}
+          </ExpandIconBtn>
+          <MenuBtn
+            onClick={() => setMenuOpen(prev => !prev)}
+            aria-haspopup="menu"
+            aria-expanded={menuOpen}
+            aria-label="Card actions"
+          >
+            <MoreVertical size={16} />
+          </MenuBtn>
+          {menuOpen && (
+            <MenuPanel role="menu">
+              <MenuItem
+                role="menuitem"
+                onClick={() => {
+                  setMenuOpen(false);
+                  setDmModalOpen(true);
+                }}
+              >
+                <Users size={14} />
+                Manage Lease Managers
+              </MenuItem>
+            </MenuPanel>
+          )}
+        </CardHeader>
+
+        <TopRow>
+          <StatusColumn>
+            <LargeBadge $color={getStatusColor(status)}>{initial}</LargeBadge>
+            <StatusLabel>{status}</StatusLabel>
+          </StatusColumn>
+          <InfoColumn>
+            <PropertyTitle>{name}</PropertyTitle>
+            <AddressRow>
+              <Building2 size={14} style={{ marginTop: '2px', flexShrink: 0 }} />
+              {businessAddr}
+            </AddressRow>
+          </InfoColumn>
+        </TopRow>
+
+        <ExpirationHighlight $expired={isExpired}>
+          <ExpDate $expired={isExpired}>
+            <Calendar size={16} />
+            {leaseExpiration}
+          </ExpDate>
+          {isExpired && <ExpPill>EXPIRED</ExpPill>}
+        </ExpirationHighlight>
+
+        <GridDetails>
+          <DetailBlock>
+            <User size={16} color="#9ca3af" />
+            <DetailContent>
+              <DetailLabel>Lease&nbsp;Manager</DetailLabel>
+              <LeaseManagerValue $verified={allVerified}>{leaseManager}</LeaseManagerValue>
+            </DetailContent>
+          </DetailBlock>
+          <DetailBlock>
+            <Maximize2 size={16} color="#9ca3af" />
+            <DetailContent>
+              <DetailLabel>Property Size</DetailLabel>
+              <DetailValue>{size}</DetailValue>
+            </DetailContent>
+          </DetailBlock>
+        </GridDetails>
+
+        {!expanded && note && (
+          <NoteIndicator>
+            <NotebookPen size={12} />
+            Has notes
+          </NoteIndicator>
         )}
-      </CardHeader>
 
-      <TopRow>
-        <StatusColumn>
-          <LargeBadge $color={getStatusColor(status)}>{initial}</LargeBadge>
-          <StatusLabel>{status}</StatusLabel>
-        </StatusColumn>
-        <InfoColumn>
-          <PropertyTitle>{name}</PropertyTitle>
-          <AddressRow>
-            <Building2 size={14} style={{ marginTop: '2px', flexShrink: 0 }} />
-            {businessAddr}
-          </AddressRow>
-        </InfoColumn>
-      </TopRow>
+        {expanded && (
+          <NoteArea>
+            <NoteTitle>Notes</NoteTitle>
+            <NoteText>{note ? formatNoteText(note) : ' '}</NoteText>
+          </NoteArea>
+        )}
 
-      <ExpirationHighlight $expired={isExpired}>
-        <ExpDate $expired={isExpired}>
-          <Calendar size={16} />
-          {leaseExpiration}
-        </ExpDate>
-        {isExpired && <ExpPill>EXPIRED</ExpPill>}
-      </ExpirationHighlight>
-
-      <GridDetails>
-        <DetailBlock>
-          <User size={16} color="#9ca3af" />
-          <div>
-            <DetailLabel>Lease&nbsp;Manager</DetailLabel>
-            <LeaseManagerValue $verified={allVerified}>{leaseManager}</LeaseManagerValue>
-          </div>
-        </DetailBlock>
-        <DetailBlock>
-          <Maximize2 size={16} color="#9ca3af" />
-          <div>
-            <DetailLabel>Property Size</DetailLabel>
-            <DetailValue>{size}</DetailValue>
-          </div>
-        </DetailBlock>
-      </GridDetails>
-
-      <NoteArea>
-        <NoteTitle>Notes</NoteTitle>
-        <NoteText>{note ? formatNoteText(note) : ' '}</NoteText>
-      </NoteArea>
-
-      <LeaseManagersModal
-        isOpen={dmModalOpen}
-        onClose={() => setDmModalOpen(false)}
-        managers={managers}
-        onUpdate={updated => onManagersChange?.(updated)}
-      />
-    </StyledCard>
+        <LeaseManagersModal
+          isOpen={dmModalOpen}
+          onClose={() => setDmModalOpen(false)}
+          managers={managers}
+          onUpdate={updated => onManagersChange?.(updated)}
+        />
+      </StyledCard>
+    </CardSlot>
   );
 }
