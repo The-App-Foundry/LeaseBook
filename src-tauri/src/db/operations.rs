@@ -2,15 +2,28 @@ use diesel::{prelude::*};
 
 use crate::models::{Lease, LeaseManager, LeasesManagers, NewLease, NewManager, UpdateLease, UpdateManager};
 
-pub fn create_lease(conn: &mut SqliteConnection, name: &str, address: &str) -> Result<Lease, diesel::result::Error> {
+pub fn create_lease(
+  conn: &mut SqliteConnection,
+  name: &str,
+  address: &str,
+  expiration_date: Option<i32>,
+  notes: Option<&str>,
+  misc_data: Option<&str>,
+) -> Result<Lease, diesel::result::Error> {
   use crate::schema::leases;
+
+  let now = std::time::SystemTime::now()
+    .duration_since(std::time::UNIX_EPOCH)
+    .unwrap_or_default()
+    .as_secs() as i32;
 
   let new_lease = NewLease { 
     name,
     address,
-    expiration_date: None,
-    notes: None,
-    misc_data: None
+    expiration_date,
+    notes,
+    misc_data,
+    created_on: now,
   };
 
   diesel::insert_into(leases::table)
@@ -23,7 +36,12 @@ pub fn create_manager(conn: &mut SqliteConnection, name: &str, lease_id: i32) ->
   use crate::schema::lease_managers;
   use crate::schema::leases_managers;
 
-  let new_mgr = NewManager { name };
+  let now = std::time::SystemTime::now()
+    .duration_since(std::time::UNIX_EPOCH)
+    .unwrap_or_default()
+    .as_secs() as i32;
+
+  let new_mgr = NewManager { name, created_on: now };
 
   let manager = diesel::insert_into(lease_managers::table)
     .values(&new_mgr)
@@ -78,6 +96,46 @@ pub fn get_managers(conn: &mut SqliteConnection, lease_id: i32) -> Result<Vec<Le
     .get_results(conn)?;
 
   Ok(managers)
+}
+
+/// Returns all leases paired with their managers in a single call (avoids N+1 queries).
+pub fn get_all_leases_with_managers(conn: &mut SqliteConnection) -> Result<Vec<(Lease, Vec<LeaseManager>)>, diesel::result::Error> {
+  use crate::schema::lease_managers;
+
+  let all_leases = get_leases(conn)?;
+
+  let all_junctions: Vec<LeasesManagers> = LeasesManagers::belonging_to(&all_leases)
+    .select(LeasesManagers::as_select())
+    .load(conn)?;
+
+  // Collect all unique manager IDs referenced
+  let mgr_ids: Vec<i32> = all_junctions.iter().map(|j| j.manager_id).collect();
+
+  let all_managers: Vec<LeaseManager> = lease_managers::table
+    .filter(lease_managers::id.eq_any(&mgr_ids))
+    .select(LeaseManager::as_select())
+    .load(conn)?;
+
+  // Build a map: manager_id -> LeaseManager
+  let mgr_map: std::collections::HashMap<i32, &LeaseManager> =
+    all_managers.iter().map(|m| (m.id, m)).collect();
+
+  // Group junctions by lease_id
+  let junctions_grouped = all_junctions.grouped_by(&all_leases);
+
+  let result = all_leases
+    .into_iter()
+    .zip(junctions_grouped)
+    .map(|(lease, junctions)| {
+      let managers: Vec<LeaseManager> = junctions
+        .iter()
+        .filter_map(|j| mgr_map.get(&j.manager_id).map(|m| (*m).clone()))
+        .collect();
+      (lease, managers)
+    })
+    .collect();
+
+  Ok(result)
 }
 
 pub fn get_manager(conn: &mut SqliteConnection, manager_id: i32) -> Result<LeaseManager, diesel::result::Error> {
@@ -217,12 +275,18 @@ pub fn import_leases(
 ) -> Result<Vec<Lease>, diesel::result::Error> {
     conn.transaction(|conn| {
         leases.iter().map(|lease| {
+            let now = std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap_or_default()
+                .as_secs() as i32;
+
             let new_lease = NewLease {
                 name: &lease.name,
                 address: &lease.address,
                 expiration_date: lease.expiration_date.map(|dt| dt.timestamp() as i32),
                 notes: Some(&lease.notes).filter(|s| !s.is_empty()).map(|s| s.as_str()),
                 misc_data: Some(&lease.misc_data).filter(|s| !s.is_empty()).map(|s| s.as_str()),
+                created_on: now,
             };
             let db_lease = diesel::insert_into(crate::schema::leases::table)
                 .values(&new_lease)

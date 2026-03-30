@@ -28,6 +28,7 @@ calamine = { version = "0.34.0", features = ["chrono"] }
 chrono = { version = "0.4.44", features = ["serde"] }
 tauri-plugin-sql = { version = "2.3.2", features = ["sqlite"] }
 diesel = { version = "2.3.7", features = ["r2d2", "returning_clauses_for_sqlite_3_35", "sqlite"] }
+diesel_migrations = "2.3"
 dotenvy = { version = "0.15.7", features = ["cli"] }
 
 [dev-dependencies]

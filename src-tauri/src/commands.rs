@@ -63,10 +63,20 @@ pub fn new_lease(
   pool: State<'_, DbPool>,
   name: String,
   address: String,
+  expiration_date: Option<i32>,
+  notes: Option<String>,
+  size: Option<String>,
 ) -> Result<DbLease, String> {
   let mut conn = pool.get().map_err(|error| error.to_string())?;
 
-  create_lease(&mut conn, &name, &address).map_err(|error| error.to_string())
+  create_lease(
+    &mut conn,
+    &name,
+    &address,
+    expiration_date,
+    notes.as_deref(),
+    size.as_deref(),
+  ).map_err(|error| error.to_string())
 }
 
 #[tauri::command]
@@ -97,6 +107,22 @@ pub fn leases(
   let mut conn = pool.get().map_err(|error| error.to_string())?;
 
   get_leases(&mut conn).map_err(|error| error.to_string())
+}
+
+#[derive(Serialize)]
+pub struct LeaseWithManagers {
+  #[serde(flatten)]
+  pub lease: DbLease,
+  pub managers: Vec<LeaseManager>,
+}
+
+#[tauri::command]
+pub fn leases_with_managers(
+  pool: State<'_, DbPool>,
+) -> Result<Vec<LeaseWithManagers>, String> {
+  let mut conn = pool.get().map_err(|error| error.to_string())?;
+  let rows = get_all_leases_with_managers(&mut conn).map_err(|e| e.to_string())?;
+  Ok(rows.into_iter().map(|(lease, managers)| LeaseWithManagers { lease, managers }).collect())
 }
 
 #[tauri::command]

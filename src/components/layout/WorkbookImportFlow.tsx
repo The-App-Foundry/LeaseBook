@@ -344,6 +344,9 @@ export default function WorkbookImportFlow({
         sheetName: selectedSheetName,
       });
 
+      // Persist all parsed leases to the database
+      await invoke('import_parsed_leases', { leases: imported });
+
       onImported(convertBackendLeasesToUi(imported));
       // Reset form state so the mapping UI collapses after a successful import
       setWorkbookPath('');
