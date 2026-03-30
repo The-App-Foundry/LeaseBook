@@ -15,7 +15,7 @@ pub struct Lease {
   pub last_modified: Option<i32>
 }
 
-#[derive(Queryable, Selectable, Identifiable, PartialEq, Debug, Serialize)]
+#[derive(Queryable, Selectable, Identifiable, PartialEq, Debug, Serialize, Clone)]
 #[diesel(table_name = crate::schema::lease_managers)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
 pub struct LeaseManager {
@@ -44,13 +44,15 @@ pub struct NewLease<'a> {
   pub address: &'a str,
   pub expiration_date: Option<i32>,
   pub notes: Option<&'a str>,
-  pub misc_data: Option<&'a str>
+  pub misc_data: Option<&'a str>,
+  pub created_on: i32,
 }
 
 #[derive(Insertable)]
 #[diesel(table_name = crate::schema::lease_managers)]
 pub struct NewManager<'a> {
-  pub name: &'a str
+  pub name: &'a str,
+  pub created_on: i32,
 }
 
 #[derive(AsChangeset)]

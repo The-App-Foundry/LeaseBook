@@ -57,7 +57,11 @@ const Logo = styled.img`
   width: 200px;
 `;
 
-export default function Header() {
+interface HeaderProps {
+  onNewProperty?: () => void;
+}
+
+export default function Header({ onNewProperty }: Readonly<HeaderProps>) {
   return (
     <OuterWrapper>
       <InnerWrapper>
@@ -68,7 +72,7 @@ export default function Header() {
         </HeaderLeft>
         <HeaderRight>
           <SearchBar />
-          <Button>
+          <Button onClick={onNewProperty}>
             <Plus />
             New Property
           </Button>
