@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import styled, { keyframes, css } from 'styled-components';
 import { Card } from '../ui';
 import {
@@ -246,6 +246,14 @@ const NoteText = styled.div`
   word-break: break-word;
 `;
 
+// Pure module-level helper — avoids recreation on every render
+function getStatusColor(s: string): string {
+  const v = s.toLowerCase();
+  if (v.includes('qualified')) return '#10b981'; // green
+  if (v.includes('prospect')) return '#3b82f6'; // blue
+  return '#6b7280'; // neutral gray fallback
+}
+
 // Matches common phone number formats, e.g. +1 (800) 555-1234, 555.867.5309, etc.
 const PHONE_REGEX = /(\+?\b\d[\d\s\-().]{6,}\d\b)/g;
 
@@ -289,6 +297,9 @@ const MenuBtn = styled.button`
   }
 `;
 
+// Static component — no dynamic props means styled-components generates the CSS
+// once at module parse time, never on click. The data-open attribute drives the
+// open/closed state purely through CSS attribute selectors.
 const MenuPanel = styled.div`
   position: absolute;
   right: 0;
@@ -302,6 +313,19 @@ const MenuPanel = styled.div`
     0 4px 6px -1px rgba(0, 0, 0, 0.1),
     0 2px 4px -2px rgba(0, 0, 0, 0.1);
   padding: 0.25rem 0;
+  opacity: 0;
+  transform: translateY(-6px) scale(0.95);
+  transform-origin: top right;
+  transition:
+    opacity 0.12s ease,
+    transform 0.12s ease;
+  pointer-events: none;
+
+  &[data-open='true'] {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+  }
 `;
 
 const MenuItem = styled.button`
@@ -331,7 +355,61 @@ const LeaseManagerValue = styled.div<{ $verified: boolean }>`
   white-space: nowrap;
 `;
 
-export default function Property({ data, onManagersChange }: Readonly<PropertyProps>) {
+// Isolated wrapper so menu open/close state never re-renders the whole card
+const MenuContainer = styled.div`
+  position: relative;
+`;
+
+interface CardMenuProps {
+  onManageManagers: () => void;
+}
+
+const CardMenu = React.memo(function CardMenu({ onManageManagers }: CardMenuProps) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: PointerEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener('pointerdown', handler);
+    return () => document.removeEventListener('pointerdown', handler);
+  }, [open]);
+
+  return (
+    <MenuContainer ref={ref}>
+      <MenuBtn
+        onPointerDown={e => {
+          // Fire immediately on press — avoids WebKit's click-delay gesture disambiguation
+          e.preventDefault();
+          setOpen(prev => !prev);
+        }}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        aria-label="Card actions"
+      >
+        <MoreVertical size={16} />
+      </MenuBtn>
+      <MenuPanel role="menu" aria-hidden={!open} data-open={open ? 'true' : undefined}>
+        <MenuItem
+          role="menuitem"
+          onClick={() => {
+            setOpen(false);
+            onManageManagers();
+          }}
+        >
+          <Users size={14} />
+          Manage Lease Managers
+        </MenuItem>
+      </MenuPanel>
+    </MenuContainer>
+  );
+});
+
+function Property({ data, onManagersChange }: Readonly<PropertyProps>) {
   const {
     status,
     name,
@@ -346,67 +424,26 @@ export default function Property({ data, onManagersChange }: Readonly<PropertyPr
 
   const isExpired = status === 'prospect';
 
-  const [menuOpen, setMenuOpen] = useState(false);
   const [dmModalOpen, setDmModalOpen] = useState(false);
   const [expanded, setExpanded] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
 
   // Determine verification status from managers array
   const allVerified = managers.length > 0 && managers.every(m => m.verified);
 
-  // Close hamburger on outside click
-  useEffect(() => {
-    if (!menuOpen) return;
-    const handler = (e: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setMenuOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, [menuOpen]);
-
-  // Map statuses to colors (Qualified = green, Prospect = blue)
-  const getStatusColor = (s: string) => {
-    const v = s.toLowerCase();
-    if (v.includes('qualified')) return '#10b981'; // green
-    if (v.includes('prospect')) return '#3b82f6'; // blue
-    return '#6b7280'; // neutral gray fallback
-  };
+  const handleManageManagers = useCallback(() => setDmModalOpen(true), []);
 
   return (
     <CardSlot $expanded={expanded}>
       {expanded && <Backdrop onClick={() => setExpanded(false)} />}
       <StyledCard $expanded={expanded}>
-        <CardHeader ref={menuRef}>
+        <CardHeader>
           <ExpandIconBtn
             onClick={() => setExpanded(prev => !prev)}
             aria-label={expanded ? 'Collapse card' : 'Expand card'}
           >
             {expanded ? <X size={14} /> : <Maximize size={14} />}
           </ExpandIconBtn>
-          <MenuBtn
-            onClick={() => setMenuOpen(prev => !prev)}
-            aria-haspopup="menu"
-            aria-expanded={menuOpen}
-            aria-label="Card actions"
-          >
-            <MoreVertical size={16} />
-          </MenuBtn>
-          {menuOpen && (
-            <MenuPanel role="menu">
-              <MenuItem
-                role="menuitem"
-                onClick={() => {
-                  setMenuOpen(false);
-                  setDmModalOpen(true);
-                }}
-              >
-                <Users size={14} />
-                Manage Lease Managers
-              </MenuItem>
-            </MenuPanel>
-          )}
+          <CardMenu onManageManagers={handleManageManagers} />
         </CardHeader>
 
         <TopRow>
@@ -472,3 +509,5 @@ export default function Property({ data, onManagersChange }: Readonly<PropertyPr
     </CardSlot>
   );
 }
+
+export default React.memo(Property);
