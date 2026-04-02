@@ -1,7 +1,6 @@
 import styled from 'styled-components';
-import { Card, Dropdown, Sort } from '../ui';
+import { Card, Dropdown, Sort, Badge, Button } from '../ui';
 import { Funnel as _Funnel } from 'lucide-react';
-import { Badge, Button } from '../ui';
 
 const Wrapper = styled.div`
   margin: 16px 0;

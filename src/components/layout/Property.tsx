@@ -1,17 +1,7 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState } from 'react';
 import styled, { keyframes, css } from 'styled-components';
 import { Card } from '../ui';
-import {
-  Building2,
-  Calendar,
-  User,
-  Maximize2,
-  Maximize,
-  MoreVertical,
-  Users,
-  X,
-  NotebookPen,
-} from 'lucide-react';
+import { Building2, Calendar, User, Maximize2, Maximize, X, NotebookPen } from 'lucide-react';
 import { Lease, Manager } from '../../types/lease';
 import LeaseManagersModal from './LeaseManagersModal';
 
@@ -54,6 +44,7 @@ const StyledCard = styled(Card)<{ $expanded: boolean }>`
   overflow: ${({ $expanded }) => ($expanded ? 'auto' : 'hidden')};
   padding: 1.25rem;
   gap: 1rem;
+  height: ${({ $expanded }) => ($expanded ? 'auto' : COLLAPSED_HEIGHT)};
   max-height: ${({ $expanded }) => ($expanded ? '85vh' : COLLAPSED_HEIGHT)};
   ${({ $expanded }) =>
     $expanded &&
@@ -279,73 +270,6 @@ const CardHeader = styled.div`
   position: relative;
 `;
 
-const MenuBtn = styled.button`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.75rem;
-  height: 1.75rem;
-  padding: 0;
-  border: none;
-  background: transparent;
-  border-radius: ${({ theme }) => theme.radii.sm};
-  color: #6b7280;
-  cursor: pointer;
-
-  &:hover {
-    background: ${({ theme }) => theme.colors.muted};
-  }
-`;
-
-// Static component — no dynamic props means styled-components generates the CSS
-// once at module parse time, never on click. The data-open attribute drives the
-// open/closed state purely through CSS attribute selectors.
-const MenuPanel = styled.div`
-  position: absolute;
-  right: 0;
-  top: 2rem;
-  z-index: 10;
-  min-width: 180px;
-  background: ${({ theme }) => theme.colors.surface};
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  border-radius: ${({ theme }) => theme.radii.md};
-  box-shadow:
-    0 4px 6px -1px rgba(0, 0, 0, 0.1),
-    0 2px 4px -2px rgba(0, 0, 0, 0.1);
-  padding: 0.25rem 0;
-  opacity: 0;
-  transform: translateY(-6px) scale(0.95);
-  transform-origin: top right;
-  transition:
-    opacity 0.12s ease,
-    transform 0.12s ease;
-  pointer-events: none;
-
-  &[data-open='true'] {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-    pointer-events: auto;
-  }
-`;
-
-const MenuItem = styled.button`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  width: 100%;
-  padding: 0.5rem 0.75rem;
-  border: none;
-  background: transparent;
-  font-size: 0.825rem;
-  color: ${({ theme }) => theme.colors.text};
-  cursor: pointer;
-  text-align: left;
-
-  &:hover {
-    background: ${({ theme }) => theme.colors.muted};
-  }
-`;
-
 const LeaseManagerValue = styled.div<{ $verified: boolean }>`
   font-size: 0.9rem;
   font-weight: 500;
@@ -354,60 +278,6 @@ const LeaseManagerValue = styled.div<{ $verified: boolean }>`
   text-overflow: ellipsis;
   white-space: nowrap;
 `;
-
-// Isolated wrapper so menu open/close state never re-renders the whole card
-const MenuContainer = styled.div`
-  position: relative;
-`;
-
-interface CardMenuProps {
-  onManageManagers: () => void;
-}
-
-const CardMenu = React.memo(function CardMenu({ onManageManagers }: CardMenuProps) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!open) return;
-    const handler = (e: PointerEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener('pointerdown', handler);
-    return () => document.removeEventListener('pointerdown', handler);
-  }, [open]);
-
-  return (
-    <MenuContainer ref={ref}>
-      <MenuBtn
-        onPointerDown={e => {
-          // Fire immediately on press — avoids WebKit's click-delay gesture disambiguation
-          e.preventDefault();
-          setOpen(prev => !prev);
-        }}
-        aria-haspopup="menu"
-        aria-expanded={open}
-        aria-label="Card actions"
-      >
-        <MoreVertical size={16} />
-      </MenuBtn>
-      <MenuPanel role="menu" aria-hidden={!open} data-open={open ? 'true' : undefined}>
-        <MenuItem
-          role="menuitem"
-          onClick={() => {
-            setOpen(false);
-            onManageManagers();
-          }}
-        >
-          <Users size={14} />
-          Manage Lease Managers
-        </MenuItem>
-      </MenuPanel>
-    </MenuContainer>
-  );
-});
 
 function Property({ data, onManagersChange }: Readonly<PropertyProps>) {
   const {
@@ -430,8 +300,6 @@ function Property({ data, onManagersChange }: Readonly<PropertyProps>) {
   // Determine verification status from managers array
   const allVerified = managers.length > 0 && managers.every(m => m.verified);
 
-  const handleManageManagers = useCallback(() => setDmModalOpen(true), []);
-
   return (
     <CardSlot $expanded={expanded}>
       {expanded && <Backdrop onClick={() => setExpanded(false)} />}
@@ -443,7 +311,6 @@ function Property({ data, onManagersChange }: Readonly<PropertyProps>) {
           >
             {expanded ? <X size={14} /> : <Maximize size={14} />}
           </ExpandIconBtn>
-          <CardMenu onManageManagers={handleManageManagers} />
         </CardHeader>
 
         <TopRow>
