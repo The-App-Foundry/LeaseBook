@@ -61,23 +61,23 @@ interface HeaderProps {
   onNewProperty?: () => void;
 }
 
-export default function Header({ onNewProperty }: Readonly<HeaderProps>) {
-  return (
-    <OuterWrapper>
-      <InnerWrapper>
-        <HeaderLeft>
-          <div>
-            <Logo src="/src/assets/leasebook.webp" alt="LeaseBook logo" />
-          </div>
-        </HeaderLeft>
-        <HeaderRight>
-          <SearchBar />
-          <Button onClick={onNewProperty}>
-            <Plus />
-            New Property
-          </Button>
-        </HeaderRight>
-      </InnerWrapper>
-    </OuterWrapper>
-  );
-}
+const Header = ({ onNewProperty }: Readonly<HeaderProps>) => (
+  <OuterWrapper>
+    <InnerWrapper>
+      <HeaderLeft>
+        <div>
+          <Logo src="/src/assets/leasebook.webp" alt="LeaseBook logo" />
+        </div>
+      </HeaderLeft>
+      <HeaderRight>
+        <SearchBar />
+        <Button onClick={onNewProperty}>
+          <Plus />
+          New Property
+        </Button>
+      </HeaderRight>
+    </InnerWrapper>
+  </OuterWrapper>
+);
+
+export default Header;

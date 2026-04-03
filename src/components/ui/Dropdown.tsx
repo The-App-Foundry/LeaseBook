@@ -38,26 +38,26 @@ const StyledToggle = styled(BsDropdown.Toggle)`
   }
 `;
 
-export default function Dropdown({
+const Dropdown = ({
   buttonLabel,
   showChevron = true,
   triggerLabel,
   items,
-}: Readonly<DropdownMenuProps>) {
-  return (
-    <BsDropdown>
-      <StyledToggle aria-label={triggerLabel}>
-        {buttonLabel}
-        {showChevron && <ChevronDown size={15} />}
-      </StyledToggle>
-      <BsDropdown.Menu>
-        {items.map(item => (
-          <BsDropdown.Item key={item.title} onClick={item.action}>
-            {item.icon}
-            {item.title}
-          </BsDropdown.Item>
-        ))}
-      </BsDropdown.Menu>
-    </BsDropdown>
-  );
-}
+}: Readonly<DropdownMenuProps>) => (
+  <BsDropdown>
+    <StyledToggle aria-label={triggerLabel}>
+      {buttonLabel}
+      {showChevron && <ChevronDown size={15} />}
+    </StyledToggle>
+    <BsDropdown.Menu>
+      {items.map(item => (
+        <BsDropdown.Item key={item.title} onClick={item.action}>
+          {item.icon}
+          {item.title}
+        </BsDropdown.Item>
+      ))}
+    </BsDropdown.Menu>
+  </BsDropdown>
+);
+
+export default Dropdown;

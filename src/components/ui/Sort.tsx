@@ -28,7 +28,7 @@ const ADownUp = styled(ArrowUpDown)`
   height: 15px;
 `;
 
-export default function Sort() {
+const Sort = () => {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
   const toggleSortOrder = () => {
@@ -42,4 +42,6 @@ export default function Sort() {
       {sortOrder === 'asc' ? <AUpDown aria-hidden="true" /> : <ADownUp aria-hidden="true" />}
     </SortButton>
   );
-}
+};
+
+export default Sort;

@@ -238,17 +238,17 @@ const NoteText = styled.div`
 `;
 
 // Pure module-level helper — avoids recreation on every render
-function getStatusColor(s: string): string {
+const getStatusColor = (s: string): string => {
   const v = s.toLowerCase();
   if (v.includes('qualified')) return '#10b981'; // green
   if (v.includes('prospect')) return '#3b82f6'; // blue
   return '#6b7280'; // neutral gray fallback
-}
+};
 
 // Matches common phone number formats, e.g. +1 (800) 555-1234, 555.867.5309, etc.
 const PHONE_REGEX = /(\+?\b\d[\d\s\-().]{6,}\d\b)/g;
 
-function formatNoteText(text: string): React.ReactNode[] {
+const formatNoteText = (text: string): React.ReactNode[] => {
   // split() with a capturing group interleaves non-matches and captures:
   // [non-match, phone, non-match, phone, ...]
   const parts = text.split(PHONE_REGEX);
@@ -261,7 +261,7 @@ function formatNoteText(text: string): React.ReactNode[] {
       <React.Fragment key={`text-${part}-${i}`}>{part}</React.Fragment>
     ),
   );
-}
+};
 
 const CardHeader = styled.div`
   display: flex;
@@ -279,7 +279,7 @@ const LeaseManagerValue = styled.div<{ $verified: boolean }>`
   white-space: nowrap;
 `;
 
-function Property({ data, onManagersChange }: Readonly<PropertyProps>) {
+const Property = ({ data, onManagersChange }: Readonly<PropertyProps>) => {
   const {
     status,
     name,
@@ -375,6 +375,6 @@ function Property({ data, onManagersChange }: Readonly<PropertyProps>) {
       </StyledCard>
     </CardSlot>
   );
-}
+};
 
 export default React.memo(Property);

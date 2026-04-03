@@ -19,7 +19,7 @@ const Container = styled.div`
   padding: 0 16px;
 `;
 
-export default function GridContainer({ leases, onManagersChange }: Readonly<GridContainerProps>) {
+const GridContainer = ({ leases, onManagersChange }: Readonly<GridContainerProps>) => {
   // Always points to the latest onManagersChange without changing identity
   const onChangeRef = useRef(onManagersChange);
   onChangeRef.current = onManagersChange;
@@ -38,4 +38,6 @@ export default function GridContainer({ leases, onManagersChange }: Readonly<Gri
       ))}
     </Container>
   );
-}
+};
+
+export default GridContainer;

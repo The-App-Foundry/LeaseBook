@@ -25,11 +25,9 @@ interface DbManager {
   email: string | null;
 }
 
-function unixToIso(ts: number): string {
-  return new Date(ts * 1000).toISOString().split('T')[0];
-}
+const unixToIso = (ts: number): string => new Date(ts * 1000).toISOString().split('T')[0];
 
-function dbLeaseToUi(db: DbLease, mgrs: DbManager[]): Lease {
+const dbLeaseToUi = (db: DbLease, mgrs: DbManager[]): Lease => {
   const isExpired = db.expiration_date ? db.expiration_date * 1000 < Date.now() : false;
   const managers: Manager[] = mgrs.map(m => ({
     id: String(m.id),
@@ -48,7 +46,7 @@ function dbLeaseToUi(db: DbLease, mgrs: DbManager[]): Lease {
     size: db.misc_data ?? '-',
     note: db.notes ?? undefined,
   };
-}
+};
 
 const Content = styled.div`
   height: calc(100vh - var(--app-header-height));
@@ -121,7 +119,7 @@ const LoadingLabel = styled.p`
   animation: ${pulse} 1.5s ease-in-out infinite;
 `;
 
-function App() {
+const App = () => {
   const [leases, setLeases] = useState<Lease[]>([]);
   const [loading, setLoading] = useState(true);
   const [showImportFlow, setShowImportFlow] = useState(false);
@@ -170,7 +168,7 @@ function App() {
 
   const hasLeases = leases.length > 0;
 
-  function renderContent() {
+  const renderContent = () => {
     if (loading) {
       return (
         <LoadingState>
@@ -212,7 +210,7 @@ function App() {
         </EmptyActions>
       </EmptyState>
     );
-  }
+  };
 
   return (
     <main>
@@ -225,6 +223,6 @@ function App() {
       />
     </main>
   );
-}
+};
 
 export default App;
