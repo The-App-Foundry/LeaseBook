@@ -29,29 +29,29 @@ const Funnel = styled(_Funnel)`
   margin-right: 5px;
 `;
 
-export default function FilterBar() {
-  return (
-    <Wrapper>
-      <Card $width="1600px" $height="77px">
-        <Wrapper className="inner">
-          <Funnel />
-          <Label>Filter:</Label>
-          <Button className="filter">All Properties</Button>
-          <Button className="filter">
-            <Badge className="emerald">Q</Badge>Qualified
-          </Button>
-          <Button className="filter">
-            <Badge className="gray">P</Badge>Prospects
-          </Button>
-        </Wrapper>
-        <Wrapper className="inner">
-          <Sort />
-          <Dropdown
-            buttonLabel="Sort by"
-            items={[{ title: 'Expiration' }, { title: 'Address' }, { title: 'Type' }]}
-          />
-        </Wrapper>
-      </Card>
-    </Wrapper>
-  );
-}
+const FilterBar = () => (
+  <Wrapper>
+    <Card $width="1600px" $height="77px">
+      <Wrapper className="inner">
+        <Funnel />
+        <Label>Filter:</Label>
+        <Button className="filter">All Properties</Button>
+        <Button className="filter">
+          <Badge className="emerald">Q</Badge>Qualified
+        </Button>
+        <Button className="filter">
+          <Badge className="gray">P</Badge>Prospects
+        </Button>
+      </Wrapper>
+      <Wrapper className="inner">
+        <Sort />
+        <Dropdown
+          buttonLabel="Sort by"
+          items={[{ title: 'Expiration' }, { title: 'Address' }, { title: 'Type' }]}
+        />
+      </Wrapper>
+    </Card>
+  </Wrapper>
+);
+
+export default FilterBar;

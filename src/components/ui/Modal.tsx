@@ -98,7 +98,7 @@ const Footer = styled.div`
   flex-shrink: 0;
 `;
 
-export default function Modal({ isOpen, onClose, title, children, footer }: Readonly<ModalProps>) {
+const Modal = ({ isOpen, onClose, title, children, footer }: Readonly<ModalProps>) => {
   const boxRef = useRef<HTMLDivElement>(null);
 
   // Close on Escape
@@ -138,4 +138,6 @@ export default function Modal({ isOpen, onClose, title, children, footer }: Read
       </Box>
     </Overlay>
   );
-}
+};
+
+export default Modal;

@@ -70,12 +70,12 @@ const EmptyState = styled.p`
   padding: 1rem 0;
 `;
 
-export default function LeaseManagersModal({
+const LeaseManagersModal = ({
   isOpen,
   onClose,
   managers,
   onUpdate,
-}: Readonly<LeaseManagersModalProps>) {
+}: Readonly<LeaseManagersModalProps>) => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isAdding, setIsAdding] = useState(false);
 
@@ -154,4 +154,6 @@ export default function LeaseManagersModal({
       )}
     </Modal>
   );
-}
+};
+
+export default LeaseManagersModal;

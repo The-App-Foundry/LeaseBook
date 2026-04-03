@@ -48,7 +48,7 @@ const Actions = styled.div`
   padding-top: 0.5rem;
 `;
 
-export default function ManagerForm({ initial, onSave, onCancel }: Readonly<ManagerFormProps>) {
+const ManagerForm = ({ initial, onSave, onCancel }: Readonly<ManagerFormProps>) => {
   const [name, setName] = useState(initial?.name ?? '');
   const [phone, setPhone] = useState(initial?.phone ?? '');
   const [email, setEmail] = useState(initial?.email ?? '');
@@ -106,4 +106,6 @@ export default function ManagerForm({ initial, onSave, onCancel }: Readonly<Mana
       </Actions>
     </Form>
   );
-}
+};
+
+export default ManagerForm;

@@ -147,11 +147,9 @@ const Badge = styled.span`
   background: #f8fafc;
 `;
 
-function normalize(value: string): string {
-  return value.toLowerCase().replaceAll(/[^a-z0-9]/g, '');
-}
+const normalize = (value: string): string => value.toLowerCase().replaceAll(/[^a-z0-9]/g, '');
 
-function autoDetectHeaders(headers: string[]): Record<LeaseFieldKey, string> {
+const autoDetectHeaders = (headers: string[]): Record<LeaseFieldKey, string> => {
   const normalized = headers.map(header => ({ raw: header, normalized: normalize(header) }));
   const next = {} as Record<LeaseFieldKey, string>;
 
@@ -163,18 +161,18 @@ function autoDetectHeaders(headers: string[]): Record<LeaseFieldKey, string> {
   });
 
   return next;
-}
+};
 
-function formatExpirationDate(isoDateStr: string): string {
+const formatExpirationDate = (isoDateStr: string): string => {
   const datePart = isoDateStr.slice(0, 10); // "2026-03-15"
   const parts = datePart.split('-');
   if (parts.length !== 3) return datePart;
   const [year, month, day] = parts;
   return `${month}/${day}/${year}`;
-}
+};
 
-function convertBackendLeasesToUi(rows: BackendLease[]): Lease[] {
-  return rows.map(item => {
+const convertBackendLeasesToUi = (rows: BackendLease[]): Lease[] =>
+  rows.map(item => {
     // Build a raw string from all available manager fields for auto-detection
     const rawParts = [
       item.lease_manager?.name,
@@ -203,14 +201,13 @@ function convertBackendLeasesToUi(rows: BackendLease[]): Lease[] {
       note: item.notes || item.misc_data || undefined,
     };
   });
-}
 
-function getFileName(path: string): string {
+const getFileName = (path: string): string => {
   const parts = path.split(/[\\/]/);
   return parts[parts.length - 1] || path;
-}
+};
 
-function getErrorMessage(error: unknown, fallback: string): string {
+const getErrorMessage = (error: unknown, fallback: string): string => {
   if (error instanceof Error && error.message.trim()) {
     return error.message;
   }
@@ -230,13 +227,13 @@ function getErrorMessage(error: unknown, fallback: string): string {
   }
 
   return fallback;
-}
+};
 
-export default function WorkbookImportFlow({
+const WorkbookImportFlow = ({
   onImported,
   onCancel,
   autoOpen,
-}: Readonly<WorkbookImportFlowProps>) {
+}: Readonly<WorkbookImportFlowProps>) => {
   const [workbookPath, setWorkbookPath] = useState('');
   const [workbookName, setWorkbookName] = useState('');
   const [spreadsheet, setSpreadsheet] = useState<ParsedSpreadsheet | null>(null);
@@ -259,7 +256,7 @@ export default function WorkbookImportFlow({
     return spreadsheet.sheets.find(sheet => sheet.name === selectedSheetName) ?? null;
   }, [spreadsheet, selectedSheetName]);
 
-  async function handleUpload() {
+  const handleUpload = async (): Promise<void> => {
     setError('');
     setIsBusy(true);
 
@@ -299,17 +296,17 @@ export default function WorkbookImportFlow({
     } finally {
       setIsBusy(false);
     }
-  }
+  };
 
-  function handleSheetChange(nextSheetName: string) {
+  const handleSheetChange = (nextSheetName: string): void => {
     setSelectedSheetName(nextSheetName);
     const sheet = spreadsheet?.sheets.find(entry => entry.name === nextSheetName);
     if (sheet) {
       setMappingByKey(autoDetectHeaders(sheet.headers));
     }
-  }
+  };
 
-  function handleMappingChange(fieldKey: LeaseFieldKey, header: string) {
+  const handleMappingChange = (fieldKey: LeaseFieldKey, header: string): void => {
     setMappingByKey(current => {
       if (!current) return current;
       return {
@@ -317,9 +314,9 @@ export default function WorkbookImportFlow({
         [fieldKey]: header,
       };
     });
-  }
+  };
 
-  async function handleImport() {
+  const handleImport = async (): Promise<void> => {
     if (!workbookPath || !selectedSheetName || !mappingByKey) {
       return;
     }
@@ -359,7 +356,7 @@ export default function WorkbookImportFlow({
     } finally {
       setIsBusy(false);
     }
-  }
+  };
 
   return (
     <Wrapper>
@@ -447,4 +444,6 @@ export default function WorkbookImportFlow({
       </ImportCard>
     </Wrapper>
   );
-}
+};
+
+export default WorkbookImportFlow;

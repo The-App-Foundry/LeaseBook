@@ -38,21 +38,21 @@ const Input = styled.input`
   }
 `;
 
-export default function SearchBar({
+const SearchBar = ({
   value,
   onChange,
   placeholder = 'Search...',
-}: Readonly<SearchBarProps>) {
-  return (
-    <Container>
-      <Search aria-hidden="true" />
-      <Input
-        role="searchbox"
-        aria-label={placeholder}
-        value={value ?? ''}
-        onChange={e => onChange?.(e.target.value)}
-        placeholder={placeholder}
-      />
-    </Container>
-  );
-}
+}: Readonly<SearchBarProps>) => (
+  <Container>
+    <Search aria-hidden="true" />
+    <Input
+      role="searchbox"
+      aria-label={placeholder}
+      value={value ?? ''}
+      onChange={e => onChange?.(e.target.value)}
+      placeholder={placeholder}
+    />
+  </Container>
+);
+
+export default SearchBar;
