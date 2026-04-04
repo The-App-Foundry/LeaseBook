@@ -1,9 +1,7 @@
-import './App.css';
 import { useEffect, useState } from 'react';
-import styled, { keyframes } from 'styled-components';
 import { invoke } from '@tauri-apps/api/core';
 import { Upload, Plus, Loader2 } from 'lucide-react';
-import { Header, FilterBar, WorkbookImportFlow, NewPropertyForm } from './components/layout';
+import { Header, FilterBar, WorkbookImportFlow, PropertyForm } from './components/layout';
 import GridContainer from './components/layout/GridContainer';
 import { Button } from './components/ui';
 import type { Lease, Manager } from './types/lease';
@@ -12,6 +10,7 @@ interface DbLease {
   id: number;
   name: string;
   address: string;
+  size: number | null;
   expiration_date: number | null;
   notes: string | null;
   misc_data: string | null;
@@ -40,84 +39,13 @@ const dbLeaseToUi = (db: DbLease, mgrs: DbManager[]): Lease => {
     status: isExpired ? 'prospect' : 'qualified',
     name: db.name,
     businessAddr: db.address,
+    size: db.size ?? 0,
     leaseExpiration: db.expiration_date ? unixToIso(db.expiration_date) : '-',
     leaseManager: managers.map(m => m.name).join(', ') || '-',
     managers,
-    size: db.misc_data ?? '-',
     note: db.notes ?? undefined,
   };
 };
-
-const Content = styled.div`
-  height: calc(100vh - var(--app-header-height));
-  padding-top: var(--app-header-height);
-  box-sizing: border-box;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-`;
-
-const EmptyState = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  height: 100%;
-  padding: 2rem;
-  text-align: center;
-`;
-
-const EmptyTitle = styled.h2`
-  margin: 0;
-  font-size: 1.25rem;
-  color: ${({ theme }) => theme.colors.text};
-`;
-
-const EmptySubtitle = styled.p`
-  margin: 0;
-  font-size: 0.9rem;
-  color: ${({ theme }) => theme.colors.muted};
-`;
-
-const EmptyActions = styled.div`
-  display: flex;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin-top: 0.5rem;
-`;
-
-const spin = keyframes`
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-`;
-
-const pulse = keyframes`
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
-`;
-
-const LoadingState = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 1.25rem;
-  height: 100%;
-`;
-
-const Spinner = styled(Loader2)`
-  animation: ${spin} 0.8s linear infinite;
-  color: ${({ theme }) => theme.colors.primary};
-`;
-
-const LoadingLabel = styled.p`
-  margin: 0;
-  font-size: 1.1rem;
-  font-weight: 500;
-  color: ${({ theme }) => theme.colors.text};
-  animation: ${pulse} 1.5s ease-in-out infinite;
-`;
 
 const App = () => {
   const [leases, setLeases] = useState<Lease[]>([]);
@@ -171,10 +99,21 @@ const App = () => {
   const renderContent = () => {
     if (loading) {
       return (
-        <LoadingState>
-          <Spinner size={48} />
-          <LoadingLabel>Loading properties…</LoadingLabel>
-        </LoadingState>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '1.25rem',
+            height: '100%',
+          }}
+        >
+          <Loader2 size={48} className="lb-spin" />
+          <p className="lb-pulse" style={{ margin: 0, fontSize: '1.1rem', fontWeight: 500 }}>
+            Loading properties…
+          </p>
+        </div>
       );
     }
     if (hasLeases) {
@@ -195,10 +134,31 @@ const App = () => {
       );
     }
     return (
-      <EmptyState>
-        <EmptyTitle>No leases yet</EmptyTitle>
-        <EmptySubtitle>Import a workbook or create a new lease to get started.</EmptySubtitle>
-        <EmptyActions>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '1rem',
+          height: '100%',
+          padding: '2rem',
+          textAlign: 'center',
+        }}
+      >
+        <h2 style={{ margin: 0, fontSize: '1.25rem' }}>No leases yet</h2>
+        <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--lb-muted)' }}>
+          Import a workbook or create a new lease to get started.
+        </p>
+        <div
+          style={{
+            display: 'flex',
+            gap: '0.75rem',
+            flexWrap: 'wrap',
+            justifyContent: 'center',
+            marginTop: '0.5rem',
+          }}
+        >
           <Button onClick={() => setShowNewPropertyForm(true)}>
             <Plus size={15} />
             Create New Lease
@@ -207,16 +167,16 @@ const App = () => {
             <Upload size={15} />
             Import Workbook
           </Button>
-        </EmptyActions>
-      </EmptyState>
+        </div>
+      </div>
     );
   };
 
   return (
     <main>
       <Header onNewProperty={() => setShowNewPropertyForm(true)} />
-      <Content>{renderContent()}</Content>
-      <NewPropertyForm
+      <div className="lb-app-content">{renderContent()}</div>
+      <PropertyForm
         isOpen={showNewPropertyForm}
         onClose={() => setShowNewPropertyForm(false)}
         onCreated={handlePropertyCreated}

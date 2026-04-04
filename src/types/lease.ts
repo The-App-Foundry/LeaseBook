@@ -11,9 +11,9 @@ export interface Lease {
   status: 'qualified' | 'prospect';
   name: string;
   businessAddr: string;
+  size?: number;
   leaseExpiration: string; // ISO date preferred, or friendly string
-  leaseManager: string;
+  leaseManager?: string;
   managers: Manager[];
-  size: string;
   note?: string;
 }

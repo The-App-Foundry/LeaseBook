@@ -8,6 +8,7 @@ pub struct Lease {
   pub id: i32,
   pub name: String,
   pub address: String,
+  pub size: Option<i32>,
   pub expiration_date: Option<i32>,
   pub notes: Option<String>,
   pub misc_data: Option<String>,

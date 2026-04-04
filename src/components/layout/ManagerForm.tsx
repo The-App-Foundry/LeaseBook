@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import styled from 'styled-components';
 import type { Manager } from '../../types/lease';
 import { Button } from '../ui';
 
@@ -8,45 +7,6 @@ interface ManagerFormProps {
   onSave: (manager: Manager) => void;
   onCancel: () => void;
 }
-
-const Form = styled.form`
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-`;
-
-const Field = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-`;
-
-const Label = styled.label`
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: ${({ theme }) => theme.colors.text};
-`;
-
-const Input = styled.input`
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  border-radius: ${({ theme }) => theme.radii.md};
-  padding: 0.5rem 0.65rem;
-  font-size: 0.875rem;
-  background: ${({ theme }) => theme.colors.surface};
-  color: ${({ theme }) => theme.colors.text};
-
-  &:focus {
-    outline: none;
-    box-shadow: 0 0 0 2px ${({ theme }) => theme.colors.primary};
-  }
-`;
-
-const Actions = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.75rem;
-  padding-top: 0.5rem;
-`;
 
 const ManagerForm = ({ initial, onSave, onCancel }: Readonly<ManagerFormProps>) => {
   const [name, setName] = useState(initial?.name ?? '');
@@ -66,45 +26,57 @@ const ManagerForm = ({ initial, onSave, onCancel }: Readonly<ManagerFormProps>) 
   };
 
   return (
-    <Form onSubmit={handleSubmit}>
-      <Field>
-        <Label htmlFor="mgr-name">Name *</Label>
-        <Input
+    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+        <label htmlFor="mgr-name" style={{ fontSize: '0.8rem', fontWeight: 600 }}>
+          Name *
+        </label>
+        <input
           id="mgr-name"
+          className="lb-form-input"
           value={name}
           onChange={e => setName(e.target.value)}
           placeholder="Full name"
           required
           autoFocus
         />
-      </Field>
-      <Field>
-        <Label htmlFor="mgr-phone">Phone</Label>
-        <Input
+      </div>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+        <label htmlFor="mgr-phone" style={{ fontSize: '0.8rem', fontWeight: 600 }}>
+          Phone
+        </label>
+        <input
           id="mgr-phone"
           type="tel"
+          className="lb-form-input"
           value={phone}
           onChange={e => setPhone(e.target.value)}
           placeholder="555-123-4567"
         />
-      </Field>
-      <Field>
-        <Label htmlFor="mgr-email">Email</Label>
-        <Input
+      </div>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+        <label htmlFor="mgr-email" style={{ fontSize: '0.8rem', fontWeight: 600 }}>
+          Email
+        </label>
+        <input
           id="mgr-email"
           type="email"
+          className="lb-form-input"
           value={email}
           onChange={e => setEmail(e.target.value)}
           placeholder="name@example.com"
         />
-      </Field>
-      <Actions>
+      </div>
+
+      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', paddingTop: '0.5rem' }}>
         <Button type="button" $variant="outline" onClick={onCancel}>
           Cancel
         </Button>
         <Button type="submit">{initial ? 'Update' : 'Create'}</Button>
-      </Actions>
-    </Form>
+      </div>
+    </form>
   );
 };
 

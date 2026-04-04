@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import styled from 'styled-components';
 import { Pencil, Trash2, Plus } from 'lucide-react';
 import type { Manager } from '../../types/lease';
 import Modal from '../ui/Modal';
@@ -12,63 +11,6 @@ interface LeaseManagersModalProps {
   managers: Manager[];
   onUpdate: (managers: Manager[]) => void;
 }
-
-const List = styled.ul`
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-`;
-
-const Row = styled.li`
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.6rem 0.75rem;
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  border-radius: ${({ theme }) => theme.radii.md};
-  background: ${({ theme }) => theme.colors.surface};
-`;
-
-const NameText = styled.span<{ $verified: boolean }>`
-  flex: 1;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: ${({ $verified, theme }) => ($verified ? theme.colors.text : theme.colors.danger)};
-`;
-
-const Detail = styled.span`
-  font-size: 0.75rem;
-  color: #6b7280;
-`;
-
-const IconBtn = styled.button`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.75rem;
-  height: 1.75rem;
-  padding: 0;
-  border: none;
-  background: transparent;
-  border-radius: ${({ theme }) => theme.radii.sm};
-  color: ${({ theme }) => theme.colors.text};
-  cursor: pointer;
-  transition: background 150ms ease;
-
-  &:hover {
-    background: ${({ theme }) => theme.colors.muted};
-  }
-`;
-
-const EmptyState = styled.p`
-  text-align: center;
-  font-size: 0.85rem;
-  color: #6b7280;
-  padding: 1rem 0;
-`;
 
 const LeaseManagersModal = ({
   isOpen,
@@ -134,23 +76,57 @@ const LeaseManagersModal = ({
       }
     >
       {managers.length === 0 ? (
-        <EmptyState>No lease managers yet.</EmptyState>
+        <p style={{ textAlign: 'center', fontSize: '0.85rem', color: '#6b7280', padding: '1rem 0', margin: 0 }}>
+          No lease managers yet.
+        </p>
       ) : (
-        <List>
+        <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
           {managers.map(m => (
-            <Row key={m.id}>
-              <NameText $verified={m.verified}>{m.name}</NameText>
-              {m.phone && <Detail>{m.phone}</Detail>}
-              {m.email && <Detail>{m.email}</Detail>}
-              <IconBtn onClick={() => setEditingId(m.id)} aria-label={`Edit ${m.name}`}>
+            <li
+              key={m.id}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.75rem',
+                padding: '0.6rem 0.75rem',
+                border: '1px solid var(--lb-border)',
+                borderRadius: 'var(--lb-radius-md)',
+                background: 'var(--lb-surface)',
+              }}
+            >
+              <span
+                style={{
+                  flex: 1,
+                  fontSize: '0.875rem',
+                  fontWeight: 500,
+                  color: m.verified ? 'var(--lb-text)' : 'var(--lb-danger)',
+                }}
+              >
+                {m.name}
+              </span>
+              {m.phone && (
+                <span style={{ fontSize: '0.75rem', color: '#6b7280' }}>{m.phone}</span>
+              )}
+              {m.email && (
+                <span style={{ fontSize: '0.75rem', color: '#6b7280' }}>{m.email}</span>
+              )}
+              <button
+                className="lb-icon-btn"
+                onClick={() => setEditingId(m.id)}
+                aria-label={`Edit ${m.name}`}
+              >
                 <Pencil size={14} />
-              </IconBtn>
-              <IconBtn onClick={() => handleDelete(m.id)} aria-label={`Delete ${m.name}`}>
+              </button>
+              <button
+                className="lb-icon-btn"
+                onClick={() => handleDelete(m.id)}
+                aria-label={`Delete ${m.name}`}
+              >
                 <Trash2 size={14} />
-              </IconBtn>
-            </Row>
+              </button>
+            </li>
           ))}
-        </List>
+        </ul>
       )}
     </Modal>
   );
