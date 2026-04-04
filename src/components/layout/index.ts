@@ -5,4 +5,4 @@ export { default as GridContainer } from './GridContainer';
 export { default as WorkbookImportFlow } from './WorkbookImportFlow';
 export { default as ManagerForm } from './ManagerForm';
 export { default as LeaseManagersModal } from './LeaseManagersModal';
-export { default as NewPropertyForm } from './PropertyForm';
+export { default as PropertyForm } from './PropertyForm';

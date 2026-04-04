@@ -1,9 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { invoke } from '@tauri-apps/api/core';
 import { open } from '@tauri-apps/plugin-dialog';
-import styled from 'styled-components';
 import { ChevronLeft, Upload, Table2, Link2 } from 'lucide-react';
-import { Button, Card } from '../ui';
+import { Button } from '../ui';
 import type { Lease } from '../../types/lease';
 import { detectManagers } from '../../utils/managerDetect';
 
@@ -74,79 +73,6 @@ const ALIASES: Record<LeaseFieldKey, string[]> = {
   notes: ['notes', 'note', 'comments'],
 };
 
-const Wrapper = styled.div`
-  margin: 16px 0;
-  padding: 0 16px;
-`;
-
-const ImportCard = styled(Card)`
-  width: 100%;
-  max-width: 1600px;
-  margin: 0 auto;
-  align-items: flex-start;
-  flex-direction: column;
-  gap: 0.75rem;
-`;
-
-const Title = styled.h2`
-  margin: 0;
-  font-size: 1rem;
-  color: ${({ theme }) => theme.colors.text};
-`;
-
-const Row = styled.div`
-  display: flex;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-  align-items: center;
-`;
-
-const FieldGrid = styled.div`
-  display: grid;
-  grid-template-columns: 220px 1fr;
-  gap: 0.5rem 0.75rem;
-  width: 100%;
-
-  @media (max-width: 720px) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-const Label = styled.label`
-  font-size: 0.85rem;
-  color: ${({ theme }) => theme.colors.text};
-  font-weight: 600;
-`;
-
-const Select = styled.select`
-  width: 100%;
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  border-radius: ${({ theme }) => theme.radii.md};
-  padding: 0.5rem 0.65rem;
-  font-size: 0.85rem;
-  background: ${({ theme }) => theme.colors.surface};
-`;
-
-const Hint = styled.p`
-  margin: 0;
-  font-size: 0.8rem;
-  color: #6b7280;
-`;
-
-const ErrorText = styled.p`
-  margin: 0;
-  color: #b91c1c;
-  font-size: 0.82rem;
-`;
-
-const Badge = styled.span`
-  font-size: 0.75rem;
-  border-radius: ${({ theme }) => theme.radii.sm};
-  padding: 0.2rem 0.45rem;
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  background: #f8fafc;
-`;
-
 const normalize = (value: string): string => value.toLowerCase().replaceAll(/[^a-z0-9]/g, '');
 
 const autoDetectHeaders = (headers: string[]): Record<LeaseFieldKey, string> => {
@@ -197,7 +123,6 @@ const convertBackendLeasesToUi = (rows: BackendLease[]): Lease[] =>
       leaseExpiration: item.expiration_date ? formatExpirationDate(item.expiration_date) : '-',
       leaseManager: displayName,
       managers: finalManagers,
-      size: '-',
       note: item.notes || item.misc_data || undefined,
     };
   });
@@ -248,8 +173,7 @@ const WorkbookImportFlow = ({
       autoOpenFired.current = true;
       void handleUpload();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, []); // autoOpen is intentionally read only on mount
 
   const selectedSheet = useMemo(() => {
     if (!spreadsheet || !selectedSheetName) return null;
@@ -359,8 +283,8 @@ const WorkbookImportFlow = ({
   };
 
   return (
-    <Wrapper>
-      <ImportCard>
+    <div className="lb-workbook-wrapper">
+      <div className="lb-card lb-workbook-card">
         {onCancel && (
           <Button
             $variant="ghost"
@@ -371,23 +295,42 @@ const WorkbookImportFlow = ({
             Back
           </Button>
         )}
-        <Title>Workbook Import</Title>
-        <Hint>Upload workbook, select a sheet, confirm column mapping, and import.</Hint>
 
-        <Row>
-          <Label>Workbook File</Label>
+        <h2 style={{ margin: 0, fontSize: '1rem' }}>Workbook Import</h2>
+        <p style={{ margin: 0, fontSize: '0.8rem', color: '#6b7280' }}>
+          Upload workbook, select a sheet, confirm column mapping, and import.
+        </p>
+
+        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
+          <label style={{ fontSize: '0.85rem', fontWeight: 600 }}>Workbook File</label>
           <Button onClick={handleUpload} $variant="outline" disabled={isBusy}>
             <Upload size={15} />
             {isBusy ? 'Working...' : 'Upload Workbook'}
           </Button>
-          {workbookName ? <Badge>{workbookName}</Badge> : null}
-        </Row>
+          {workbookName ? (
+            <span
+              style={{
+                fontSize: '0.75rem',
+                borderRadius: 'var(--lb-radius-sm)',
+                padding: '0.2rem 0.45rem',
+                border: '1px solid var(--lb-border)',
+                background: '#f8fafc',
+              }}
+            >
+              {workbookName}
+            </span>
+          ) : null}
+        </div>
 
         {spreadsheet ? (
-          <Row>
-            <Label htmlFor="sheet-select">Sheet</Label>
-            <Select
+          <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
+            <label htmlFor="sheet-select" style={{ fontSize: '0.85rem', fontWeight: 600 }}>
+              Sheet
+            </label>
+            <select
               id="sheet-select"
+              className="lb-form-select"
+              style={{ width: 'auto' }}
               value={selectedSheetName}
               onChange={event => handleSheetChange(event.target.value)}
             >
@@ -396,28 +339,43 @@ const WorkbookImportFlow = ({
                   {sheet.name}
                 </option>
               ))}
-            </Select>
-            <Badge>
-              <Table2 size={12} style={{ marginRight: 6, verticalAlign: 'text-bottom' }} />
+            </select>
+            <span
+              style={{
+                fontSize: '0.75rem',
+                borderRadius: 'var(--lb-radius-sm)',
+                padding: '0.2rem 0.45rem',
+                border: '1px solid var(--lb-border)',
+                background: '#f8fafc',
+              }}
+            >
+              <Table2 size={12} style={{ marginRight: 6, verticalAlign: 'text-bottom', display: 'inline' }} />
               {spreadsheet.sheets.length} sheets
-            </Badge>
-          </Row>
+            </span>
+          </div>
         ) : null}
 
         {selectedSheet && mappingByKey ? (
           <>
-            <Row>
+            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
               <Link2 size={14} />
-              <Hint>
+              <p style={{ margin: 0, fontSize: '0.8rem', color: '#6b7280' }}>
                 Auto-detected mapping is prefilled. Change any selection before importing.
-              </Hint>
-            </Row>
-            <FieldGrid>
+              </p>
+            </div>
+
+            <div className="lb-field-grid">
               {FIELDS.map(field => (
                 <div key={field.key} style={{ display: 'contents' }}>
-                  <Label htmlFor={`mapping-${field.key}`}>{field.label}</Label>
-                  <Select
+                  <label
+                    htmlFor={`mapping-${field.key}`}
+                    style={{ fontSize: '0.85rem', fontWeight: 600 }}
+                  >
+                    {field.label}
+                  </label>
+                  <select
                     id={`mapping-${field.key}`}
+                    className="lb-form-select"
                     value={mappingByKey[field.key]}
                     onChange={event => handleMappingChange(field.key, event.target.value)}
                   >
@@ -427,22 +385,24 @@ const WorkbookImportFlow = ({
                         {header}
                       </option>
                     ))}
-                  </Select>
+                  </select>
                 </div>
               ))}
-            </FieldGrid>
+            </div>
 
-            <Row>
+            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
               <Button onClick={handleImport} disabled={isBusy}>
                 {isBusy ? 'Importing...' : 'Import Selected Sheet'}
               </Button>
-            </Row>
+            </div>
           </>
         ) : null}
 
-        {error ? <ErrorText>{error}</ErrorText> : null}
-      </ImportCard>
-    </Wrapper>
+        {error ? (
+          <p style={{ margin: 0, color: '#b91c1c', fontSize: '0.82rem' }}>{error}</p>
+        ) : null}
+      </div>
+    </div>
   );
 };
 

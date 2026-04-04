@@ -16,6 +16,7 @@ diesel::table! {
         id -> Integer,
         name -> Text,
         address -> Text,
+        size -> Nullable<Integer>,
         expiration_date -> Nullable<Integer>,
         notes -> Nullable<Text>,
         misc_data -> Nullable<Text>,
