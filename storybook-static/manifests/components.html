@@ -1,0 +1,1940 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Components Manifest</title>
+  <style>
+      :root {
+          --bg: #0b0c10;
+          --panel: #121318;
+          --muted: #9aa0a6;
+          --fg: #e8eaed;
+          --ok: #22c55e;
+          --info: #1e88e5;
+          --err: #c62828;
+          --ok-bg: #0c1a13;
+          --info-bg: #0c1624;
+          --err-bg: #1a0e0e;
+          --chip: #1f2330;
+          --border: #2b2f3a;
+          --link: #8ab4f8;
+          --active-ring: 1px; /* 1px active ring for pills and toggles */
+      }
+
+      * {
+          box-sizing: border-box;
+      }
+
+      html,
+      body {
+          margin: 0;
+          background: var(--bg);
+          color: var(--fg);
+          font: 14px/1.5 system-ui,
+          -apple-system,
+          Segoe UI,
+          Roboto,
+          Ubuntu,
+          Cantarell,
+          'Helvetica Neue',
+          Arial,
+          'Noto Sans';
+      }
+
+      .wrap {
+          max-width: 1100px;
+          margin: 0 auto;
+          padding: 16px 20px;
+      }
+
+      header {
+          position: sticky;
+          top: 0;
+          backdrop-filter: blur(6px);
+          background: color-mix(in srgb, var(--bg) 84%, transparent);
+          border-bottom: 1px solid var(--border);
+          z-index: 10;
+      }
+
+      h1 {
+          font-size: 20px;
+          margin: 0 0 6px;
+      }
+
+      .summary {
+          display: flex;
+          gap: 12px;
+          flex-wrap: wrap;
+          align-items: center;
+      }
+
+      /* Top filter pills */
+      .filter-pill {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 6px 12px;
+          border: 1px solid var(--border);
+          border-radius: 999px;
+          background: var(--panel);
+          text-decoration: none;
+          cursor: pointer;
+          user-select: none;
+          color: var(--fg);
+      }
+
+      .filter-pill.ok {
+          color: #b9f6ca;
+          border-color: color-mix(in srgb, var(--ok) 55%, var(--border));
+          background: color-mix(in srgb, var(--ok) 18%, #000);
+      }
+
+      .filter-pill.info {
+          color: #b3d9ff;
+          border-color: color-mix(in srgb, var(--info) 55%, var(--border));
+          background: var(--info-bg);
+      }
+
+      .filter-pill.err {
+          color: #ff9aa0;
+          border-color: color-mix(in srgb, var(--err) 55%, var(--border));
+          background: var(--err-bg);
+      }
+
+      .filter-pill.all {
+          color: #d7dbe0;
+          border-color: var(--border);
+          background: var(--panel);
+      }
+
+      .filter-pill[aria-disabled='true'] {
+          cursor: default;
+          text-decoration: none;
+      }
+
+      .filter-pill:focus,
+      .filter-pill:active {
+          outline: none;
+          box-shadow: none;
+      }
+
+      /* Selected top pill ring via :target */
+      #filter-all:target ~ header .filter-pill[data-k='all'],
+      #filter-errors:target ~ header .filter-pill[data-k='errors'],
+      #filter-infos:target ~ header .filter-pill[data-k='infos'],
+      #filter-story-errors:target ~ header .filter-pill[data-k='story-errors'],
+      #filter-doc-errors:target ~ header .filter-pill[data-k='docs'],
+      #filter-docs:target ~ header .filter-pill[data-k='docs'] {
+          box-shadow: 0 0 0 var(--active-ring) currentColor;
+          border-color: currentColor;
+      }
+
+      /* Hidden targets for filtering */
+      #filter-all,
+      #filter-errors,
+      #filter-infos,
+      #filter-story-errors,
+      #filter-doc-errors,
+      #filter-docs {
+          display: none;
+      }
+
+      main {
+          padding: 36px 0 40px;
+      }
+
+      .grid {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 18px;
+      }
+
+      /* one card per row */
+
+      .card {
+          border: 1px solid var(--border);
+          background: var(--panel);
+          border-radius: 14px;
+          padding: 14px;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+      }
+
+      .head {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+      }
+
+      .title {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 10px;
+      }
+
+      .title h2 {
+          font-size: 16px;
+          margin: 0;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+      }
+
+      .meta {
+          font-size: 12px;
+          color: var(--muted);
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+      }
+
+      .kv {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 6px;
+      }
+
+      .chip {
+          font-size: 12px;
+          padding: 4px 8px;
+          border-radius: 999px;
+          background: var(--chip);
+          border: 1px solid var(--border);
+      }
+
+      .hint {
+          color: var(--muted);
+          font-size: 12px;
+      }
+
+      .badges {
+          display: flex;
+          gap: 8px;
+          flex-wrap: wrap;
+      }
+
+      /* Per-card badges: labels become toggles when clickable */
+      .badge {
+          font-size: 12px;
+          padding: 3px 8px;
+          border-radius: 999px;
+          border: 1px solid var(--border);
+          background: var(--chip);
+          color: #d7dbe0;
+      }
+
+      .badge.ok {
+          color: #b9f6ca;
+          border-color: color-mix(in srgb, var(--ok) 55%, var(--border));
+      }
+
+      .badge.info {
+          color: #b3d9ff;
+          border-color: color-mix(in srgb, var(--info) 55%, var(--border));
+      }
+
+      .badge.err {
+          color: #ff9aa0;
+          border-color: color-mix(in srgb, var(--err) 55%, var(--border));
+      }
+
+      .as-toggle {
+          cursor: pointer;
+      }
+
+      /* 1px ring on active toggle */
+      .tg-err:checked + label.as-toggle,
+      .tg-info:checked + label.as-toggle,
+      .tg-stories:checked + label.as-toggle,
+      .tg-docs:checked + label.as-toggle,
+      .tg-content:checked + label.as-toggle,
+      .tg-props:checked + label.as-toggle {
+          box-shadow: 0 0 0 var(--active-ring) currentColor;
+          border-color: currentColor;
+      }
+
+      /* Panels: hidden by default, shown when respective toggle checked */
+      .panels {
+          display: grid;
+          gap: 10px;
+      }
+
+      .panel {
+          display: none;
+      }
+
+      .tg-err:checked ~ .panels .panel-err {
+          display: grid;
+      }
+
+      .tg-info:checked ~ .panels .panel-info {
+          display: grid;
+          gap: 8px;
+      }
+
+      .tg-stories:checked ~ .panels .panel-stories {
+          display: grid;
+          gap: 8px;
+      }
+
+      .tg-docs:checked ~ .panels .panel-docs {
+          display: grid;
+          gap: 8px;
+      }
+
+      .tg-content:checked ~ .panels .panel-content {
+          display: grid;
+          gap: 8px;
+      }
+
+      .tg-props:checked ~ .panels .panel-props {
+          display: grid;
+      }
+
+      /* Colored notes for prop type error + info */
+      .note {
+          padding: 12px;
+          border: 1px solid var(--border);
+          border-radius: 10px;
+      }
+
+      .note.err {
+          border-color: color-mix(in srgb, var(--err) 55%, var(--border));
+          background: var(--err-bg);
+          color: #ffd1d4;
+      }
+
+      .note.info {
+          border-color: color-mix(in srgb, var(--info) 55%, var(--border));
+          background: var(--info-bg);
+          color: #d6e8ff;
+      }
+
+      .note.ok {
+          border-color: color-mix(in srgb, var(--ok) 55%, var(--border));
+          background: var(--ok-bg);
+          color: var(--fg);
+      }
+
+      .note-title {
+          font-weight: 600;
+          margin-bottom: 6px;
+      }
+
+      .note-body {
+          white-space: normal;
+      }
+
+      /* Story error cards */
+      .ex {
+          padding: 10px;
+          border: 1px solid var(--border);
+          border-radius: 10px;
+          background: #0f131b;
+      }
+
+      .ex.err {
+          border-color: color-mix(in srgb, var(--err) 55%, var(--border));
+      }
+
+      .row {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          flex-wrap: wrap;
+      }
+
+      .status-dot {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          display: inline-block;
+      }
+
+      .dot-ok {
+          background: var(--ok);
+      }
+
+      .dot-err {
+          background: var(--err);
+      }
+
+      .ex-name {
+          font-weight: 600;
+      }
+
+      /* Error groups (visible in errors filter) */
+      .error-groups {
+          display: none;
+          margin-bottom: 16px;
+      }
+
+      .group {
+          border: 1px solid var(--border);
+          background: var(--panel);
+          border-radius: 14px;
+          overflow: hidden;
+      }
+
+      .group + .group {
+          margin-top: 12px;
+      }
+
+      .group-header {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 12px 14px;
+          cursor: pointer;
+          border-bottom: 1px solid var(--border);
+      }
+
+      .group-header:hover {
+          background: #141722;
+      }
+
+      .group-title {
+          font-weight: 600;
+          flex: 1;
+      }
+
+      .group-count {
+          font-size: 12px;
+          color: var(--muted);
+      }
+
+      .group-cards {
+          display: none;
+          padding: 12px;
+      }
+
+      .group .card {
+          margin: 12px 0;
+      }
+
+      .group .card:first-child {
+          margin-top: 0;
+      }
+
+      .group .card:last-child {
+          margin-bottom: 0;
+      }
+
+      /* caret rotation */
+      .group-tg:checked + label .caret {
+          transform: rotate(90deg);
+      }
+
+      .caret {
+          transition: transform 0.15s ease;
+      }
+
+      /* toggle body */
+      .group-tg:checked ~ .group-cards {
+          display: block;
+      }
+
+      /* CSS-only filtering of cards via top pills */
+      #filter-errors:target ~ main .card:not(.has-error):not(.has-story-error) {
+          display: none;
+      }
+
+      #filter-infos:target ~ main .card:not(.has-info) {
+          display: none;
+      }
+
+      #filter-story-errors:target ~ main .card:not(.has-story-error) {
+          display: none;
+      }
+
+      #filter-doc-errors:target ~ main .card:not(.has-doc-error) {
+          display: none;
+      }
+
+      #filter-docs:target ~ main .card:has(> .tg-docs),
+      #filter-docs:target ~ main .card.is-doc {
+          display: block;
+      }
+
+      #filter-docs:target ~ main .card:not(:has(> .tg-docs)):not(.is-doc) {
+          display: none;
+      }
+
+      #filter-all:target ~ main .card {
+          display: block;
+      }
+
+      /* In errors view, hide standalone component-error cards in the regular grid (they will appear in groups) */
+      #filter-errors:target ~ main .grid .card.has-error {
+          display: none;
+      }
+
+      /* Show grouped section only in errors view */
+      #filter-errors:target ~ main .error-groups {
+          display: block;
+      }
+
+      /* Section titles */
+      .section-title {
+          font-size: 16px;
+          font-weight: 600;
+          color: var(--muted);
+          margin: 24px 0 12px;
+          padding-bottom: 8px;
+          border-bottom: 1px solid var(--border);
+      }
+      .section-title:first-child {
+          margin-top: 0;
+      }
+
+      /* When a toggle is checked, show the corresponding panel */
+      .card > .tg-err:checked ~ .panels .panel-err {
+          display: grid;
+      }
+      
+      .card > .tg-info:checked ~ .panels .panel-info {
+          display: grid;
+      }
+      
+      .card > .tg-stories:checked ~ .panels .panel-stories {
+          display: grid;
+      }
+
+      .card > .tg-docs:checked ~ .panels .panel-docs {
+          display: grid;
+      }
+
+      .card > .tg-content:checked ~ .panels .panel-content {
+          display: grid;
+      }
+
+      /* Add vertical spacing around panels only when any panel is visible */
+      .card > .tg-err:checked ~ .panels,
+      .card > .tg-info:checked ~ .panels,
+      .card > .tg-stories:checked ~ .panels,
+      .card > .tg-docs:checked ~ .panels,
+      .card > .tg-content:checked ~ .panels,
+      .card > .tg-props:checked ~ .panels {
+          margin: 10px 0;
+      }
+
+      /* Optional: a subtle 1px ring on the active badge, using :has() if available */
+      @supports selector(.card:has(.tg-err:checked)) {
+          .card:has(.tg-err:checked) label[for$='-err'],
+          .card:has(.tg-info:checked) label[for$='-info'],
+          .card:has(.tg-stories:checked) label[for$='-stories'],
+          .card:has(.tg-docs:checked) label[for$='-docs'],
+          .card:has(.tg-content:checked) label[for$='-content'],
+          .card:has(.tg-props:checked) label[for$='-props'] {
+              box-shadow: 0 0 0 1px currentColor;
+              border-color: currentColor;
+          }
+      }
+
+      /* Wrap long lines in code blocks at ~120 characters */
+      pre, code {
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      }
+      pre {
+          white-space: pre-wrap;
+          overflow-wrap: anywhere;
+          word-break: break-word;
+          overflow-x: auto; /* fallback for extremely long tokens */
+          margin: 8px 0 0;
+      }
+      pre > code {
+          display: block;
+          white-space: inherit;
+          overflow-wrap: inherit;
+          word-break: inherit;
+          inline-size: min(100%, 120ch);
+      }
+
+      /* MDX content container for docs */
+      .mdx-content {
+          background: #0f131b;
+          border: 1px solid var(--border);
+          border-radius: 10px;
+          padding: 12px;
+          max-height: 400px;
+          overflow-y: auto;
+          margin-top: 8px;
+      }
+  </style>
+</head>
+<body>
+<!-- Hidden targets for the top-level filters -->
+<span id="filter-all"></span>
+<span id="filter-errors"></span>
+<span id="filter-infos"></span>
+<span id="filter-story-errors"></span>
+<span id="filter-doc-errors"></span>
+<span id="filter-docs"></span>
+<header>
+  <div class="wrap">
+    <h1>Manifest Debugger</h1>
+    <div class="summary"><a class="filter-pill all" data-k="all" href="#filter-all">All</a><span class="filter-pill ok" aria-disabled="true">10 components ok</span><a class="filter-pill info" data-k="infos" href="#filter-infos">10/10 infos</a><span class="filter-pill ok" aria-disabled="true">49 stories ok</span></div>
+  </div>
+</header>
+<main>
+  <div class="wrap">
+    <div class="note info" style="margin-bottom: 16px;">
+            <strong>Tip:</strong> You are using <code>react-docgen</code> (the default). Generation took <strong>1.9s</strong>. For higher quality prop types, consider switching to <code>react-docgen-typescript</code> in your <code>main.ts</code>:
+            <pre><code>typescript: {
+  reactDocgen: 'react-docgen-typescript',
+}</code></pre>
+            Note: <code>react-docgen-typescript</code> can be slower. If performance is acceptable for your project, it generally produces better results.
+            <a href="https://storybook.js.org/docs/api/main-config/main-config-typescript#reactdocgen" target="_blank">Learn more</a>
+          </div>
+    <h2 class="section-title">Components</h2>
+    <div class="grid" role="list">
+      
+<article
+  class="card 
+  no-error 
+  has-info 
+  no-story-error
+  no-doc-error"
+  role="listitem"
+  aria-label="Badge">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-ok"></span> Badge</h2>
+      <div class="badges">
+        <label for="c-0-ui-badge-props" class="badge ok as-toggle">1 prop type</label>
+        <label for="c-0-ui-badge-info" class="badge info as-toggle">1 info</label>
+        <label for="c-0-ui-badge-stories" class="badge ok as-toggle">7 stories</label>
+        
+      </div>
+    </div>
+    <div class="meta" title="./.storybook/stories/ui/Badge.stories.tsx">ui-badge · ./.storybook/stories/ui/Badge.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  
+  <input id="c-0-ui-badge-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-0-ui-badge-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  <input id="c-0-ui-badge-props" class="tg tg-props" type="checkbox" hidden />
+
+  <div class="panels">
+    
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+        <div class="panel panel-props">
+          <div class="note ok">
+            <div class="row">
+              <span class="ex-name">Prop types <small>(react-docgen)</small></span>
+              <span class="badge ok">1 prop type</span>
+            </div>
+            <pre><code>Component: src/components/ui/Badge.tsx::default</code></pre>
+            <pre><code>Props:</code></pre>
+            <pre><code>className?: any = &#39;&#39;</code></pre>
+          </div>
+        </div>
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { Badge } from "leasebook";</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Emerald</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Emerald = () =&gt; &lt;Badge className=&quot;emerald&quot;&gt;Q&lt;/Badge&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Gray</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Gray = () =&gt; &lt;Badge className=&quot;gray&quot;&gt;P&lt;/Badge&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Transparent</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Transparent = () =&gt; &lt;Badge className=&quot;trans&quot;&gt;T&lt;/Badge&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">With Number</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const WithNumber = () =&gt; &lt;Badge className=&quot;emerald&quot;&gt;5&lt;/Badge&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Qualified Badge</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const QualifiedBadge = () =&gt; &lt;Badge className=&quot;emerald&quot;&gt;Q&lt;/Badge&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Prospect Badge</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const ProspectBadge = () =&gt; &lt;Badge className=&quot;gray&quot;&gt;P&lt;/Badge&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">All Variants</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const AllVariants = () =&gt; (
+  &lt;div style={{ display: &#39;flex&#39;, gap: &#39;16px&#39;, alignItems: &#39;center&#39; }}&gt;
+    &lt;Badge className=&quot;emerald&quot;&gt;Q&lt;/Badge&gt;
+    &lt;Badge className=&quot;gray&quot;&gt;P&lt;/Badge&gt;
+    &lt;Badge className=&quot;trans&quot;&gt;T&lt;/Badge&gt;
+    &lt;Badge className=&quot;emerald&quot;&gt;1&lt;/Badge&gt;
+    &lt;Badge className=&quot;gray&quot;&gt;2&lt;/Badge&gt;
+  &lt;/div&gt;
+);</code></pre>
+            </div>
+        </div>
+    
+  </div>
+</article>
+<article
+  class="card 
+  no-error 
+  has-info 
+  no-story-error
+  no-doc-error"
+  role="listitem"
+  aria-label="Button">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-ok"></span> Button</h2>
+      <div class="badges">
+        <label for="c-1-ui-button-props" class="badge ok as-toggle">2 prop types</label>
+        <label for="c-1-ui-button-info" class="badge info as-toggle">1 info</label>
+        <label for="c-1-ui-button-stories" class="badge ok as-toggle">7 stories</label>
+        
+      </div>
+    </div>
+    <div class="meta" title="./.storybook/stories/ui/Button.stories.tsx">ui-button · ./.storybook/stories/ui/Button.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  
+  <input id="c-1-ui-button-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-1-ui-button-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  <input id="c-1-ui-button-props" class="tg tg-props" type="checkbox" hidden />
+
+  <div class="panels">
+    
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+        <div class="panel panel-props">
+          <div class="note ok">
+            <div class="row">
+              <span class="ex-name">Prop types <small>(react-docgen)</small></span>
+              <span class="badge ok">2 prop types</span>
+            </div>
+            <pre><code>Component: src/components/ui/Button.tsx::default</code></pre>
+            <pre><code>Props:</code></pre>
+            <pre><code>$variant?: any = &#39;default&#39;
+
+className?: any = &#39;&#39;</code></pre>
+          </div>
+        </div>
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { Button } from "leasebook";
+import { Plus } from "lucide-react";</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Default</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Default = () =&gt; &lt;Button
+    onClick={fn()}
+    {...{
+        &quot;$variant&quot;: &#39;default&#39;
+    }}&gt;Default Button&lt;/Button&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Outline</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Outline = () =&gt; &lt;Button
+    onClick={fn()}
+    {...{
+        &quot;$variant&quot;: &#39;outline&#39;
+    }}&gt;Outline Button&lt;/Button&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Ghost</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Ghost = () =&gt; &lt;Button
+    onClick={fn()}
+    {...{
+        &quot;$variant&quot;: &#39;ghost&#39;
+    }}&gt;Ghost Button&lt;/Button&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Destructive</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Destructive = () =&gt; &lt;Button
+    onClick={fn()}
+    {...{
+        &quot;$variant&quot;: &#39;destructive&#39;
+    }}&gt;Delete&lt;/Button&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">With Icon</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const WithIcon = () =&gt; &lt;Button
+    onClick={fn()}
+    {...{
+        &quot;$variant&quot;: &#39;default&#39;
+    }}&gt;(&lt;&gt;
+      &lt;Plus size={16} /&gt;New Property
+            &lt;/&gt;)&lt;/Button&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Filter Button</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const FilterButton = () =&gt; &lt;Button onClick={fn()} className=&quot;filter&quot;&gt;All Properties&lt;/Button&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">All Variants</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const AllVariants = () =&gt; (
+  &lt;div style={{ display: &#39;flex&#39;, gap: &#39;16px&#39;, flexWrap: &#39;wrap&#39; }}&gt;
+    &lt;Button $variant=&quot;default&quot;&gt;Default&lt;/Button&gt;
+    &lt;Button $variant=&quot;outline&quot;&gt;Outline&lt;/Button&gt;
+    &lt;Button $variant=&quot;ghost&quot;&gt;Ghost&lt;/Button&gt;
+    &lt;Button $variant=&quot;destructive&quot;&gt;Destructive&lt;/Button&gt;
+    &lt;Button $variant=&quot;default&quot;&gt;
+      &lt;Plus size={16} /&gt;
+      With Icon
+    &lt;/Button&gt;
+    &lt;Button className=&quot;filter&quot;&gt;Filter Style&lt;/Button&gt;
+  &lt;/div&gt;
+);</code></pre>
+            </div>
+        </div>
+    
+  </div>
+</article>
+<article
+  class="card 
+  no-error 
+  has-info 
+  no-story-error
+  no-doc-error"
+  role="listitem"
+  aria-label="Card">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-ok"></span> Card</h2>
+      <div class="badges">
+        <label for="c-2-ui-card-props" class="badge ok as-toggle">1 prop type</label>
+        <label for="c-2-ui-card-info" class="badge info as-toggle">1 info</label>
+        <label for="c-2-ui-card-stories" class="badge ok as-toggle">7 stories</label>
+        
+      </div>
+    </div>
+    <div class="meta" title="./.storybook/stories/ui/Card.stories.tsx">ui-card · ./.storybook/stories/ui/Card.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  
+  <input id="c-2-ui-card-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-2-ui-card-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  <input id="c-2-ui-card-props" class="tg tg-props" type="checkbox" hidden />
+
+  <div class="panels">
+    
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+        <div class="panel panel-props">
+          <div class="note ok">
+            <div class="row">
+              <span class="ex-name">Prop types <small>(react-docgen)</small></span>
+              <span class="badge ok">1 prop type</span>
+            </div>
+            <pre><code>Component: src/components/ui/Card.tsx::default</code></pre>
+            <pre><code>Props:</code></pre>
+            <pre><code>className?: any = &#39;&#39;</code></pre>
+          </div>
+        </div>
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { Card } from "leasebook";</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Default</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Default = () =&gt; &lt;Card&gt;This is a card&lt;/Card&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Custom Width</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const CustomWidth = () =&gt; &lt;Card
+    {...{
+        &quot;$width&quot;: &#39;400px&#39;
+    }}&gt;Card with 400px width&lt;/Card&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Custom Height</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const CustomHeight = () =&gt; &lt;Card
+    {...{
+        &quot;$height&quot;: &#39;100px&#39;
+    }}&gt;Card with 100px height&lt;/Card&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Custom Size</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const CustomSize = () =&gt; &lt;Card
+    {...{
+        &quot;$width&quot;: &#39;600px&#39;,
+        &quot;$height&quot;: &#39;120px&#39;
+    }}&gt;Card with custom width and height&lt;/Card&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">With Content</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const WithContent = () =&gt; &lt;Card
+    {...{
+        &quot;$width&quot;: &#39;500px&#39;
+    }}&gt;(&lt;div style={{ display: &#39;flex&#39;, flexDirection: &#39;column&#39;, gap: &#39;8px&#39;, width: &#39;100%&#39; }}&gt;
+      &lt;h3 style={{ margin: 0 }}&gt;Card Title&lt;/h3&gt;
+      &lt;p style={{ margin: 0 }}&gt;
+        This card contains structured content with a title and description.
+      &lt;/p&gt;
+    &lt;/div&gt;)&lt;/Card&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Space Between</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const SpaceBetween = () =&gt; &lt;Card
+    {...{
+        &quot;$width&quot;: &#39;600px&#39;
+    }}&gt;(&lt;&gt;
+      &lt;span&gt;Left content&lt;/span&gt;
+      &lt;span&gt;Right content&lt;/span&gt;
+    &lt;/&gt;)&lt;/Card&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Multiple Sizes</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const MultipleSizes = () =&gt; (
+  &lt;div style={{ display: &#39;flex&#39;, flexDirection: &#39;column&#39;, gap: &#39;16px&#39; }}&gt;
+    &lt;Card $width=&quot;300px&quot;&gt;Small card (300px)&lt;/Card&gt;
+    &lt;Card $width=&quot;500px&quot;&gt;Medium card (500px)&lt;/Card&gt;
+    &lt;Card $width=&quot;800px&quot;&gt;Large card (800px)&lt;/Card&gt;
+    &lt;Card $width=&quot;100%&quot;&gt;Full width card&lt;/Card&gt;
+  &lt;/div&gt;
+);</code></pre>
+            </div>
+        </div>
+    
+  </div>
+</article>
+<article
+  class="card 
+  no-error 
+  has-info 
+  no-story-error
+  no-doc-error"
+  role="listitem"
+  aria-label="Dropdown">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-ok"></span> Dropdown</h2>
+      <div class="badges">
+        
+        <label for="c-3-ui-dropdown-info" class="badge info as-toggle">1 info</label>
+        <label for="c-3-ui-dropdown-stories" class="badge ok as-toggle">5 stories</label>
+        
+      </div>
+    </div>
+    <div class="meta" title="./.storybook/stories/ui/Dropdown.stories.tsx">ui-dropdown · ./.storybook/stories/ui/Dropdown.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  
+  <input id="c-3-ui-dropdown-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-3-ui-dropdown-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  
+
+  <div class="panels">
+    
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { Building, Factory, Home } from "lucide-react";
+import { Dropdown } from "leasebook";</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Default</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Default = () =&gt; &lt;Dropdown
+    buttonLabel=&quot;Options&quot;
+    items={[{ title: &#39;Option 1&#39; }, { title: &#39;Option 2&#39; }, { title: &#39;Option 3&#39; }]} /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">With Icons</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const WithIcons = () =&gt; &lt;Dropdown
+    buttonLabel=&quot;Select Type&quot;
+    items={[
+      { title: &#39;Residential&#39;, icon: &lt;Home size={16} /&gt; },
+      { title: &#39;Commercial&#39;, icon: &lt;Building size={16} /&gt; },
+      { title: &#39;Industrial&#39;, icon: &lt;Factory size={16} /&gt; },
+    ]} /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Sort By Dropdown</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const SortByDropdown = () =&gt; &lt;Dropdown
+    buttonLabel=&quot;Sort by&quot;
+    items={[{ title: &#39;Expiration&#39; }, { title: &#39;Address&#39; }, { title: &#39;Type&#39; }]} /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Many Items</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const ManyItems = () =&gt; &lt;Dropdown
+    buttonLabel=&quot;Select State&quot;
+    items={[
+      { title: &#39;Alabama&#39; },
+      { title: &#39;Alaska&#39; },
+      { title: &#39;Arizona&#39; },
+      { title: &#39;Arkansas&#39; },
+      { title: &#39;California&#39; },
+      { title: &#39;Colorado&#39; },
+      { title: &#39;Connecticut&#39; },
+      { title: &#39;Delaware&#39; },
+      { title: &#39;Florida&#39; },
+      { title: &#39;Georgia&#39; },
+    ]} /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">With Interaction Test</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const WithInteractionTest = () =&gt; &lt;Dropdown
+    buttonLabel=&quot;Actions&quot;
+    items={[{ title: &#39;Edit&#39; }, { title: &#39;Delete&#39; }, { title: &#39;Archive&#39; }]} /&gt;;</code></pre>
+            </div>
+        </div>
+    
+  </div>
+</article>
+<article
+  class="card 
+  no-error 
+  has-info 
+  no-story-error
+  no-doc-error"
+  role="listitem"
+  aria-label="FilterBar">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-ok"></span> FilterBar</h2>
+      <div class="badges">
+        
+        <label for="c-4-layout-filterbar-info" class="badge info as-toggle">1 info</label>
+        <label for="c-4-layout-filterbar-stories" class="badge ok as-toggle">2 stories</label>
+        
+      </div>
+    </div>
+    <div class="meta" title="./.storybook/stories/layout/FilterBar.stories.tsx">layout-filterbar · ./.storybook/stories/layout/FilterBar.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  
+  <input id="c-4-layout-filterbar-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-4-layout-filterbar-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  
+
+  <div class="panels">
+    
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { FilterBar } from "leasebook";</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Default</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Default = () =&gt; &lt;FilterBar /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">With Padding</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const WithPadding = () =&gt; (
+  &lt;div style={{ padding: &#39;20px&#39;, background: &#39;#e4e8ec&#39; }}&gt;
+    &lt;FilterBar /&gt;
+  &lt;/div&gt;
+);</code></pre>
+            </div>
+        </div>
+    
+  </div>
+</article>
+<article
+  class="card 
+  no-error 
+  has-info 
+  no-story-error
+  no-doc-error"
+  role="listitem"
+  aria-label="GridContainer">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-ok"></span> GridContainer</h2>
+      <div class="badges">
+        
+        <label for="c-5-layout-gridcontainer-info" class="badge info as-toggle">1 info</label>
+        <label for="c-5-layout-gridcontainer-stories" class="badge ok as-toggle">4 stories</label>
+        
+      </div>
+    </div>
+    <div class="meta" title="./.storybook/stories/layout/GridContainer.stories.tsx">layout-gridcontainer · ./.storybook/stories/layout/GridContainer.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  
+  <input id="c-5-layout-gridcontainer-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-5-layout-gridcontainer-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  
+
+  <div class="panels">
+    
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { GridContainer, Property } from "leasebook";</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Empty</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Empty = () =&gt; &lt;GridContainer&gt;{null}&lt;/GridContainer&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">With Cards</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const WithCards = () =&gt; &lt;GridContainer&gt;(&lt;&gt;
+      &lt;Property data={sampleProperty} /&gt;
+      &lt;Property data={{ ...sampleProperty, name: &#39;Corner Loft&#39; }} /&gt;
+      &lt;Property data={{ ...sampleProperty, name: &#39;Riverside Suite&#39; }} /&gt;
+      &lt;Property data={{ ...sampleProperty, name: &#39;Downtown Studio&#39; }} /&gt;
+    &lt;/&gt;)&lt;/GridContainer&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Many Items</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const ManyItems = () =&gt; &lt;GridContainer&gt;(&lt;&gt;
+      {Array.from({ length: 12 }, (_, i) =&gt; (
+        &lt;Property
+          key={i}
+          data={{
+            ...sampleProperty,
+            name: `Property ${i + 1}`,
+            businessAddr: `Address ${i + 1}`,
+            leaseManager: `Contact ${i + 1}`,
+          }}
+        /&gt;
+      ))}
+    &lt;/&gt;)&lt;/GridContainer&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">With Content</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const WithContent = () =&gt; &lt;GridContainer&gt;(&lt;&gt;
+      {Array.from({ length: 6 }, (_, i) =&gt; (
+        &lt;Property
+          key={i}
+          data={{
+            ...sampleProperty,
+            name: `Card ${i + 1}`,
+            note: `Sample content for card ${i + 1}`,
+          }}
+        /&gt;
+      ))}
+    &lt;/&gt;)&lt;/GridContainer&gt;;</code></pre>
+            </div>
+        </div>
+    
+  </div>
+</article>
+<article
+  class="card 
+  no-error 
+  has-info 
+  no-story-error
+  no-doc-error"
+  role="listitem"
+  aria-label="Header">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-ok"></span> Header</h2>
+      <div class="badges">
+        
+        <label for="c-6-layout-header-info" class="badge info as-toggle">1 info</label>
+        <label for="c-6-layout-header-stories" class="badge ok as-toggle">2 stories</label>
+        
+      </div>
+    </div>
+    <div class="meta" title="./.storybook/stories/layout/Header.stories.tsx">layout-header · ./.storybook/stories/layout/Header.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  
+  <input id="c-6-layout-header-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-6-layout-header-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  
+
+  <div class="panels">
+    
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { Header } from "leasebook";</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Default</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Default = () =&gt; &lt;Header /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">With Content</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const WithContent = () =&gt; (
+  &lt;&gt;
+    &lt;Header /&gt;
+    &lt;div style={{ paddingTop: &#39;var(--app-header-height)&#39;, padding: &#39;20px&#39; }}&gt;
+      &lt;h1&gt;Page Content&lt;/h1&gt;
+      &lt;p&gt;
+        The header is fixed at the top. This content area uses padding-top to offset the header
+        height.
+      &lt;/p&gt;
+    &lt;/div&gt;
+  &lt;/&gt;
+);</code></pre>
+            </div>
+        </div>
+    
+  </div>
+</article>
+<article
+  class="card 
+  no-error 
+  has-info 
+  no-story-error
+  no-doc-error"
+  role="listitem"
+  aria-label="Property">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-ok"></span> Property</h2>
+      <div class="badges">
+        
+        <label for="c-7-layout-property-info" class="badge info as-toggle">1 info</label>
+        <label for="c-7-layout-property-stories" class="badge ok as-toggle">7 stories</label>
+        
+      </div>
+    </div>
+    <div class="meta" title="./.storybook/stories/layout/Property.stories.tsx">layout-property · ./.storybook/stories/layout/Property.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  
+  <input id="c-7-layout-property-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-7-layout-property-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  
+
+  <div class="panels">
+    
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { GridContainer, Property } from "leasebook";</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Default</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Default = () =&gt; &lt;Property data={defaultData} /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Qualified</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Qualified = () =&gt; &lt;Property
+    data={{
+      ...defaultData,
+      status: &#39;Qualified&#39;,
+      name: &#39;Qualified Property Inc&#39;,
+      businessAddr: &#39;456 Oak Ave, Springfield, IL 62701&#39;,
+    }} /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Prospect</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Prospect = () =&gt; &lt;Property
+    data={{
+      ...defaultData,
+      status: &#39;Prospect&#39;,
+      name: &#39;Prospect Business Center&#39;,
+      businessAddr: &#39;789 Pine Road, Chicago, IL 60601&#39;,
+    }} /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Active Lease</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const ActiveLease = () =&gt; &lt;Property
+    data={{
+      ...defaultData,
+      status: &#39;Active&#39;,
+      name: &#39;Active Lease Property&#39;,
+      businessAddr: &#39;321 Elm Street, Boston, MA 02101&#39;,
+      leaseExpiration: &#39;2027-06-30&#39;,
+    }} /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Expiring Soon</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const ExpiringSoon = () =&gt; &lt;Property
+    data={{
+      ...defaultData,
+      status: &#39;Warning&#39;,
+      name: &#39;Expiring Soon Property&#39;,
+      businessAddr: &#39;555 Maple Drive, Seattle, WA 98101&#39;,
+      leaseExpiration: &#39;2025-03-15&#39;,
+    }} /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Expired</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Expired = () =&gt; &lt;Property
+    data={{
+      ...defaultData,
+      status: &#39;Expired&#39;,
+      name: &#39;Expired Lease Property&#39;,
+      businessAddr: &#39;999 Cedar Lane, Austin, TX 78701&#39;,
+      leaseExpiration: &#39;2024-01-01&#39;,
+    }} /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Multiple Properties</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const MultipleProperties = () =&gt; (
+  &lt;GridContainer&gt;
+    &lt;Property
+      data={{
+        status: &#39;Qualified&#39;,
+        name: &#39;Acme Industries&#39;,
+        businessAddr: &#39;100 Business Park Dr, Dallas, TX 75201&#39;,
+        leaseExpiration: &#39;2026-12-31&#39;,
+        leaseManager: &#39;Jane Smith&#39;,
+        size: &#39;10,000 sq ft&#39;,
+        note: &#39;&#39;,
+      }}
+    /&gt;
+    &lt;Property
+      data={{
+        status: &#39;Prospect&#39;,
+        name: &#39;Tech Solutions Ltd&#39;,
+        businessAddr: &#39;200 Innovation Way, San Jose, CA 95101&#39;,
+        leaseExpiration: &#39;2025-09-30&#39;,
+        leaseManager: &#39;Bob Johnson&#39;,
+        size: &#39;7,500 sq ft&#39;,
+        note: &#39;&#39;,
+      }}
+    /&gt;
+    &lt;Property
+      data={{
+        status: &#39;Active&#39;,
+        name: &#39;Retail Store Co&#39;,
+        businessAddr: &#39;300 Shopping Center Blvd, Miami, FL 33101&#39;,
+        leaseExpiration: &#39;2027-03-15&#39;,
+        leaseManager: &#39;Alice Williams&#39;,
+        size: &#39;15,000 sq ft&#39;,
+        note: &#39;&#39;,
+      }}
+    /&gt;
+    &lt;Property
+      data={{
+        status: &#39;Warning&#39;,
+        name: &#39;Small Business Inc&#39;,
+        businessAddr: &#39;400 Commerce St, Portland, OR 97201&#39;,
+        leaseExpiration: &#39;2025-02-28&#39;,
+        leaseManager: &#39;Charlie Brown&#39;,
+        size: &#39;3,000 sq ft&#39;,
+        note: &#39;&#39;,
+      }}
+    /&gt;
+    &lt;Property
+      data={{
+        status: &#39;Expired&#39;,
+        name: &#39;Old Tenant LLC&#39;,
+        businessAddr: &#39;500 Historic Ave, Philadelphia, PA 19101&#39;,
+        leaseExpiration: &#39;2023-12-31&#39;,
+        leaseManager: &#39;David Wilson&#39;,
+        size: &#39;8,000 sq ft&#39;,
+        note: &#39;&#39;,
+      }}
+    /&gt;
+    &lt;Property
+      data={{
+        status: &#39;Qualified&#39;,
+        name: &#39;New Prospect Corp&#39;,
+        businessAddr: &#39;600 Future Lane, Denver, CO 80201&#39;,
+        leaseExpiration: &#39;2028-06-01&#39;,
+        leaseManager: &#39;Eva Martinez&#39;,
+        size: &#39;12,000 sq ft&#39;,
+        note: &#39;&#39;,
+      }}
+    /&gt;
+  &lt;/GridContainer&gt;
+);</code></pre>
+            </div>
+        </div>
+    
+  </div>
+</article>
+<article
+  class="card 
+  no-error 
+  has-info 
+  no-story-error
+  no-doc-error"
+  role="listitem"
+  aria-label="SearchBar">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-ok"></span> SearchBar</h2>
+      <div class="badges">
+        <label for="c-8-ui-searchbar-props" class="badge ok as-toggle">1 prop type</label>
+        <label for="c-8-ui-searchbar-info" class="badge info as-toggle">1 info</label>
+        <label for="c-8-ui-searchbar-stories" class="badge ok as-toggle">5 stories</label>
+        
+      </div>
+    </div>
+    <div class="meta" title="./.storybook/stories/ui/SearchBar.stories.tsx">ui-searchbar · ./.storybook/stories/ui/SearchBar.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  
+  <input id="c-8-ui-searchbar-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-8-ui-searchbar-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  <input id="c-8-ui-searchbar-props" class="tg tg-props" type="checkbox" hidden />
+
+  <div class="panels">
+    
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+        <div class="panel panel-props">
+          <div class="note ok">
+            <div class="row">
+              <span class="ex-name">Prop types <small>(react-docgen)</small></span>
+              <span class="badge ok">1 prop type</span>
+            </div>
+            <pre><code>Component: src/components/ui/SearchBar.tsx::default</code></pre>
+            <pre><code>Props:</code></pre>
+            <pre><code>placeholder?: any = &#39;Search...&#39;</code></pre>
+          </div>
+        </div>
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { SearchBar } from "leasebook";</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Default</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Default = () =&gt; &lt;SearchBar onChange={fn()} placeholder=&quot;Search...&quot; /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Custom Placeholder</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const CustomPlaceholder = () =&gt; &lt;SearchBar onChange={fn()} placeholder=&quot;Search properties...&quot; /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">With Value</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const WithValue = () =&gt; &lt;SearchBar onChange={fn()} value=&quot;Sample search query&quot; placeholder=&quot;Search...&quot; /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Interactive</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Interactive = function InteractiveSearchBar() {
+  const [value, setValue] = useState(&#39;&#39;);
+  return (
+    &lt;div&gt;
+      &lt;SearchBar value={value} onChange={setValue} placeholder=&quot;Type to search...&quot; /&gt;
+      &lt;p style={{ marginTop: &#39;16px&#39; }}&gt;Current value: {value || &#39;(empty)&#39;}&lt;/p&gt;
+    &lt;/div&gt;
+  );
+};</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">With Interaction Test</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const WithInteractionTest = function InteractiveForTest() {
+  const [value, setValue] = useState(&#39;&#39;);
+  return &lt;SearchBar value={value} onChange={setValue} placeholder=&quot;Search properties...&quot; /&gt;;
+};</code></pre>
+            </div>
+        </div>
+    
+  </div>
+</article>
+<article
+  class="card 
+  no-error 
+  has-info 
+  no-story-error
+  no-doc-error"
+  role="listitem"
+  aria-label="Sort">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-ok"></span> Sort</h2>
+      <div class="badges">
+        
+        <label for="c-9-ui-sort-info" class="badge info as-toggle">1 info</label>
+        <label for="c-9-ui-sort-stories" class="badge ok as-toggle">3 stories</label>
+        
+      </div>
+    </div>
+    <div class="meta" title="./.storybook/stories/ui/Sort.stories.tsx">ui-sort · ./.storybook/stories/ui/Sort.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  
+  <input id="c-9-ui-sort-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-9-ui-sort-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  
+
+  <div class="panels">
+    
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { Sort } from "leasebook";</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Default</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Default = () =&gt; &lt;Sort /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">With Interaction Test</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const WithInteractionTest = () =&gt; &lt;Sort /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">In Context</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const InContext = () =&gt; (
+  &lt;div style={{ display: &#39;flex&#39;, alignItems: &#39;center&#39;, gap: &#39;8px&#39; }}&gt;
+    &lt;span style={{ fontSize: &#39;14px&#39; }}&gt;Sort:&lt;/span&gt;
+    &lt;Sort /&gt;
+  &lt;/div&gt;
+);</code></pre>
+            </div>
+        </div>
+    
+  </div>
+</article>
+    </div>
+    
+    
+    
+  </div>
+</main>
+</body>
+</html>  

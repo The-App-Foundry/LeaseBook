@@ -1,0 +1,1 @@
+import{j as o}from"./iframe-DnqJuSJ7.js";const d=({className:e="",children:a,...s})=>o.jsx("span",{className:`lb-badge${e?` ${e}`:""}`,...s,children:a});d.__docgenInfo={description:"",methods:[],displayName:"Badge",props:{className:{defaultValue:{value:"''",computed:!1},required:!1}}};export{d as B};
