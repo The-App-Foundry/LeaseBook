@@ -1,0 +1,54 @@
+.lb-header-logo {
+  height: 48px;
+  width: auto;
+  display: block;
+}
+
+.lb-header-subtitle {
+  font-size: 14px;
+  color: #6B7280;
+  margin-top: 4px;
+}
+
+.lb-header-search-input {
+  border: 1px solid #DADEE5;
+  border-radius: 10px;
+  padding: 13px 18px;
+  font-size: 16px;
+  outline: none;
+  color: #1C2333;
+  background: #FFFFFF;
+  height: 48px;
+  box-sizing: border-box;
+}
+
+.lb-header-new-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #2F5FE0;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 10px;
+  padding: 0 18px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  height: 48px;
+  box-sizing: border-box;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+
+.lb-header-new-btn:hover {
+  background: #2850C4;
+}
+
+.lb-header-new-btn-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.lb-header-spacer {
+  flex: 1;
+}

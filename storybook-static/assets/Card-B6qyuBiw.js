@@ -1,0 +1,1 @@
+import{j as r}from"./iframe-DnqJuSJ7.js";const i=({$width:s,$height:a,className:e="",style:d,children:t,...o})=>r.jsx("div",{className:`lb-card${e?` ${e}`:""}`,style:{width:s,height:a,...d},...o,children:t});i.__docgenInfo={description:"",methods:[],displayName:"Card",props:{className:{defaultValue:{value:"''",computed:!1},required:!1}}};export{i as C};

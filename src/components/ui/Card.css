@@ -1,0 +1,4 @@
+.lb-card {
+  width: var(--card-width, auto);
+  height: var(--card-height, auto);
+}

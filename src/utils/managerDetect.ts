@@ -1,7 +1,7 @@
 import type { Manager } from '../types/lease';
 
 let nextId = 1;
-const uid = (): string => `mgr-${Date.now()}-${nextId++}`;
+const uid = (): number => nextId++;
 
 const EMAIL_RE = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
 const PHONE_RE = /(?:\+?\d[\d\s().-]{6,}\d)/;
@@ -20,7 +20,7 @@ const splitEntries = (raw: string): string[] =>
  * Extracts a phone number and an email from a single entry string,
  * then treats the remainder as the manager's name.
  */
-const parseEntry = (entry: string): Pick<Manager, 'name' | 'phone' | 'email'> => {
+const parseEntry = (entry: string): { name: string; phone?: string; email?: string } => {
   let remaining = entry;
 
   const emailMatch = EMAIL_RE.exec(remaining);
@@ -65,7 +65,7 @@ export const detectManagers = (raw: string): DetectionResult => {
   const managers: Manager[] = entries.map(entry => {
     const { name, phone, email } = parseEntry(entry);
     const verified = name.length > 0;
-    return { id: uid(), name: name || entry.trim(), phone, email, verified };
+    return { id: uid(), name: name || entry.trim(), phoneNumbers: phone ? [phone] : [], email, verified };
   });
 
   const allVerified = managers.length > 0 && managers.every(m => m.verified);

@@ -1,43 +1,174 @@
-import { useRef } from 'react';
-import styled from 'styled-components';
+import { useRef, memo, useCallback } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Property from './Property';
 import { Lease, Manager } from '../../types/lease';
+import { Button } from '../ui';
+import './GridContainer.css';
 
 interface GridContainerProps {
   leases: Lease[];
   onManagersChange?: (leaseIndex: number, managers: Manager[]) => void;
+  onPropertyClick?: (id: number) => void;
+  onPropertyEdit?: (id: number) => void;
+  onPropertyDelete?: (id: number) => void;
+  currentPage: number;
+  totalPages: number;
+  totalCount: number;
+  pageSize: number;
+  onPageChange: (page: number) => void;
+  onPageSizeChange: (size: number) => void;
+  onNewProperty?: () => void;
 }
 
-const Container = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-  align-items: start;
-  gap: calc(var(--spacing) * 4);
-  width: 100%;
-  box-sizing: border-box;
-  margin: 16px 0;
-  padding: 0 16px;
-`;
+const PAGE_SIZE_OPTIONS = [25, 50, 100] as const;
 
-const GridContainer = ({ leases, onManagersChange }: Readonly<GridContainerProps>) => {
-  // Always points to the latest onManagersChange without changing identity
-  const onChangeRef = useRef(onManagersChange);
-  onChangeRef.current = onManagersChange;
-
-  // Stable per-index callbacks — created once per slot, so React.memo on Property works
-  const callbacksRef = useRef<Array<(managers: Manager[]) => void>>([]);
-  for (let i = callbacksRef.current.length; i < leases.length; i++) {
-    const idx = i;
-    callbacksRef.current[idx] = (managers: Manager[]) => onChangeRef.current?.(idx, managers);
+/** Build a compact page-number list with ellipsis gaps for large ranges. */
+const getPageNumbers = (current: number, total: number): (number | '...')[] => {
+  if (total <= 7) {
+    return Array.from({ length: total }, (_, i) => i + 1);
   }
+  const pages: (number | '...')[] = [1];
+  if (current > 3) pages.push('...');
+  const start = Math.max(2, current - 1);
+  const end = Math.min(total - 1, current + 1);
+  for (let i = start; i <= end; i++) pages.push(i);
+  if (current < total - 2) pages.push('...');
+  pages.push(total);
+  return pages;
+};
+
+const GridContainer = ({
+  leases,
+  onManagersChange,
+  onPropertyClick,
+  currentPage,
+  totalPages,
+  totalCount,
+  pageSize,
+  onPageChange,
+  onPageSizeChange,
+  onPropertyEdit,
+  onPropertyDelete,
+  onNewProperty,
+}: Readonly<GridContainerProps>) => {
+  // Stable references updated on every render
+  const onChangeRef = useRef(onManagersChange);
+  const leasesRef = useRef(leases);
+  onChangeRef.current = onManagersChange;
+  leasesRef.current = leases;
+
+  // Stable callbacks keyed by lease ID — created once, use refs for current values
+  const callbacksMapRef = useRef<Map<number, (managers: Manager[]) => void>>(new Map());
+
+  const handlePageSizeChange = useCallback(
+    (e: React.ChangeEvent<HTMLSelectElement>) => {
+      onPageSizeChange(Number(e.target.value));
+    },
+    [onPageSizeChange],
+  );
+
+  const rangeStart = (currentPage - 1) * pageSize + 1;
+  const rangeEnd = Math.min(currentPage * pageSize, totalCount);
 
   return (
-    <Container>
-      {leases.map((l, i) => (
-        <Property key={i} data={l} onManagersChange={callbacksRef.current[i]} />
-      ))}
-    </Container>
+    <div className="lb-grid-outer">
+      <div className="lb-property-grid">
+        {leases.map(lease => {
+          // Get or create a stable callback for this lease ID
+          let callback = callbacksMapRef.current.get(lease.id);
+          if (!callback) {
+            const capturedId = lease.id;
+            callback = (managers: Manager[]) => {
+              // Use current leases array from ref to find index
+              const currentIndex = leasesRef.current.findIndex(l => l.id === capturedId);
+              if (currentIndex !== -1) {
+                onChangeRef.current?.(currentIndex, managers);
+              }
+            };
+            callbacksMapRef.current.set(lease.id, callback);
+          }
+
+          return <Property key={lease.id} data={lease} onManagersChange={callback} onClick={() => onPropertyClick?.(lease.id)} onEdit={() => onPropertyEdit?.(lease.id)} onDelete={() => onPropertyDelete?.(lease.id)} />;
+        })}
+      </div>
+
+      {/* Pagination bar */}
+      {totalCount > 0 && (
+        <div className="lb-pagination" id="pagination-bar">
+          <div className="lb-pagination-info">
+            <span>
+              Showing <strong>{rangeStart}–{rangeEnd}</strong> of{' '}
+              <strong>{totalCount.toLocaleString()}</strong>
+            </span>
+          </div>
+
+          <div className="lb-pagination-controls">
+            <button
+              className="lb-page-btn"
+              disabled={currentPage <= 1}
+              onClick={() => onPageChange(currentPage - 1)}
+              aria-label="Previous page"
+              id="pagination-prev"
+            >
+              <ChevronLeft size={16} />
+            </button>
+
+            {getPageNumbers(currentPage, totalPages).map((page, idx) =>
+              page === '...' ? (
+                <span key={`ellipsis-${idx}`} className="lb-page-ellipsis">
+                  …
+                </span>
+              ) : (
+                <button
+                  key={page}
+                  className={`lb-page-btn${page === currentPage ? ' active' : ''}`}
+                  onClick={() => onPageChange(page)}
+                  aria-label={`Page ${page}`}
+                  aria-current={page === currentPage ? 'page' : undefined}
+                >
+                  {page}
+                </button>
+              ),
+            )}
+
+            <button
+              className="lb-page-btn"
+              disabled={currentPage >= totalPages}
+              onClick={() => onPageChange(currentPage + 1)}
+              aria-label="Next page"
+              id="pagination-next"
+            >
+              <ChevronRight size={16} />
+            </button>
+          </div>
+
+          <div className="lb-pagination-size">
+            <label htmlFor="page-size-select">Rows per page</label>
+            <select
+              id="page-size-select"
+              className="lb-page-size-select"
+              value={pageSize}
+              onChange={handlePageSizeChange}
+            >
+              {PAGE_SIZE_OPTIONS.map(size => (
+                <option key={size} value={size}>
+                  {size}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      )}
+
+      {onNewProperty && (
+        <div className="lb-grid-new-property-wrapper">
+          <Button onClick={onNewProperty} className="lb-btn-primary">
+            Create New Lease
+          </Button>
+        </div>
+      )}
+    </div>
   );
 };
 
-export default GridContainer;
+export default memo(GridContainer);
