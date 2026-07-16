@@ -1,5 +1,6 @@
 import { ReactNode } from 'react';
 import { Modal as BsModal } from 'react-bootstrap';
+import './Modal.css';
 
 interface ModalProps {
   isOpen: boolean;
@@ -13,7 +14,7 @@ interface ModalProps {
 const Modal = ({ isOpen, onClose, title, children, footer }: Readonly<ModalProps>) => (
   <BsModal show={isOpen} onHide={onClose} centered keyboard>
     <BsModal.Header closeButton>
-      <BsModal.Title style={{ fontSize: '1rem', fontWeight: 600 }}>{title}</BsModal.Title>
+      <BsModal.Title className="lb-modal-title">{title}</BsModal.Title>
     </BsModal.Header>
 
     <BsModal.Body>{children}</BsModal.Body>
