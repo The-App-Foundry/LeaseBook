@@ -1,0 +1,19 @@
+.lb-dropdown-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  color: inherit;
+  font-size: 12px;
+  height: calc(var(--spacing) * 10);
+  padding: calc(var(--spacing) * 4) calc(var(--spacing) * 2);
+}
+
+/* Override default bootstrap toggle dropdown arrow styles if needed */
+.lb-dropdown-toggle::after {
+  display: inline-block;
+  margin-left: 0.255em;
+  vertical-align: 0.255em;
+}

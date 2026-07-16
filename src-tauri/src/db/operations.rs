@@ -5,7 +5,7 @@ use crate::models::{Lease, LeaseManager, LeasesManagers, NewLease, NewManager, U
 pub fn create_lease(
   conn: &mut SqliteConnection,
   name: &str,
-  address: &str,
+  address: Option<&str>,
   expiration_date: Option<i32>,
   notes: Option<&str>,
   misc_data: Option<&str>,
@@ -149,6 +149,15 @@ pub fn get_manager(conn: &mut SqliteConnection, manager_id: i32) -> Result<Lease
   Ok(manager)
 }
 
+pub fn get_last_manager_id(conn: &mut SqliteConnection) -> Result<Option<i32>, diesel::result::Error> {
+  use crate::schema::lease_managers::dsl::*;
+  use diesel::dsl::max;
+
+  lease_managers
+    .select(max(id))
+    .get_result(conn)
+}
+
 pub fn update_lease(conn: &mut SqliteConnection, lease_id: i32, changes: UpdateLease<'_>) -> Result<Lease, diesel::result::Error> {
   use crate::schema::leases::dsl::*;
 
@@ -269,6 +278,78 @@ pub fn delete_manager(conn: &mut SqliteConnection, manager_id: &i32) -> Result<u
   })
 }
 
+/// Returns the total number of leases in the database.
+pub fn count_leases(conn: &mut SqliteConnection) -> Result<i64, diesel::result::Error> {
+  use crate::schema::leases;
+  use diesel::dsl::count_star;
+
+  leases::table
+    .select(count_star())
+    .get_result(conn)
+}
+
+/// Returns a single page of leases ordered by id.
+pub fn get_leases_paginated(
+  conn: &mut SqliteConnection,
+  limit: i64,
+  offset: i64,
+) -> Result<Vec<Lease>, diesel::result::Error> {
+  use crate::schema::leases;
+
+  leases::table
+    .select(Lease::as_select())
+    .order(leases::id.asc())
+    .limit(limit)
+    .offset(offset)
+    .get_results(conn)
+}
+
+/// Returns one page of leases paired with their managers, plus the total lease count.
+pub fn get_paginated_leases_with_managers(
+  conn: &mut SqliteConnection,
+  limit: i64,
+  offset: i64,
+) -> Result<(Vec<(Lease, Vec<LeaseManager>)>, i64), diesel::result::Error> {
+  use crate::schema::lease_managers;
+
+  let total = count_leases(conn)?;
+  let page_leases = get_leases_paginated(conn, limit, offset)?;
+
+  if page_leases.is_empty() {
+    return Ok((vec![], total));
+  }
+
+  let all_junctions: Vec<LeasesManagers> = LeasesManagers::belonging_to(&page_leases)
+    .select(LeasesManagers::as_select())
+    .load(conn)?;
+
+  let mgr_ids: Vec<i32> = all_junctions.iter().map(|j| j.manager_id).collect();
+
+  let all_managers: Vec<LeaseManager> = lease_managers::table
+    .filter(lease_managers::id.eq_any(&mgr_ids))
+    .select(LeaseManager::as_select())
+    .load(conn)?;
+
+  let mgr_map: std::collections::HashMap<i32, &LeaseManager> =
+    all_managers.iter().map(|m| (m.id, m)).collect();
+
+  let junctions_grouped = all_junctions.grouped_by(&page_leases);
+
+  let result = page_leases
+    .into_iter()
+    .zip(junctions_grouped)
+    .map(|(lease, junctions)| {
+      let managers: Vec<LeaseManager> = junctions
+        .iter()
+        .filter_map(|j| mgr_map.get(&j.manager_id).map(|m| (*m).clone()))
+        .collect();
+      (lease, managers)
+    })
+    .collect();
+
+  Ok((result, total))
+}
+
 pub fn import_leases(
     conn: &mut SqliteConnection,
     leases: &[crate::property::Lease],
@@ -282,7 +363,7 @@ pub fn import_leases(
 
             let new_lease = NewLease {
                 name: &lease.name,
-                address: &lease.address,
+                address: Some(lease.address.as_str()),
                 expiration_date: lease.expiration_date.map(|dt| dt.timestamp() as i32),
                 notes: Some(&lease.notes).filter(|s| !s.is_empty()).map(|s| s.as_str()),
                 misc_data: Some(&lease.misc_data).filter(|s| !s.is_empty()).map(|s| s.as_str()),

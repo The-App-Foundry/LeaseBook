@@ -59,6 +59,7 @@ pub fn run() {
             commands::edit_lease,
             commands::edit_manager,
             commands::move_manager,
+            commands::last_manager_id,
             commands::unassign_manager,
             commands::prune,
             commands::delete,
@@ -66,7 +67,8 @@ pub fn run() {
             commands::parse_spreadsheet,
             commands::parse_spreadsheet_to_leases,
             commands::import_parsed_leases,
-            commands::leases_with_managers
+            commands::leases_with_managers,
+            commands::leases_with_managers_paginated
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

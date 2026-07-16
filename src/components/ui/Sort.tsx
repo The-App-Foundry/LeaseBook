@@ -1,34 +1,8 @@
 import { useState } from 'react';
-import styled from 'styled-components';
 import { ArrowUpDown, ArrowDownUp } from 'lucide-react';
+import './Sort.css';
 
-const SortButton = styled.button`
-  display: flex;
-  align-items: center;
-  box-shadow: none;
-  cursor: pointer;
-  font-weight: 500;
-  padding: 0;
-  color: ${({ theme }) => theme.colors.text};
-
-  &:focus {
-    outline: none;
-  }
-
-  &:active {
-    background: none;
-  }
-`;
-
-const AUpDown = styled(ArrowDownUp)`
-  height: 15px;
-`;
-
-const ADownUp = styled(ArrowUpDown)`
-  height: 15px;
-`;
-
-export default function Sort() {
+const Sort = () => {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
   const toggleSortOrder = () => {
@@ -38,8 +12,19 @@ export default function Sort() {
   const tooltipText = `Sort: ${sortOrder === 'asc' ? 'ascending' : 'descending'}`;
 
   return (
-    <SortButton onClick={toggleSortOrder} title={tooltipText} aria-label={tooltipText}>
-      {sortOrder === 'asc' ? <AUpDown aria-hidden="true" /> : <ADownUp aria-hidden="true" />}
-    </SortButton>
+    <button
+      className="lb-btn lb-btn-ghost lb-sort-button"
+      onClick={toggleSortOrder}
+      title={tooltipText}
+      aria-label={tooltipText}
+    >
+      {sortOrder === 'asc' ? (
+        <ArrowDownUp size={15} aria-hidden="true" />
+      ) : (
+        <ArrowUpDown size={15} aria-hidden="true" />
+      )}
+    </button>
   );
-}
+};
+
+export default Sort;
