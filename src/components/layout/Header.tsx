@@ -1,6 +1,7 @@
-import SearchBar from '../ui/SearchBar';
-import Button from '../ui/Button';
-import { Plus, Settings } from 'lucide-react';
+import { memo } from 'react';
+import logo from '../../assets/leasebook.webp';
+import logoMobile from '../../assets/leasebook_mobile.webp';
+import './Header.css';
 
 interface HeaderProps {
   onNewProperty?: () => void;
@@ -8,22 +9,31 @@ interface HeaderProps {
 
 const Header = ({ onNewProperty }: Readonly<HeaderProps>) => (
   <header className="lb-header">
-    <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
-      <img className="lb-header-logo" src="/src/assets/leasebook.webp" alt="LeaseBook logo" />
+    <div>
+      <picture>
+        <source media="(max-width: 768px)" srcSet={logoMobile} />
+        <img className="lb-header-logo" src={logo} alt="LeaseBook logo" />
+      </picture>
+      <div className="lb-header-subtitle">Track and manage property leases and expirations</div>
     </div>
-    <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-      <Button onClick={onNewProperty}>
-        <span className="d-flex align-items-center gap-1">
-          <Plus size={18} />
+    <div className="lb-header-search-wrapper">
+      <div className="lb-header-search-inner">
+        <input 
+          type="text" 
+          placeholder="Search company or address..." 
+          className="lb-header-search-input"
+        />
+        <button 
+          onClick={onNewProperty} 
+          className="lb-header-new-btn"
+        >
+          <span className="lb-header-new-btn-icon">+</span>
           New Property
-        </span>
-      </Button>
-      <SearchBar />
-      <button className="btn btn-link text-body p-1">
-        <Settings size={20} />
-      </button>
+        </button>
+      </div>
     </div>
+    <div className="lb-header-spacer"></div>
   </header>
 );
 
-export default Header;
+export default memo(Header);

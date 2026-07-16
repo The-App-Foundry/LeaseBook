@@ -62,7 +62,7 @@ pub fn parse_spreadsheet_to_leases(
 pub fn new_lease(
   pool: State<'_, DbPool>,
   name: String,
-  address: String,
+  address: Option<String>,
   expiration_date: Option<i32>,
   notes: Option<String>,
   size: Option<String>,
@@ -72,7 +72,7 @@ pub fn new_lease(
   create_lease(
     &mut conn,
     &name,
-    &address,
+    address.as_deref(),
     expiration_date,
     notes.as_deref(),
     size.as_deref(),
@@ -125,6 +125,26 @@ pub fn leases_with_managers(
   Ok(rows.into_iter().map(|(lease, managers)| LeaseWithManagers { lease, managers }).collect())
 }
 
+#[derive(Serialize)]
+pub struct PaginatedResponse {
+  pub leases: Vec<LeaseWithManagers>,
+  pub total_count: i64,
+}
+
+#[tauri::command]
+pub fn leases_with_managers_paginated(
+  pool: State<'_, DbPool>,
+  page: i64,
+  page_size: i64,
+) -> Result<PaginatedResponse, String> {
+  let mut conn = pool.get().map_err(|e| e.to_string())?;
+  let offset = (page - 1) * page_size;
+  let (rows, total_count) = get_paginated_leases_with_managers(&mut conn, page_size, offset)
+    .map_err(|e| e.to_string())?;
+  let leases = rows.into_iter().map(|(lease, managers)| LeaseWithManagers { lease, managers }).collect();
+  Ok(PaginatedResponse { leases, total_count })
+}
+
 #[tauri::command]
 pub fn manager(
   pool: State<'_, DbPool>,
@@ -146,6 +166,13 @@ pub fn managers(
 }
 
 #[tauri::command]
+pub fn last_manager_id(pool: State<'_, DbPool>) -> Result<Option<i32>, String> {
+  let mut conn = pool.inner().get().map_err(|e| e.to_string())?;
+
+  get_last_manager_id(&mut conn).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
 pub fn edit_lease(
   pool: State<'_, DbPool>,
   lease_id: i32,
@@ -155,6 +182,7 @@ pub fn edit_lease(
   let diesel_changes = UpdateLease {
     name: changes.name.as_deref(),
     address: changes.address.as_deref(),
+    size: changes.size.as_ref(),
     expiration_date: changes.expiration_date.as_ref(),
     notes: changes.notes.as_deref(),
     misc_data: changes.misc_data.as_deref(),

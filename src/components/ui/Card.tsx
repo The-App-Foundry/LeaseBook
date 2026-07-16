@@ -1,4 +1,5 @@
 import React from 'react';
+import './Card.css';
 
 interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   $width?: string;
@@ -15,7 +16,11 @@ const Card = ({
 }: Readonly<CardProps>) => (
   <div
     className={`lb-card${className ? ` ${className}` : ''}`}
-    style={{ width: $width, height: $height, ...style }}
+    style={{
+      '--card-width': $width,
+      '--card-height': $height,
+      ...style,
+    } as React.CSSProperties}
     {...props}
   >
     {children}

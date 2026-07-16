@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 pub struct Lease {
   pub id: i32,
   pub name: String,
-  pub address: String,
+  pub address: Option<String>,
   pub size: Option<i32>,
   pub expiration_date: Option<i32>,
   pub notes: Option<String>,
@@ -42,7 +42,7 @@ pub struct LeasesManagers {
 #[diesel(table_name = crate::schema::leases)]
 pub struct NewLease<'a> {
   pub name: &'a str,
-  pub address: &'a str,
+  pub address: Option<&'a str>,
   pub expiration_date: Option<i32>,
   pub notes: Option<&'a str>,
   pub misc_data: Option<&'a str>,
@@ -61,6 +61,7 @@ pub struct NewManager<'a> {
 pub struct UpdateLease<'a> {
   pub name: Option<&'a str>,
   pub address: Option<&'a str>,
+  pub size: Option<&'a i32>,
   pub expiration_date: Option<&'a i32>,
   pub notes: Option<&'a str>,
   pub misc_data: Option<&'a str>,
@@ -81,6 +82,7 @@ pub struct UpdateManager<'a> {
 pub struct UpdateLeaseInput {
   pub name: Option<String>,
   pub address: Option<String>,
+  pub size: Option<i32>,
   pub expiration_date: Option<i32>,
   pub notes: Option<String>,
   pub misc_data: Option<String>,

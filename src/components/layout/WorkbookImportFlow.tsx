@@ -3,8 +3,9 @@ import { invoke } from '@tauri-apps/api/core';
 import { open } from '@tauri-apps/plugin-dialog';
 import { ChevronLeft, Upload, Table2, Link2 } from 'lucide-react';
 import { Button } from '../ui';
-import type { Lease } from '../../types/lease';
+import type { Lease, Manager } from '../../types/lease';
 import { detectManagers } from '../../utils/managerDetect';
+import './WorkbookImportFlow.css';
 
 type LeaseFieldKey =
   | 'name'
@@ -111,12 +112,13 @@ const convertBackendLeasesToUi = (rows: BackendLease[]): Lease[] =>
     const displayName = managers.map(m => m.name).join(', ') || '-';
 
     // If no managers were detected but backend had a name, create an unverified entry
-    const finalManagers =
+    const finalManagers: Manager[] =
       managers.length === 0 && item.lease_manager?.name
-        ? [{ id: `mgr-${Date.now()}-fallback`, name: item.lease_manager.name, verified: false }]
+        ? [{ id: Date.now() + Math.floor(Math.random() * 1000), name: item.lease_manager.name, verified: false, phoneNumbers: [] }]
         : managers;
 
     return {
+      id: 0,
       status: item.expired ? 'prospect' : 'qualified',
       name: item.name || 'Unnamed',
       businessAddr: item.address || '-',
@@ -289,48 +291,39 @@ const WorkbookImportFlow = ({
           <Button
             $variant="ghost"
             onClick={onCancel}
-            style={{ marginRight: 0, paddingLeft: '0.25rem' }}
+            className="lb-import-back-btn"
           >
             <ChevronLeft size={14} />
             Back
           </Button>
         )}
 
-        <h2 style={{ margin: 0, fontSize: '1rem' }}>Workbook Import</h2>
-        <p style={{ margin: 0, fontSize: '0.8rem', color: '#6b7280' }}>
+        <h2 className="lb-import-title">Workbook Import</h2>
+        <p className="lb-import-desc">
           Upload workbook, select a sheet, confirm column mapping, and import.
         </p>
 
-        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
-          <label style={{ fontSize: '0.85rem', fontWeight: 600 }}>Workbook File</label>
+        <div className="lb-import-row">
+          <label className="lb-import-label">Workbook File</label>
           <Button onClick={handleUpload} $variant="outline" disabled={isBusy}>
             <Upload size={15} />
             {isBusy ? 'Working...' : 'Upload Workbook'}
           </Button>
           {workbookName ? (
-            <span
-              style={{
-                fontSize: '0.75rem',
-                borderRadius: 'var(--lb-radius-sm)',
-                padding: '0.2rem 0.45rem',
-                border: '1px solid var(--lb-border)',
-                background: '#f8fafc',
-              }}
-            >
+            <span className="lb-import-pill">
               {workbookName}
             </span>
           ) : null}
         </div>
 
         {spreadsheet ? (
-          <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
-            <label htmlFor="sheet-select" style={{ fontSize: '0.85rem', fontWeight: 600 }}>
+          <div className="lb-import-row">
+            <label htmlFor="sheet-select" className="lb-import-label">
               Sheet
             </label>
             <select
               id="sheet-select"
-              className="lb-form-select"
-              style={{ width: 'auto' }}
+              className="lb-form-select lb-import-select-auto"
               value={selectedSheetName}
               onChange={event => handleSheetChange(event.target.value)}
             >
@@ -340,16 +333,8 @@ const WorkbookImportFlow = ({
                 </option>
               ))}
             </select>
-            <span
-              style={{
-                fontSize: '0.75rem',
-                borderRadius: 'var(--lb-radius-sm)',
-                padding: '0.2rem 0.45rem',
-                border: '1px solid var(--lb-border)',
-                background: '#f8fafc',
-              }}
-            >
-              <Table2 size={12} style={{ marginRight: 6, verticalAlign: 'text-bottom', display: 'inline' }} />
+            <span className="lb-import-pill">
+              <Table2 size={12} className="lb-import-icon-inline" />
               {spreadsheet.sheets.length} sheets
             </span>
           </div>
@@ -357,19 +342,19 @@ const WorkbookImportFlow = ({
 
         {selectedSheet && mappingByKey ? (
           <>
-            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
+            <div className="lb-import-row">
               <Link2 size={14} />
-              <p style={{ margin: 0, fontSize: '0.8rem', color: '#6b7280' }}>
+              <p className="lb-import-desc">
                 Auto-detected mapping is prefilled. Change any selection before importing.
               </p>
             </div>
 
             <div className="lb-field-grid">
               {FIELDS.map(field => (
-                <div key={field.key} style={{ display: 'contents' }}>
+                <div key={field.key} className="lb-import-contents">
                   <label
                     htmlFor={`mapping-${field.key}`}
-                    style={{ fontSize: '0.85rem', fontWeight: 600 }}
+                    className="lb-import-label"
                   >
                     {field.label}
                   </label>
@@ -390,7 +375,7 @@ const WorkbookImportFlow = ({
               ))}
             </div>
 
-            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
+            <div className="lb-import-row">
               <Button onClick={handleImport} disabled={isBusy}>
                 {isBusy ? 'Importing...' : 'Import Selected Sheet'}
               </Button>
@@ -399,7 +384,7 @@ const WorkbookImportFlow = ({
         ) : null}
 
         {error ? (
-          <p style={{ margin: 0, color: '#b91c1c', fontSize: '0.82rem' }}>{error}</p>
+          <p className="lb-import-error">{error}</p>
         ) : null}
       </div>
     </div>

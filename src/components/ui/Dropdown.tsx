@@ -1,6 +1,6 @@
 import React from 'react';
 import { Dropdown as BsDropdown } from 'react-bootstrap';
-import { ChevronDown } from 'lucide-react';
+import './Dropdown.css';
 
 interface DropdownMenuProps {
   buttonLabel: React.ReactNode;
@@ -21,18 +21,7 @@ const Dropdown = ({
   <BsDropdown>
     <BsDropdown.Toggle
       aria-label={triggerLabel}
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: 4,
-        border: 'none',
-        background: 'transparent',
-        boxShadow: 'none',
-        color: 'inherit',
-        fontSize: 12,
-        height: 'calc(var(--spacing) * 10)',
-        padding: 'calc(var(--spacing) * 4) calc(var(--spacing) * 2)',
-      }}
+      className="lb-dropdown-toggle"
     >
       {buttonLabel}
     </BsDropdown.Toggle>

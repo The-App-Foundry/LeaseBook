@@ -6,7 +6,7 @@ DROP TABLE leases_managers;
 CREATE TABLE leases_new (
   id              INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   name            TEXT    NOT NULL,
-  address         TEXT    NOT NULL,
+  address         TEXT,
   size            INTEGER,
   expiration_date INTEGER,
   notes           TEXT,
@@ -16,7 +16,7 @@ CREATE TABLE leases_new (
 ) STRICT;
 
 INSERT INTO leases_new (id, name, address, size, expiration_date, notes, misc_data, created_on, last_modified)
-SELECT id, name, address, NULL, expiration_date, notes, misc_data, COALESCE(created_on, unixepoch()), last_modified
+SELECT id, name, NULL, NULL, expiration_date, notes, misc_data, COALESCE(created_on, unixepoch()), last_modified
 FROM leases;
 
 DROP TABLE leases;

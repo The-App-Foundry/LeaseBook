@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { ArrowUpDown, ArrowDownUp } from 'lucide-react';
+import './Sort.css';
 
 const Sort = () => {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
@@ -12,8 +13,7 @@ const Sort = () => {
 
   return (
     <button
-      className="lb-btn lb-btn-ghost"
-      style={{ padding: 0, boxShadow: 'none' }}
+      className="lb-btn lb-btn-ghost lb-sort-button"
       onClick={toggleSortOrder}
       title={tooltipText}
       aria-label={tooltipText}
