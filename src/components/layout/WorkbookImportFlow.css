@@ -1,0 +1,55 @@
+.lb-import-back-btn {
+  margin-right: 0 !important;
+  padding-left: 0.25rem !important;
+}
+
+.lb-import-title {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.lb-import-desc {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.lb-import-row {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.lb-import-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.lb-import-pill {
+  font-size: 0.75rem;
+  border-radius: var(--lb-radius-sm);
+  padding: 0.2rem 0.45rem;
+  border: 1px solid var(--lb-border);
+  background: #f8fafc;
+}
+
+.lb-import-select-auto {
+  width: auto !important;
+}
+
+.lb-import-icon-inline {
+  margin-right: 6px;
+  vertical-align: text-bottom;
+  display: inline;
+}
+
+.lb-import-contents {
+  display: contents;
+}
+
+.lb-import-error {
+  margin: 0;
+  color: #b91c1c;
+  font-size: 0.82rem;
+}

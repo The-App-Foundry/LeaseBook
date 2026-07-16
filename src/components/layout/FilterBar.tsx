@@ -1,57 +1,51 @@
-import styled from 'styled-components';
-import { Card, Dropdown, Sort, Badge, Button } from '../ui';
-import { Funnel as _Funnel } from 'lucide-react';
+import { memo } from 'react';
+import './FilterBar.css';
 
-const Wrapper = styled.div`
-  margin: 16px 0;
-  display: flex;
-  justify-content: center;
-  padding: 0 16px;
-  box-sizing: border-box;
+const STAGE_COLORS: Record<string, { bg: string, abbr: string }> = {
+  'New':          { bg: '#94A3B8', abbr: 'NW' },
+  'Contacted':    { bg: '#3B82F6', abbr: 'CN' },
+  'Qualified':    { bg: '#10B981', abbr: 'QL' },
+  'Negotiating':  { bg: '#F59E0B', abbr: 'NG' },
+  'Won':          { bg: '#0D9488', abbr: 'WN' },
+  'Lost':         { bg: '#94A3B8', abbr: 'LT' },
+};
 
-  &.inner {
-    padding: 0;
-    height: 100%;
-  }
-`;
-
-const Label = styled.label`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  margin-right: 25px;
-  font-weight: 600;
-`;
-
-const Funnel = styled(_Funnel)`
-  stroke-width: 1.5px;
-  margin-right: 5px;
-`;
-
-export default function FilterBar() {
+const Dot = ({ stage }: { stage: string }) => {
+  const color = STAGE_COLORS[stage];
+  if (!color) return null;
   return (
-    <Wrapper>
-      <Card $width="1600px" $height="77px">
-        <Wrapper className="inner">
-          <Funnel />
-          <Label>Filter:</Label>
-          <Button className="filter">All Properties</Button>
-          <Button className="filter">
-            <Badge className="emerald">Q</Badge>Qualified
-          </Button>
-          <Button className="filter">
-            <Badge className="gray">P</Badge>Prospects
-          </Button>
-        </Wrapper>
-        <Wrapper className="inner">
-          <Sort />
-          <Dropdown
-            buttonLabel="Sort by"
-            items={[{ title: 'Expiration' }, { title: 'Address' }, { title: 'Type' }]}
-          />
-        </Wrapper>
-      </Card>
-    </Wrapper>
+    <span 
+      className="lb-filter-dot" 
+      style={{ background: color.bg }}
+    >
+      {color.abbr}
+    </span>
   );
-}
+};
+
+const FilterBar = () => (
+  <div className="lb-filter-outer">
+    <div className="lb-filter-content">
+      <div className="lb-filter-label">
+        <span>Filter:</span>
+      </div>
+      <div className="lb-filter-buttons-wrapper">
+        <button className="lb-filter-pill lb-filter-pill-active">All Properties ( 12 )</button>
+        <button className="lb-filter-pill lb-filter-pill-inactive"><Dot stage="New" /> New ( 2 )</button>
+        <button className="lb-filter-pill lb-filter-pill-inactive"><Dot stage="Contacted" /> Contacted ( 2 )</button>
+        <button className="lb-filter-pill lb-filter-pill-inactive"><Dot stage="Qualified" /> Qualified ( 3 )</button>
+        <button className="lb-filter-pill lb-filter-pill-inactive"><Dot stage="Negotiating" /> Negotiating ( 2 )</button>
+        <button className="lb-filter-pill lb-filter-pill-inactive"><Dot stage="Won" /> Won ( 2 )</button>
+        <button className="lb-filter-pill lb-filter-pill-inactive"><Dot stage="Lost" /> Lost ( 1 )</button>
+      </div>
+      <div className="lb-filter-spacer"></div>
+      <select className="lb-filter-select">
+        <option value="expiration">Sort: Lease Expiration</option>
+        <option value="name">Sort: Company Name</option>
+        <option value="size">Sort: Property Size</option>
+      </select>
+    </div>
+  </div>
+);
+
+export default memo(FilterBar);
