@@ -46,7 +46,15 @@ main,
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-family:
+    'Inter',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
   font-size: 1rem;
   line-height: 1.5;
   color: #1C2333;
@@ -309,12 +317,16 @@ button {
 }
 
 .lb-search-input {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
   background: transparent;
   border: 1px solid var(--lb-primary);
   padding: 8px 12px 8px 2.5rem;
   border-radius: 8px;
   outline: none;
   font-size: 14px;
+  line-height: normal;
   width: 100%;
   color: var(--lb-text);
 }
@@ -1288,7 +1300,7 @@ button {
   align-items: center;
   gap: 12px;
 }
-.lb-header-search-input {
+.lb-header-search-input-container {
   width: 380px;
 }
 
@@ -1310,7 +1322,7 @@ button {
     flex-wrap: wrap;
     justify-content: center;
   }
-  .lb-header-search-input {
+  .lb-header-search-input-container {
     width: 100%;
     max-width: 100%;
   }

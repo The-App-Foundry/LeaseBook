@@ -237,7 +237,7 @@ const Property = ({ data, onClick, onEdit, onDelete }: Readonly<PropertyProps>) 
         <div className="lb-property-details-col">
           <div className="lb-property-details-label">↔ Property Size</div>
           <div className="lb-property-details-val-size">
-            {size} sq ft
+            {size && size.toLowerCase().includes('sq ft') ? size : `${size || '0'} sq ft`}
           </div>
         </div>
       </div>

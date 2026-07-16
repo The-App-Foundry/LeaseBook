@@ -16,6 +16,7 @@
   width: 100%;
   max-width: 480px;
   height: 380px;
+  container-type: inline-size;
 }
 
 .lb-property-card-html:hover {
@@ -155,4 +156,79 @@
   line-height: 1.4;
   word-break: break-word;
   overflow: hidden;
+}
+
+@container (max-width: 385px) {
+  .lb-property-card-html {
+    padding: 16px;
+  }
+
+  .lb-property-info-header {
+    flex-direction: row;
+    align-items: center;
+    text-align: left;
+    gap: 12px;
+    padding-right: 76px; /* Avoid overlapping absolute-positioned edit/delete buttons */
+  }
+
+  .lb-property-name {
+    font-size: 14px;
+    margin-bottom: 0;
+  }
+
+  .lb-property-address {
+    justify-content: flex-start;
+    font-size: 11px;
+    gap: 4px;
+  }
+
+  .lb-property-badge-label {
+    text-align: left;
+    margin: 4px 0 6px 48px; /* Indent to match text column (36px badge + 12px gap) */
+  }
+
+  .lb-property-expiration-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    padding: 10px 12px;
+  }
+
+  .lb-property-exp-badge {
+    align-self: flex-start;
+    font-size: 11px;
+    padding: 4px 8px;
+  }
+
+  .lb-property-exp-date {
+    font-size: 13px;
+  }
+
+  .lb-property-details-row {
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .lb-property-details-col {
+    min-width: 0;
+  }
+
+  .lb-property-details-label {
+    margin-bottom: 1px;
+  }
+
+  .lb-property-details-val-dm,
+  .lb-property-details-val-size {
+    font-size: 12px;
+  }
+
+  .lb-property-notes-container {
+    margin-top: 8px;
+    padding: 6px 8px;
+  }
+
+  .lb-property-notes-content {
+    font-size: 11px;
+  }
 }
