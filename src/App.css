@@ -1385,5 +1385,18 @@ button {
   margin-top: 0.5rem;
 }
 
+/* Links styling inside Notes Rich Text Editor and View Mode */
+.lb-rtf-editor .tiptap a,
+.lb-detail-notes-html a {
+  color: #2F5FE0;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.lb-rtf-editor .tiptap a:hover,
+.lb-detail-notes-html a:hover {
+  color: #1E3FA8;
+}
+
 
 
