@@ -1,10 +1,14 @@
 import React, { useCallback, useState, useEffect, useRef } from 'react';
 import { invoke } from '@tauri-apps/api/core';
 import { confirm } from '@tauri-apps/plugin-dialog';
+import { openUrl } from '@tauri-apps/plugin-opener';
 import DOMPurify from 'dompurify';
-import { useEditor, EditorContent } from '@tiptap/react';
+import { useEditor, EditorContent, getMarkRange } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
+import LinkExtension from '@tiptap/extension-link';
+import { Link2, Unlink } from 'lucide-react';
+import Modal from '../ui/Modal';
 import type { Lease, Manager } from '../../types/lease';
 import './PropertyDetail.css';
 
@@ -97,14 +101,12 @@ const unixToIso = (ts: number): string => {
   return `${y}-${mo}-${day}`;
 };
 
-// ---------------------------------------------------------------------------
-// RTF Toolbar
-// ---------------------------------------------------------------------------
 interface RtfToolbarProps {
   editor: ReturnType<typeof useEditor>;
+  onLinkClick: () => void;
 }
 
-const RtfToolbar = ({ editor }: RtfToolbarProps) => {
+const RtfToolbar = ({ editor, onLinkClick }: RtfToolbarProps) => {
   if (!editor) return null;
 
   return (
@@ -150,6 +152,25 @@ const RtfToolbar = ({ editor }: RtfToolbarProps) => {
       >
         1.
       </button>
+      <div className="lb-rtf-separator" />
+      <button
+        type="button"
+        title="Link"
+        className={`lb-rtf-tool-btn${editor.isActive('link') ? ' active' : ''}`}
+        onMouseDown={(e) => { e.preventDefault(); onLinkClick(); }}
+      >
+        <Link2 size={14} />
+      </button>
+      {editor.isActive('link') && (
+        <button
+          type="button"
+          title="Remove Link"
+          className="lb-rtf-tool-btn"
+          onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().unsetLink().run(); }}
+        >
+          <Unlink size={14} />
+        </button>
+      )}
     </div>
   );
 };
@@ -180,14 +201,84 @@ const PropertyDetail = ({ lease, onBack, onSaved, onDelete, initialEditMode }: R
     decisionPhone: '',
   });
 
+  const [isLinkModalOpen, setIsLinkModalOpen] = useState(false);
+  const [linkUrl, setLinkUrl] = useState('');
+  const [linkText, setLinkText] = useState('');
+  const [activeRange, setActiveRange] = useState<{ from: number, to: number } | null>(null);
+
   // Tiptap editor — always mounted but only visible/active in edit mode
   const editor = useEditor({
-    extensions: [StarterKit, Underline],
+    extensions: [
+      StarterKit,
+      Underline,
+      LinkExtension.configure({
+        openOnClick: false,
+        HTMLAttributes: {
+          rel: 'noopener noreferrer',
+          target: '_blank',
+          class: 'lb-editor-link'
+        }
+      })
+    ],
     content: '',
     editorProps: {
       attributes: { class: 'tiptap' },
     },
   });
+
+  const handleLinkClick = useCallback(() => {
+    if (!editor) return;
+    const { state } = editor;
+    const { selection } = state;
+    const { from, to, empty } = selection;
+
+    let text = '';
+    let url = '';
+    let range: { from: number, to: number } | null = null;
+
+    if (editor.isActive('link')) {
+      const markRange = getMarkRange(selection.$from, state.schema.marks.link);
+      if (markRange) {
+        range = markRange;
+        text = state.doc.textBetween(markRange.from, markRange.to);
+        url = editor.getAttributes('link').href || '';
+      }
+    } else {
+      range = { from, to };
+      if (!empty) {
+        text = state.doc.textBetween(from, to);
+      }
+    }
+
+    setLinkUrl(url);
+    setLinkText(text);
+    setActiveRange(range);
+    setIsLinkModalOpen(true);
+  }, [editor]);
+
+  const handleApplyLink = useCallback(() => {
+    if (!editor || !activeRange) return;
+    let url = linkUrl.trim();
+    let text = linkText.trim();
+
+    if (url) {
+      if (!/^(https?:\/\/|mailto:|tel:|#)/i.test(url)) {
+        url = `https://${url}`;
+      }
+      editor.chain().focus()
+        .insertContentAt(activeRange, `<a href="${url}">${text || url}</a>`)
+        .run();
+    } else {
+      editor.chain().focus().setTextSelection(activeRange).unsetLink().run();
+    }
+    setIsLinkModalOpen(false);
+  }, [editor, linkUrl, linkText, activeRange]);
+
+  const handleRemoveLink = useCallback(() => {
+    if (!editor || !activeRange) return;
+    editor.chain().focus().setTextSelection(activeRange).unsetLink().run();
+    setIsLinkModalOpen(false);
+  }, [editor, activeRange]);
 
   // ------------------------------------------------------------------
   // Edit actions
@@ -389,12 +480,30 @@ const PropertyDetail = ({ lease, onBack, onSaved, onDelete, initialEditMode }: R
     }
     // RTF/HTML note — sanitize before rendering
     const clean = DOMPurify.sanitize(rawNote, {
-      ALLOWED_TAGS: ['p', 'strong', 'em', 'u', 'ul', 'ol', 'li', 'br'],
-      ALLOWED_ATTR: [],
+      ALLOWED_TAGS: ['p', 'strong', 'em', 'u', 'ul', 'ol', 'li', 'br', 'a'],
+      ALLOWED_ATTR: ['href', 'target', 'rel'],
     });
+
+    const handleNotesClick = async (e: React.MouseEvent<HTMLDivElement>) => {
+      const target = e.target as HTMLElement;
+      const anchor = target.closest('a');
+      if (anchor) {
+        e.preventDefault();
+        const href = anchor.getAttribute('href');
+        if (href) {
+          try {
+            await openUrl(href);
+          } catch (err) {
+            console.error('Failed to open link:', err);
+          }
+        }
+      }
+    };
+
     return (
       <div
         className="lb-detail-notes-html"
+        onClick={handleNotesClick}
         dangerouslySetInnerHTML={{ __html: clean }}
       />
     );
@@ -545,7 +654,7 @@ const PropertyDetail = ({ lease, onBack, onSaved, onDelete, initialEditMode }: R
             <div className="lb-detail-notes-edit-wrapper">
               <label className="lb-edit-label">NOTES</label>
               <div className="lb-rtf-wrapper">
-                <RtfToolbar editor={editor} />
+                 <RtfToolbar editor={editor} onLinkClick={handleLinkClick} />
                 <div className="lb-rtf-editor">
                   <EditorContent editor={editor} />
                 </div>
@@ -676,6 +785,78 @@ const PropertyDetail = ({ lease, onBack, onSaved, onDelete, initialEditMode }: R
             </div>
           </>
         )}
+        <Modal
+          isOpen={isLinkModalOpen}
+          onClose={() => setIsLinkModalOpen(false)}
+          title={editor?.isActive('link') ? "Edit Link" : "Add Link"}
+          footer={
+            <div className="lb-link-modal-footer" style={{ display: 'flex', width: '100%', gap: '8px' }}>
+              {editor?.isActive('link') && (
+                <button
+                  type="button"
+                  className="lb-edit-cancel-btn"
+                  onClick={handleRemoveLink}
+                  style={{ marginRight: 'auto', color: '#D64545' }}
+                >
+                  Remove Link
+                </button>
+              )}
+              <button
+                type="button"
+                className="lb-edit-cancel-btn"
+                onClick={() => setIsLinkModalOpen(false)}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="lb-edit-save-btn"
+                onClick={handleApplyLink}
+              >
+                Apply
+              </button>
+            </div>
+          }
+        >
+          <div className="lb-link-modal-body">
+            <div style={{ marginBottom: '14px' }}>
+              <label className="lb-edit-label" htmlFor="link-text-input" style={{ marginBottom: '6px', display: 'block' }}>
+                Link Text
+              </label>
+              <input
+                id="link-text-input"
+                type="text"
+                className="lb-edit-input"
+                placeholder="Text to display"
+                value={linkText}
+                onChange={(e) => setLinkText(e.target.value)}
+                style={{ width: '100%' }}
+                autoFocus={!linkText}
+              />
+            </div>
+            <div>
+              <label className="lb-edit-label" htmlFor="link-url-input" style={{ marginBottom: '6px', display: 'block' }}>
+                URL
+              </label>
+              <input
+                id="link-url-input"
+                type="text"
+                className="lb-edit-input"
+                placeholder="e.g. google.com"
+                value={linkUrl}
+                onChange={(e) => setLinkUrl(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleApplyLink();
+                  }
+                }}
+                style={{ width: '100%' }}
+                autoFocus={!!linkText}
+              />
+            </div>
+          </div>
+        </Modal>
       </div>
     </div>
   );
