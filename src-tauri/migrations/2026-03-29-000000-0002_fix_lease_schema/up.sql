@@ -1,12 +1,6 @@
--- Remove UNIQUE constraint from leases.address and add DEFAULT to created_on columns.
--- Because Diesel wraps migrations in a transaction, PRAGMA foreign_keys = OFF has no
--- effect; instead we back up and recreate leases_managers ourselves.
-
--- 1. Back up and drop the FK junction table first
 CREATE TABLE leases_managers_bak AS SELECT * FROM leases_managers;
 DROP TABLE leases_managers;
 
--- 2. Rebuild leases without UNIQUE on address, with DEFAULT on created_on
 CREATE TABLE leases_new (
   id              INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   name            TEXT    NOT NULL,
@@ -25,7 +19,6 @@ FROM leases;
 DROP TABLE leases;
 ALTER TABLE leases_new RENAME TO leases;
 
--- 3. Rebuild lease_managers with DEFAULT on created_on
 CREATE TABLE lease_managers_new (
   id            INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   name          TEXT    NOT NULL,
@@ -42,7 +35,6 @@ FROM lease_managers;
 DROP TABLE lease_managers;
 ALTER TABLE lease_managers_new RENAME TO lease_managers;
 
--- 4. Restore the junction table with proper FK references
 CREATE TABLE leases_managers (
   manager_id INTEGER,
   lease_id   INTEGER,

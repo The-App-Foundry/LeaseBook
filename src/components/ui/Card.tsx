@@ -1,24 +1,30 @@
-import styled from 'styled-components';
+import React from 'react';
+import './Card.css';
 
-interface CardProps {
+interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   $width?: string;
   $height?: string;
 }
 
-const Card = styled.div<CardProps>`
-  background: ${({ theme }) => theme.colors.surface};
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  border-radius: 0.5rem;
-  box-shadow:
-    0 1px 3px 0 rgba(0, 0, 0, 0.1),
-    0 1px 2px 0 rgba(0, 0, 0, 0.06);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  transition: box-shadow 0.2s ease;
-  padding: calc(var(--spacing) * 4);
-  width: ${props => props.$width};
-  height: ${props => props.$height};
-`;
+const Card = ({
+  $width,
+  $height,
+  className = '',
+  style,
+  children,
+  ...props
+}: Readonly<CardProps>) => (
+  <div
+    className={`lb-card${className ? ` ${className}` : ''}`}
+    style={{
+      '--card-width': $width,
+      '--card-height': $height,
+      ...style,
+    } as React.CSSProperties}
+    {...props}
+  >
+    {children}
+  </div>
+);
 
 export default Card;

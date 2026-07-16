@@ -4,12 +4,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-LeaseBook is a cross-platform property management application built with Tauri v2, React 19, TypeScript, and styled-components. The application targets desktop (Linux, macOS, Windows), Android, and iOS platforms.
+LeaseBook is a cross-platform property management application built with Tauri v2, React 19, TypeScript, and CSS. The application targets desktop (Linux, macOS, Windows), Android, and iOS platforms.
 
 **Tech Stack:**
 
 - **Frontend**: React 19 + TypeScript + Vite
-- **UI Styling**: styled-components with a custom theme system
+- **UI Styling**: Component-specific CSS files with a custom bootstrap integration
 - **Backend**: Tauri v2 (Rust)
 - **Icons**: lucide-react
 - **Package Manager**: pnpm 10.26.1
@@ -56,33 +56,23 @@ pnpm tauri:build
 
 ### Frontend Structure
 
-The React application uses a component-based architecture with centralized theming:
+The React application uses a component-based architecture with CSS-based styling:
 
-- **Entry Point**: `src/main.tsx` wraps the app with `ThemeProvider` and `GlobalStyle`
-- **Theme System**: `src/styles/theme.ts` exports the theme object, typed in `src/styles/styled.d.ts`
-- **Global Styles**: `src/styles/global.ts` contains CSS resets and base typography
+- **Entry Point**: `src/main.tsx` imports Bootstrap CSS and global `src/App.css`
+- **Global Styles**: `src/App.css` contains variables, resets, base typography, and common layouts
 - **Component Organization**:
   - `src/components/ui/`: Reusable UI primitives (Button, Card, Badge, SearchBar, Sort)
   - `src/components/layout/`: Layout components (Header, FilterBar)
   - Each directory has an `index.ts` barrel file for clean imports
 
-### Styled-Components Patterns
+### Styling Patterns
 
-All components use styled-components with the following conventions:
+All components use standard CSS with the following conventions:
 
-1. **Transient Props**: Use `$` prefix for props that shouldn't be passed to the DOM (e.g., `$variant`, `$width`)
-2. **Theme Access**: Components access theme via `${({ theme }) => theme.colors.primary}`
-3. **CSS Variables**: App uses CSS custom properties for spacing (`--spacing: 0.25rem`) and layout (`--app-header-height`)
-4. **Lucide Icons**: Import and wrap icons with styled-components for styling
-
-Example pattern:
-
-```tsx
-const StyledIcon = styled(IconFromLucide)`
-  height: 16px;
-  width: 16px;
-`;
-```
+1. **Component-Specific CSS**: Custom styling resides in a `.css` file next to the `.tsx` component and is imported directly (e.g., `import './Header.css'`).
+2. **Static Styles**: Move all static styles into CSS classes.
+3. **Dynamic Styling**: Only pass dynamic properties (e.g., dynamic color badges or custom dimensions) as inline `style` objects or CSS custom variables.
+4. **Hover States**: Implement using standard CSS pseudo-classes (e.g., `:hover`) in the CSS file instead of React mouse event handlers.
 
 ### Layout System
 

@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { invoke } from '@tauri-apps/api/core';
 import { open } from '@tauri-apps/plugin-dialog';
-import styled from 'styled-components';
 import { ChevronLeft, Upload, Table2, Link2 } from 'lucide-react';
-import { Button, Card } from '../ui';
-import type { Lease } from '../../types/lease';
+import { Button } from '../ui';
+import type { Lease, Manager } from '../../types/lease';
 import { detectManagers } from '../../utils/managerDetect';
+import './WorkbookImportFlow.css';
 
 type LeaseFieldKey =
   | 'name'
@@ -74,79 +74,6 @@ const ALIASES: Record<LeaseFieldKey, string[]> = {
   notes: ['notes', 'note', 'comments'],
 };
 
-const Wrapper = styled.div`
-  margin: 16px 0;
-  padding: 0 16px;
-`;
-
-const ImportCard = styled(Card)`
-  width: 100%;
-  max-width: 1600px;
-  margin: 0 auto;
-  align-items: flex-start;
-  flex-direction: column;
-  gap: 0.75rem;
-`;
-
-const Title = styled.h2`
-  margin: 0;
-  font-size: 1rem;
-  color: ${({ theme }) => theme.colors.text};
-`;
-
-const Row = styled.div`
-  display: flex;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-  align-items: center;
-`;
-
-const FieldGrid = styled.div`
-  display: grid;
-  grid-template-columns: 220px 1fr;
-  gap: 0.5rem 0.75rem;
-  width: 100%;
-
-  @media (max-width: 720px) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-const Label = styled.label`
-  font-size: 0.85rem;
-  color: ${({ theme }) => theme.colors.text};
-  font-weight: 600;
-`;
-
-const Select = styled.select`
-  width: 100%;
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  border-radius: ${({ theme }) => theme.radii.md};
-  padding: 0.5rem 0.65rem;
-  font-size: 0.85rem;
-  background: ${({ theme }) => theme.colors.surface};
-`;
-
-const Hint = styled.p`
-  margin: 0;
-  font-size: 0.8rem;
-  color: #6b7280;
-`;
-
-const ErrorText = styled.p`
-  margin: 0;
-  color: #b91c1c;
-  font-size: 0.82rem;
-`;
-
-const Badge = styled.span`
-  font-size: 0.75rem;
-  border-radius: ${({ theme }) => theme.radii.sm};
-  padding: 0.2rem 0.45rem;
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  background: #f8fafc;
-`;
-
 const normalize = (value: string): string => value.toLowerCase().replaceAll(/[^a-z0-9]/g, '');
 
 const autoDetectHeaders = (headers: string[]): Record<LeaseFieldKey, string> => {
@@ -185,19 +112,19 @@ const convertBackendLeasesToUi = (rows: BackendLease[]): Lease[] =>
     const displayName = managers.map(m => m.name).join(', ') || '-';
 
     // If no managers were detected but backend had a name, create an unverified entry
-    const finalManagers =
+    const finalManagers: Manager[] =
       managers.length === 0 && item.lease_manager?.name
-        ? [{ id: `mgr-${Date.now()}-fallback`, name: item.lease_manager.name, verified: false }]
+        ? [{ id: Date.now() + Math.floor(Math.random() * 1000), name: item.lease_manager.name, verified: false, phoneNumbers: [] }]
         : managers;
 
     return {
+      id: 0,
       status: item.expired ? 'prospect' : 'qualified',
       name: item.name || 'Unnamed',
       businessAddr: item.address || '-',
       leaseExpiration: item.expiration_date ? formatExpirationDate(item.expiration_date) : '-',
       leaseManager: displayName,
       managers: finalManagers,
-      size: '-',
       note: item.notes || item.misc_data || undefined,
     };
   });
@@ -248,8 +175,7 @@ const WorkbookImportFlow = ({
       autoOpenFired.current = true;
       void handleUpload();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, []); // autoOpen is intentionally read only on mount
 
   const selectedSheet = useMemo(() => {
     if (!spreadsheet || !selectedSheetName) return null;
@@ -359,35 +285,45 @@ const WorkbookImportFlow = ({
   };
 
   return (
-    <Wrapper>
-      <ImportCard>
+    <div className="lb-workbook-wrapper">
+      <div className="lb-card lb-workbook-card">
         {onCancel && (
           <Button
             $variant="ghost"
             onClick={onCancel}
-            style={{ marginRight: 0, paddingLeft: '0.25rem' }}
+            className="lb-import-back-btn"
           >
             <ChevronLeft size={14} />
             Back
           </Button>
         )}
-        <Title>Workbook Import</Title>
-        <Hint>Upload workbook, select a sheet, confirm column mapping, and import.</Hint>
 
-        <Row>
-          <Label>Workbook File</Label>
+        <h2 className="lb-import-title">Workbook Import</h2>
+        <p className="lb-import-desc">
+          Upload workbook, select a sheet, confirm column mapping, and import.
+        </p>
+
+        <div className="lb-import-row">
+          <label className="lb-import-label">Workbook File</label>
           <Button onClick={handleUpload} $variant="outline" disabled={isBusy}>
             <Upload size={15} />
             {isBusy ? 'Working...' : 'Upload Workbook'}
           </Button>
-          {workbookName ? <Badge>{workbookName}</Badge> : null}
-        </Row>
+          {workbookName ? (
+            <span className="lb-import-pill">
+              {workbookName}
+            </span>
+          ) : null}
+        </div>
 
         {spreadsheet ? (
-          <Row>
-            <Label htmlFor="sheet-select">Sheet</Label>
-            <Select
+          <div className="lb-import-row">
+            <label htmlFor="sheet-select" className="lb-import-label">
+              Sheet
+            </label>
+            <select
               id="sheet-select"
+              className="lb-form-select lb-import-select-auto"
               value={selectedSheetName}
               onChange={event => handleSheetChange(event.target.value)}
             >
@@ -396,28 +332,35 @@ const WorkbookImportFlow = ({
                   {sheet.name}
                 </option>
               ))}
-            </Select>
-            <Badge>
-              <Table2 size={12} style={{ marginRight: 6, verticalAlign: 'text-bottom' }} />
+            </select>
+            <span className="lb-import-pill">
+              <Table2 size={12} className="lb-import-icon-inline" />
               {spreadsheet.sheets.length} sheets
-            </Badge>
-          </Row>
+            </span>
+          </div>
         ) : null}
 
         {selectedSheet && mappingByKey ? (
           <>
-            <Row>
+            <div className="lb-import-row">
               <Link2 size={14} />
-              <Hint>
+              <p className="lb-import-desc">
                 Auto-detected mapping is prefilled. Change any selection before importing.
-              </Hint>
-            </Row>
-            <FieldGrid>
+              </p>
+            </div>
+
+            <div className="lb-field-grid">
               {FIELDS.map(field => (
-                <div key={field.key} style={{ display: 'contents' }}>
-                  <Label htmlFor={`mapping-${field.key}`}>{field.label}</Label>
-                  <Select
+                <div key={field.key} className="lb-import-contents">
+                  <label
+                    htmlFor={`mapping-${field.key}`}
+                    className="lb-import-label"
+                  >
+                    {field.label}
+                  </label>
+                  <select
                     id={`mapping-${field.key}`}
+                    className="lb-form-select"
                     value={mappingByKey[field.key]}
                     onChange={event => handleMappingChange(field.key, event.target.value)}
                   >
@@ -427,22 +370,24 @@ const WorkbookImportFlow = ({
                         {header}
                       </option>
                     ))}
-                  </Select>
+                  </select>
                 </div>
               ))}
-            </FieldGrid>
+            </div>
 
-            <Row>
+            <div className="lb-import-row">
               <Button onClick={handleImport} disabled={isBusy}>
                 {isBusy ? 'Importing...' : 'Import Selected Sheet'}
               </Button>
-            </Row>
+            </div>
           </>
         ) : null}
 
-        {error ? <ErrorText>{error}</ErrorText> : null}
-      </ImportCard>
-    </Wrapper>
+        {error ? (
+          <p className="lb-import-error">{error}</p>
+        ) : null}
+      </div>
+    </div>
   );
 };
 

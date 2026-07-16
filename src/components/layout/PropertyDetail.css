@@ -1,0 +1,21 @@
+.lb-detail-notes-edit-wrapper {
+  margin-bottom: 20px;
+}
+
+.lb-detail-save-error {
+  color: #D64545;
+  font-size: 13px;
+  margin: 4px 0 0;
+}
+
+.lb-detail-actions {
+  gap: 8px !important;
+}
+
+.lb-detail-emoji {
+  font-size: 15px;
+}
+
+.lb-detail-dm-phone {
+  margin-top: 2px;
+}

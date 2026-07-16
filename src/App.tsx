@@ -1,9 +1,8 @@
-import './App.css';
-import { useEffect, useState } from 'react';
-import styled, { keyframes } from 'styled-components';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { invoke } from '@tauri-apps/api/core';
 import { Upload, Plus, Loader2 } from 'lucide-react';
-import { Header, FilterBar, WorkbookImportFlow, NewPropertyForm } from './components/layout';
+import { Header, FilterBar, WorkbookImportFlow, PropertyForm, TabBar, PropertyDetail } from './components/layout';
+import type { Tab } from './components/layout/TabBar';
 import GridContainer from './components/layout/GridContainer';
 import { Button } from './components/ui';
 import type { Lease, Manager } from './types/lease';
@@ -12,6 +11,7 @@ interface DbLease {
   id: number;
   name: string;
   address: string;
+  size: number | null;
   expiration_date: number | null;
   notes: string | null;
   misc_data: string | null;
@@ -25,202 +25,353 @@ interface DbManager {
   email: string | null;
 }
 
+interface DbLeaseWithManagers extends DbLease {
+  managers: DbManager[];
+}
+
+interface PaginatedResponse {
+  leases: DbLeaseWithManagers[];
+  total_count: number;
+}
+
+const DEFAULT_PAGE_SIZE = 50;
+
 const unixToIso = (ts: number): string => new Date(ts * 1000).toISOString().split('T')[0];
 
 const dbLeaseToUi = (db: DbLease, mgrs: DbManager[]): Lease => {
   const isExpired = db.expiration_date ? db.expiration_date * 1000 < Date.now() : false;
   const managers: Manager[] = mgrs.map(m => ({
-    id: String(m.id),
+    id: m.id,
     name: m.name,
-    phone: m.phone_numbers ?? undefined,
+    phoneNumbers: m.phone_numbers ? m.phone_numbers.split(',').map(p => p.trim()) : [],
     email: m.email ?? undefined,
     verified: true,
   }));
   return {
+    id: db.id,
     status: isExpired ? 'prospect' : 'qualified',
     name: db.name,
     businessAddr: db.address,
+    size: db.size?.toString() ?? '0',
     leaseExpiration: db.expiration_date ? unixToIso(db.expiration_date) : '-',
     leaseManager: managers.map(m => m.name).join(', ') || '-',
     managers,
-    size: db.misc_data ?? '-',
     note: db.notes ?? undefined,
   };
 };
 
-const Content = styled.div`
-  height: calc(100vh - var(--app-header-height));
-  padding-top: var(--app-header-height);
-  box-sizing: border-box;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-`;
 
-const EmptyState = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  height: 100%;
-  padding: 2rem;
-  text-align: center;
-`;
 
-const EmptyTitle = styled.h2`
-  margin: 0;
-  font-size: 1.25rem;
-  color: ${({ theme }) => theme.colors.text};
-`;
+type Page = 'list' | 'new-property' | 'import' | 'detail';
 
-const EmptySubtitle = styled.p`
-  margin: 0;
-  font-size: 0.9rem;
-  color: ${({ theme }) => theme.colors.muted};
-`;
+interface ListPageProps {
+  loading: boolean;
+  hasLeases: boolean;
+  leases: Lease[];
+  onManagersChange: (leaseIndex: number, managers: Manager[]) => void;
+  onPropertyClick: (id: number) => void;
+  onPropertyEdit: (id: number) => void;
+  onPropertyDelete: (id: number) => void;
+  onNewProperty: () => void;
+  onShowImport: () => void;
+  currentPage: number;
+  totalPages: number;
+  totalCount: number;
+  pageSize: number;
+  onPageChange: (page: number) => void;
+  onPageSizeChange: (size: number) => void;
+}
 
-const EmptyActions = styled.div`
-  display: flex;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin-top: 0.5rem;
-`;
-
-const spin = keyframes`
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-`;
-
-const pulse = keyframes`
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
-`;
-
-const LoadingState = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 1.25rem;
-  height: 100%;
-`;
-
-const Spinner = styled(Loader2)`
-  animation: ${spin} 0.8s linear infinite;
-  color: ${({ theme }) => theme.colors.primary};
-`;
-
-const LoadingLabel = styled.p`
-  margin: 0;
-  font-size: 1.1rem;
-  font-weight: 500;
-  color: ${({ theme }) => theme.colors.text};
-  animation: ${pulse} 1.5s ease-in-out infinite;
-`;
+// Module-level memo: React completely skips this subtree when navigating away
+const ListPageContent = React.memo(function ListPageContent({
+  loading,
+  hasLeases,
+  leases,
+  onManagersChange,
+  onPropertyClick,
+  onPropertyEdit,
+  onPropertyDelete,
+  onNewProperty,
+  onShowImport,
+  currentPage,
+  totalPages,
+  totalCount,
+  pageSize,
+  onPageChange,
+  onPageSizeChange,
+}: ListPageProps) {
+  if (loading) {
+    return (
+      <div className="lb-loading-container">
+        <Loader2 size={48} className="lb-spin" />
+        <p className="lb-pulse lb-loading-text">
+          Loading properties…
+        </p>
+      </div>
+    );
+  }
+  if (hasLeases) {
+    return (
+      <>
+        <FilterBar />
+        <GridContainer
+          leases={leases}
+          onManagersChange={onManagersChange}
+          onPropertyClick={onPropertyClick}
+          onPropertyEdit={onPropertyEdit}
+          onPropertyDelete={onPropertyDelete}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalCount={totalCount}
+          pageSize={pageSize}
+          onPageChange={onPageChange}
+          onPageSizeChange={onPageSizeChange}
+          onNewProperty={onNewProperty}
+        />
+      </>
+    );
+  }
+  return (
+    <div className="lb-empty-state-container">
+      <h2 className="lb-empty-state-title">No leases yet</h2>
+      <p className="lb-empty-state-text">Import a workbook or create a new lease to get started.</p>
+      <div className="lb-empty-state-btn-container">
+        <Button onClick={onNewProperty}>
+          <Plus size={15} />
+          Create New Lease
+        </Button>
+        <Button onClick={onShowImport}>
+          <Upload size={15} />
+          Import Workbook
+        </Button>
+      </div>
+    </div>
+  );
+});
 
 const App = () => {
   const [leases, setLeases] = useState<Lease[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showImportFlow, setShowImportFlow] = useState(false);
-  const [showNewPropertyForm, setShowNewPropertyForm] = useState(false);
+  const [currentPage, setCurrentPage] = useState<Page>('list');
+  const [activeTab, setActiveTab] = useState<Tab>('properties');
+  const [selectedLeaseId, setSelectedLeaseId] = useState<number | null>(null);
+  const [startInEditMode, setStartInEditMode] = useState(false);
 
-  // Load persisted leases from the database on mount
+  // Pagination state
+  const [dataPage, setDataPage] = useState(1);
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
+  const [totalCount, setTotalCount] = useState(0);
+
+  const totalPages = useMemo(
+    () => Math.max(1, Math.ceil(totalCount / pageSize)),
+    [totalCount, pageSize],
+  );
+
+  // Fetch a single page of leases from the backend
+  const fetchPage = useCallback(
+    (page: number, size: number) => {
+      setLoading(true);
+      invoke<PaginatedResponse>('leases_with_managers_paginated', {
+        page,
+        pageSize: size,
+      })
+        .then(resp => {
+          setLeases(resp.leases.map(r => dbLeaseToUi(r, r.managers)));
+          setTotalCount(resp.total_count);
+        })
+        .catch(err => {
+          console.error('[LeaseBook] Failed to load leases:', err);
+        })
+        .finally(() => setLoading(false));
+    },
+    [],
+  );
+
+  // Load on mount and when page/size changes
   useEffect(() => {
-    interface DbLeaseWithManagers extends DbLease {
-      managers: DbManager[];
-    }
-    invoke<DbLeaseWithManagers[]>('leases_with_managers')
-      .then(rows => {
-        setLeases(rows.map(r => dbLeaseToUi(r, r.managers)));
-      })
-      .catch(err => {
-        console.error('[LeaseBook] Failed to load leases:', err);
-      })
-      .finally(() => setLoading(false));
+    fetchPage(dataPage, pageSize);
+  }, [dataPage, pageSize, fetchPage]);
+
+  const handlePageChange = useCallback(
+    (page: number) => {
+      setDataPage(page);
+      // Scroll to top of content area on page change
+      document.querySelector('.lb-app-content')?.scrollTo({ top: 0, behavior: 'smooth' });
+    },
+    [],
+  );
+
+  const handlePageSizeChange = useCallback(
+    (size: number) => {
+      setPageSize(size);
+      setDataPage(1); // Reset to first page when page size changes
+    },
+    [],
+  );
+
+  const formatManagerNames = useCallback((managers: Manager[]): string => {
+    return managers.map(m => m.name).join(', ') || '-';
   }, []);
 
-  const formatManagerNames = (managers: Manager[]): string => {
-    return managers.map(m => m.name).join(', ') || '-';
-  };
+  const handleImported = useCallback((_imported: Lease[]) => {
+    // After import, refresh from page 1 so the user sees the latest data
+    setDataPage(1);
+    setCurrentPage('list');
+  }, []);
 
-  const handleImported = (imported: Lease[]) => {
-    setLeases(imported);
-    setShowImportFlow(false);
-  };
+  const handlePropertyCreated = useCallback((_lease: Lease) => {
+    // After creation, go to last page so the new entry is visible
+    setCurrentPage('list');
+    // Refetch to update total count, then jump to last page
+    invoke<PaginatedResponse>('leases_with_managers_paginated', {
+      page: 1,
+      pageSize,
+    })
+      .then(resp => {
+        const newTotal = resp.total_count;
+        const lastPage = Math.max(1, Math.ceil(newTotal / pageSize));
+        setTotalCount(newTotal);
+        setDataPage(lastPage);
+        fetchPage(lastPage, pageSize); // Force refetch if already on last page
+      })
+      .catch(err => console.error('[LeaseBook] Failed to refresh after create:', err));
+  }, [pageSize, fetchPage]);
 
-  const handlePropertyCreated = (lease: Lease) => {
-    setLeases(prev => [...prev, lease]);
-  };
+  const handlePropertyFormCancel = useCallback(() => {
+    setCurrentPage('list');
+  }, []);
 
-  const handleManagersChange = (leaseIndex: number, managers: Manager[]) => {
+  const handleManagersChange = useCallback(
+    (leaseIndex: number, managers: Manager[]) => {
+      setLeases(prev =>
+        prev.map((lease, i) => {
+          if (i !== leaseIndex) return lease;
+          return {
+            ...lease,
+            managers,
+            leaseManager: formatManagerNames(managers),
+          };
+        }),
+      );
+    },
+    [formatManagerNames],
+  );
+
+  const hasLeases = useMemo(() => leases.length > 0 || totalCount > 0, [leases.length, totalCount]);
+
+  const handleNewProperty = useCallback(() => {
+    setCurrentPage('new-property');
+  }, []);
+
+  const handleShowImportFlow = useCallback(() => {
+    setCurrentPage('import');
+  }, []);
+
+  const handlePropertyClick = useCallback((id: number) => {
+    setSelectedLeaseId(id);
+    setStartInEditMode(false);
+    setCurrentPage('detail');
+  }, []);
+
+  const handlePropertyEdit = useCallback((id: number) => {
+    setSelectedLeaseId(id);
+    setStartInEditMode(true);
+    setCurrentPage('detail');
+  }, []);
+
+  const handlePropertyDelete = useCallback(async (id: number) => {
+    try {
+      await invoke('remove_lease', { leaseId: id });
+      // Remove it optimistically from the current page
+      setLeases(prev => prev.filter(l => l.id !== id));
+      setTotalCount(prev => Math.max(0, prev - 1));
+      
+      // If we're on the detail view, go back to list
+      if (currentPage === 'detail' && selectedLeaseId === id) {
+        setCurrentPage('list');
+      }
+    } catch (err) {
+      console.error('[LeaseBook] Failed to delete lease:', err);
+      alert('Failed to delete property. Please try again.');
+    }
+  }, [currentPage, selectedLeaseId]);
+
+  const handleBackToList = useCallback(() => {
+    setCurrentPage('list');
+    // We intentionally don't clear selectedLeaseId here so the unmount is smooth
+  }, []);
+
+  const handleLeaseSaved = useCallback((updated: Lease) => {
     setLeases(prev =>
-      prev.map((lease, i) => {
-        if (i !== leaseIndex) return lease;
-        return {
-          ...lease,
-          managers,
-          leaseManager: formatManagerNames(managers),
-        };
-      }),
+      prev.map(l => (l.id === updated.id ? { ...l, ...updated } : l)),
     );
-  };
+    
+    // If the edit was launched directly from the grid view, go back to the grid.
+    if (startInEditMode) {
+      setCurrentPage('list');
+    }
+  }, [startInEditMode]);
 
-  const hasLeases = leases.length > 0;
-
-  const renderContent = () => {
-    if (loading) {
-      return (
-        <LoadingState>
-          <Spinner size={48} />
-          <LoadingLabel>Loading properties…</LoadingLabel>
-        </LoadingState>
-      );
-    }
-    if (hasLeases) {
-      return (
-        <>
-          <FilterBar />
-          <GridContainer leases={leases} onManagersChange={handleManagersChange} />
-        </>
-      );
-    }
-    if (showImportFlow) {
-      return (
-        <WorkbookImportFlow
-          onImported={handleImported}
-          onCancel={() => setShowImportFlow(false)}
-          autoOpen
-        />
-      );
-    }
-    return (
-      <EmptyState>
-        <EmptyTitle>No leases yet</EmptyTitle>
-        <EmptySubtitle>Import a workbook or create a new lease to get started.</EmptySubtitle>
-        <EmptyActions>
-          <Button onClick={() => setShowNewPropertyForm(true)}>
-            <Plus size={15} />
-            Create New Lease
-          </Button>
-          <Button onClick={() => setShowImportFlow(true)}>
-            <Upload size={15} />
-            Import Workbook
-          </Button>
-        </EmptyActions>
-      </EmptyState>
-    );
-  };
+  const isListPage = currentPage === 'list';
 
   return (
     <main>
-      <Header onNewProperty={() => setShowNewPropertyForm(true)} />
-      <Content>{renderContent()}</Content>
-      <NewPropertyForm
-        isOpen={showNewPropertyForm}
-        onClose={() => setShowNewPropertyForm(false)}
-        onCreated={handlePropertyCreated}
-      />
+      {isListPage && (
+        <>
+          <Header onNewProperty={handleNewProperty} />
+          <TabBar activeTab={activeTab} onTabChange={setActiveTab} />
+        </>
+      )}
+
+      {/* List page — always mounted; hidden via CSS so no layout recalculation on show */}
+      <div className={`lb-app-content${isListPage ? '' : ' lb-page-hidden'}`}>
+        <ListPageContent
+          loading={loading}
+          hasLeases={hasLeases}
+          leases={leases}
+          onManagersChange={handleManagersChange}
+          onPropertyClick={handlePropertyClick}
+          onPropertyEdit={handlePropertyEdit}
+          onPropertyDelete={handlePropertyDelete}
+          onNewProperty={handleNewProperty}
+          onShowImport={handleShowImportFlow}
+          currentPage={dataPage}
+          totalPages={totalPages}
+          totalCount={totalCount}
+          pageSize={pageSize}
+          onPageChange={handlePageChange}
+          onPageSizeChange={handlePageSizeChange}
+        />
+      </div>
+
+      {/* Form pages — lightweight, safe to conditionally mount */}
+      {currentPage === 'new-property' && (
+        <div className="lb-app-content-no-header">
+          <PropertyForm onClose={handlePropertyFormCancel} onCreated={handlePropertyCreated} />
+        </div>
+      )}
+
+      {currentPage === 'import' && (
+        <div className="lb-app-content-no-header">
+          <WorkbookImportFlow
+            onImported={handleImported}
+            onCancel={() => setCurrentPage('list')}
+            autoOpen
+          />
+        </div>
+      )}
+
+      {currentPage === 'detail' && selectedLeaseId !== null && (
+        <div className="lb-app-content-no-header">
+          <PropertyDetail
+            lease={leases.find(l => l.id === selectedLeaseId)!}
+            onBack={handleBackToList}
+            onSaved={handleLeaseSaved}
+            onDelete={() => handlePropertyDelete(selectedLeaseId)}
+            initialEditMode={startInEditMode}
+          />
+        </div>
+      )}
     </main>
   );
 };
