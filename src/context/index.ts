@@ -1,1 +1,2 @@
-export { SearchContext, SearchProvider } from './SearchContext';
+export * from './SearchContext';
+export * from './FilterGridContext';

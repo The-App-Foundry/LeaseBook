@@ -1,4 +1,6 @@
-import { memo } from 'react';
+import { memo, useContext } from 'react';
+import { FilterGridContext } from '../../context';
+import type { SortOption } from '../../context/FilterGridContext';
 import './FilterBar.css';
 
 const STAGE_COLORS: Record<string, { bg: string, abbr: string }> = {
@@ -23,29 +25,48 @@ const Dot = ({ stage }: { stage: string }) => {
   );
 };
 
-const FilterBar = () => (
-  <div className="lb-filter-outer">
-    <div className="lb-filter-content">
-      <div className="lb-filter-label">
-        <span>Filter:</span>
+const FilterBar = () => {
+  const { activeStage, setActiveStage, sortOption, setSortOption, totalCount } = useContext(FilterGridContext);
+
+  const stages = Object.keys(STAGE_COLORS);
+
+  return (
+    <div className="lb-filter-outer">
+      <div className="lb-filter-content">
+        <div className="lb-filter-label">
+          <span>Filter:</span>
+        </div>
+        <div className="lb-filter-buttons-wrapper">
+          <button 
+            className={`lb-filter-pill ${activeStage === null ? 'lb-filter-pill-active' : 'lb-filter-pill-inactive'}`}
+            onClick={() => setActiveStage(null)}
+          >
+            All Properties {activeStage === null && `( ${totalCount} )`}
+          </button>
+          
+          {stages.map(stage => (
+            <button 
+              key={stage}
+              className={`lb-filter-pill ${activeStage === stage ? 'lb-filter-pill-active' : 'lb-filter-pill-inactive'}`}
+              onClick={() => setActiveStage(stage)}
+            >
+              <Dot stage={stage} /> {stage} {activeStage === stage && `( ${totalCount} )`}
+            </button>
+          ))}
+        </div>
+        <div className="lb-filter-spacer"></div>
+        <select 
+          className="lb-filter-select" 
+          value={sortOption}
+          onChange={(e) => setSortOption(e.target.value as SortOption)}
+        >
+          <option value="expiration">Sort: Lease Expiration</option>
+          <option value="name">Sort: Company Name</option>
+          <option value="size">Sort: Property Size</option>
+        </select>
       </div>
-      <div className="lb-filter-buttons-wrapper">
-        <button className="lb-filter-pill lb-filter-pill-active">All Properties ( 12 )</button>
-        <button className="lb-filter-pill lb-filter-pill-inactive"><Dot stage="New" /> New ( 2 )</button>
-        <button className="lb-filter-pill lb-filter-pill-inactive"><Dot stage="Contacted" /> Contacted ( 2 )</button>
-        <button className="lb-filter-pill lb-filter-pill-inactive"><Dot stage="Qualified" /> Qualified ( 3 )</button>
-        <button className="lb-filter-pill lb-filter-pill-inactive"><Dot stage="Negotiating" /> Negotiating ( 2 )</button>
-        <button className="lb-filter-pill lb-filter-pill-inactive"><Dot stage="Won" /> Won ( 2 )</button>
-        <button className="lb-filter-pill lb-filter-pill-inactive"><Dot stage="Lost" /> Lost ( 1 )</button>
-      </div>
-      <div className="lb-filter-spacer"></div>
-      <select className="lb-filter-select">
-        <option value="expiration">Sort: Lease Expiration</option>
-        <option value="name">Sort: Company Name</option>
-        <option value="size">Sort: Property Size</option>
-      </select>
     </div>
-  </div>
-);
+  );
+};
 
 export default memo(FilterBar);

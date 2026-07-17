@@ -305,6 +305,7 @@ pub fn get_leases_paginated(
   limit: i64,
   offset: i64,
   search_query: Option<&str>,
+  sort_by: Option<&str>,
 ) -> Result<Vec<Lease>, diesel::result::Error> {
   use crate::schema::leases;
 
@@ -319,9 +320,15 @@ pub fn get_leases_paginated(
     }
   }
 
+  match sort_by {
+    Some("name") => query = query.order(leases::name.asc()),
+    Some("size") => query = query.order(leases::size.desc()),
+    Some("expiration") => query = query.order(leases::expiration_date.asc()),
+    _ => query = query.order(leases::id.asc()),
+  }
+
   query
     .select(Lease::as_select())
-    .order(leases::id.asc())
     .limit(limit)
     .offset(offset)
     .get_results(conn)
@@ -333,11 +340,12 @@ pub fn get_paginated_leases_with_managers(
   limit: i64,
   offset: i64,
   search_query: Option<&str>,
+  sort_by: Option<&str>,
 ) -> Result<(Vec<(Lease, Vec<LeaseManager>)>, i64), diesel::result::Error> {
   use crate::schema::lease_managers;
 
   let total = count_leases(conn, search_query)?;
-  let page_leases = get_leases_paginated(conn, limit, offset, search_query)?;
+  let page_leases = get_leases_paginated(conn, limit, offset, search_query, sort_by)?;
 
   if page_leases.is_empty() {
     return Ok((vec![], total));
