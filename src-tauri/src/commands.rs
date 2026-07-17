@@ -136,10 +136,11 @@ pub fn leases_with_managers_paginated(
   pool: State<'_, DbPool>,
   page: i64,
   page_size: i64,
+  search_query: Option<String>,
 ) -> Result<PaginatedResponse, String> {
   let mut conn = pool.get().map_err(|e| e.to_string())?;
   let offset = (page - 1) * page_size;
-  let (rows, total_count) = get_paginated_leases_with_managers(&mut conn, page_size, offset)
+  let (rows, total_count) = get_paginated_leases_with_managers(&mut conn, page_size, offset, search_query.as_deref())
     .map_err(|e| e.to_string())?;
   let leases = rows.into_iter().map(|(lease, managers)| LeaseWithManagers { lease, managers }).collect();
   Ok(PaginatedResponse { leases, total_count })
