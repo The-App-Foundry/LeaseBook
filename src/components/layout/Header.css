@@ -10,16 +10,31 @@
   margin-top: 4px;
 }
 
-.lb-header-search-input {
+.lb-header-search-input-container {
+  display: flex;
+  align-items: center;
   border: 1px solid #DADEE5;
-  border-radius: 10px;
-  padding: 13px 18px;
-  font-size: 16px;
-  outline: none;
-  color: #1C2333;
+  border-radius: 8px;
+  padding: 0 12px;
   background: #FFFFFF;
-  height: 48px;
+  height: 32px;
   box-sizing: border-box;
+}
+
+.lb-header-search-input {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  border: none !important;
+  outline: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  width: 100% !important;
+  height: 30px !important;
+  line-height: 30px !important;
+  font-size: 13px !important;
+  color: #1C2333 !important;
 }
 
 .lb-header-new-btn {
@@ -34,7 +49,7 @@
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  height: 48px;
+  height: 32px;
   box-sizing: border-box;
   white-space: nowrap;
   transition: background 0.15s;
