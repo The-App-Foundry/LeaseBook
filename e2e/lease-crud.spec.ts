@@ -6,7 +6,6 @@ test.beforeEach(async ({ page }) => {
     let nextId = 1;
     window.__TAURI_INTERNALS__ = window.__TAURI_INTERNALS__ || {};
     window.__TAURI_INTERNALS__.invoke = async (cmd: string, args: any) => {
-      console.log('MOCK INVOKE', cmd, args);
       if (cmd === 'leases_with_managers_paginated') {
         return {
           leases: leases.map(l => ({ lease: l, managers: [] })),
