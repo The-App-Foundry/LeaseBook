@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Property, GridContainer } from '../../../src/components/layout';
+import type { Lease } from '../../../src/types/lease';
 
 const meta = {
   title: 'Layout/Property',
@@ -122,76 +123,91 @@ export const MultipleProperties: Story = {
   args: {
     data: defaultData,
   },
-  render: () => (
-    <GridContainer>
-      <Property
-        data={{
-          status: 'Qualified',
-          name: 'Acme Industries',
-          businessAddr: '100 Business Park Dr, Dallas, TX 75201',
-          leaseExpiration: '2026-12-31',
-          leaseManager: 'Jane Smith',
-          size: '10,000 sq ft',
-          note: '',
-        }}
+  render: () => {
+    const mockLeases: Lease[] = [
+      {
+        id: 1,
+        status: 'qualified',
+        name: 'Acme Industries',
+        businessAddr: '100 Business Park Dr, Dallas, TX 75201',
+        leaseExpiration: '2026-12-31',
+        leaseManager: 'Jane Smith',
+        size: '10,000',
+        managers: [],
+        note: '',
+      },
+      {
+        id: 2,
+        status: 'prospect',
+        name: 'Tech Solutions Ltd',
+        businessAddr: '200 Innovation Way, San Jose, CA 95101',
+        leaseExpiration: '2025-09-30',
+        leaseManager: 'Bob Johnson',
+        size: '7,500',
+        managers: [],
+        note: '',
+      },
+      {
+        id: 3,
+        status: 'qualified',
+        name: 'Retail Store Co',
+        businessAddr: '300 Shopping Center Blvd, Miami, FL 33101',
+        leaseExpiration: '2027-03-15',
+        leaseManager: 'Alice Williams',
+        size: '15,000',
+        managers: [],
+        note: '',
+      },
+      {
+        id: 4,
+        status: 'prospect',
+        name: 'Small Business Inc',
+        businessAddr: '400 Commerce St, Portland, OR 97201',
+        leaseExpiration: '2025-02-28',
+        leaseManager: 'Charlie Brown',
+        size: '3,000',
+        managers: [],
+        note: '',
+      },
+      {
+        id: 5,
+        status: 'prospect',
+        name: 'Old Tenant LLC',
+        businessAddr: '500 Historic Ave, Philadelphia, PA 19101',
+        leaseExpiration: '2023-12-31',
+        leaseManager: 'David Wilson',
+        size: '8,000',
+        managers: [],
+        note: '',
+      },
+      {
+        id: 6,
+        status: 'qualified',
+        name: 'New Prospect Corp',
+        businessAddr: '600 Future Lane, Denver, CO 80201',
+        leaseExpiration: '2028-06-01',
+        leaseManager: 'Eva Martinez',
+        size: '12,000',
+        managers: [],
+        note: '',
+      },
+    ];
+
+    return (
+      <GridContainer
+        leases={mockLeases}
+        currentPage={1}
+        totalPages={1}
+        totalCount={mockLeases.length}
+        pageSize={25}
+        onPageChange={() => {}}
+        onPageSizeChange={() => {}}
+        onPropertyClick={() => {}}
+        onPropertyEdit={() => {}}
+        onPropertyDelete={() => {}}
       />
-      <Property
-        data={{
-          status: 'Prospect',
-          name: 'Tech Solutions Ltd',
-          businessAddr: '200 Innovation Way, San Jose, CA 95101',
-          leaseExpiration: '2025-09-30',
-          leaseManager: 'Bob Johnson',
-          size: '7,500 sq ft',
-          note: '',
-        }}
-      />
-      <Property
-        data={{
-          status: 'Active',
-          name: 'Retail Store Co',
-          businessAddr: '300 Shopping Center Blvd, Miami, FL 33101',
-          leaseExpiration: '2027-03-15',
-          leaseManager: 'Alice Williams',
-          size: '15,000 sq ft',
-          note: '',
-        }}
-      />
-      <Property
-        data={{
-          status: 'Warning',
-          name: 'Small Business Inc',
-          businessAddr: '400 Commerce St, Portland, OR 97201',
-          leaseExpiration: '2025-02-28',
-          leaseManager: 'Charlie Brown',
-          size: '3,000 sq ft',
-          note: '',
-        }}
-      />
-      <Property
-        data={{
-          status: 'Expired',
-          name: 'Old Tenant LLC',
-          businessAddr: '500 Historic Ave, Philadelphia, PA 19101',
-          leaseExpiration: '2023-12-31',
-          leaseManager: 'David Wilson',
-          size: '8,000 sq ft',
-          note: '',
-        }}
-      />
-      <Property
-        data={{
-          status: 'Qualified',
-          name: 'New Prospect Corp',
-          businessAddr: '600 Future Lane, Denver, CO 80201',
-          leaseExpiration: '2028-06-01',
-          leaseManager: 'Eva Martinez',
-          size: '12,000 sq ft',
-          note: '',
-        }}
-      />
-    </GridContainer>
-  ),
+    );
+  },
   parameters: {
     docs: {
       description: {
