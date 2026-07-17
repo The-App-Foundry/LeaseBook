@@ -18,7 +18,8 @@
     "test:browser": "vitest --config=vitest.browser.config.ts"
   },
   "dependencies": {
-    "@tauri-apps/api": "^2.10.1",
+    "@fontsource/inter": "^5.2.8",
+    "@tauri-apps/api": "^2.11.1",
     "@tauri-apps/plugin-dialog": "^2.6.0",
     "@tauri-apps/plugin-fs": "~2.4.5",
     "@tauri-apps/plugin-opener": "^2.5.3",
@@ -41,7 +42,7 @@
     "@storybook/addon-docs": "^10.5.0",
     "@storybook/addon-vitest": "^10.5.0",
     "@storybook/react-vite": "^10.5.0",
-    "@tauri-apps/cli": "^2.10.1",
+    "@tauri-apps/cli": "^2.11.1",
     "@types/dompurify": "^3.2.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",

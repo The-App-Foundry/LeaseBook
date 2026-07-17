@@ -18,11 +18,13 @@ const Header = ({ onNewProperty }: Readonly<HeaderProps>) => (
     </div>
     <div className="lb-header-search-wrapper">
       <div className="lb-header-search-inner">
-        <input 
-          type="text" 
-          placeholder="Search company or address..." 
-          className="lb-header-search-input"
-        />
+        <div className="lb-header-search-input-container">
+          <input 
+            type="text" 
+            placeholder="Search company or address..." 
+            className="lb-header-search-input"
+          />
+        </div>
         <button 
           onClick={onNewProperty} 
           className="lb-header-new-btn"
