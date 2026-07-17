@@ -279,11 +279,22 @@ pub fn delete_manager(conn: &mut SqliteConnection, manager_id: &i32) -> Result<u
 }
 
 /// Returns the total number of leases in the database.
-pub fn count_leases(conn: &mut SqliteConnection) -> Result<i64, diesel::result::Error> {
+pub fn count_leases(conn: &mut SqliteConnection, search_query: Option<&str>) -> Result<i64, diesel::result::Error> {
   use crate::schema::leases;
   use diesel::dsl::count_star;
 
-  leases::table
+  let mut query = leases::table.into_boxed();
+
+  if let Some(q) = search_query {
+    if !q.trim().is_empty() {
+      let pattern = format!("%{}%", q);
+      query = query.filter(
+        leases::name.like(pattern.clone()).or(leases::address.like(pattern))
+      );
+    }
+  }
+
+  query
     .select(count_star())
     .get_result(conn)
 }
@@ -293,12 +304,31 @@ pub fn get_leases_paginated(
   conn: &mut SqliteConnection,
   limit: i64,
   offset: i64,
+  search_query: Option<&str>,
+  sort_by: Option<&str>,
 ) -> Result<Vec<Lease>, diesel::result::Error> {
   use crate::schema::leases;
 
-  leases::table
+  let mut query = leases::table.into_boxed();
+
+  if let Some(q) = search_query {
+    if !q.trim().is_empty() {
+      let pattern = format!("%{}%", q);
+      query = query.filter(
+        leases::name.like(pattern.clone()).or(leases::address.like(pattern))
+      );
+    }
+  }
+
+  match sort_by {
+    Some("name") => query = query.order(leases::name.asc()),
+    Some("size") => query = query.order(leases::size.desc()),
+    Some("expiration") => query = query.order(leases::expiration_date.asc()),
+    _ => query = query.order(leases::id.asc()),
+  }
+
+  query
     .select(Lease::as_select())
-    .order(leases::id.asc())
     .limit(limit)
     .offset(offset)
     .get_results(conn)
@@ -309,11 +339,13 @@ pub fn get_paginated_leases_with_managers(
   conn: &mut SqliteConnection,
   limit: i64,
   offset: i64,
+  search_query: Option<&str>,
+  sort_by: Option<&str>,
 ) -> Result<(Vec<(Lease, Vec<LeaseManager>)>, i64), diesel::result::Error> {
   use crate::schema::lease_managers;
 
-  let total = count_leases(conn)?;
-  let page_leases = get_leases_paginated(conn, limit, offset)?;
+  let total = count_leases(conn, search_query)?;
+  let page_leases = get_leases_paginated(conn, limit, offset, search_query, sort_by)?;
 
   if page_leases.is_empty() {
     return Ok((vec![], total));

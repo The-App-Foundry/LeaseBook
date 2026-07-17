@@ -1,22 +1,15 @@
-import { useRef, memo, useCallback } from 'react';
+import { useRef, memo, useCallback, useContext } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Property from './Property';
-import { Lease, Manager } from '../../types/lease';
+import { Manager } from '../../types/lease';
+import { FilterGridContext } from '../../context';
 import { Button } from '../ui';
 import './GridContainer.css';
 
 interface GridContainerProps {
-  leases: Lease[];
-  onManagersChange?: (leaseIndex: number, managers: Manager[]) => void;
   onPropertyClick?: (id: number) => void;
   onPropertyEdit?: (id: number) => void;
   onPropertyDelete?: (id: number) => void;
-  currentPage: number;
-  totalPages: number;
-  totalCount: number;
-  pageSize: number;
-  onPageChange: (page: number) => void;
-  onPageSizeChange: (size: number) => void;
   onNewProperty?: () => void;
 }
 
@@ -38,23 +31,26 @@ const getPageNumbers = (current: number, total: number): (number | '...')[] => {
 };
 
 const GridContainer = ({
-  leases,
-  onManagersChange,
   onPropertyClick,
-  currentPage,
-  totalPages,
-  totalCount,
-  pageSize,
-  onPageChange,
-  onPageSizeChange,
   onPropertyEdit,
   onPropertyDelete,
   onNewProperty,
 }: Readonly<GridContainerProps>) => {
+  const { 
+    leases, 
+    currentPage, 
+    pageSize, 
+    totalCount, 
+    totalPages, 
+    setPage, 
+    setPageSize, 
+    updateLeaseManagers 
+  } = useContext(FilterGridContext);
+
   // Stable references updated on every render
-  const onChangeRef = useRef(onManagersChange);
+  const onChangeRef = useRef(updateLeaseManagers);
   const leasesRef = useRef(leases);
-  onChangeRef.current = onManagersChange;
+  onChangeRef.current = updateLeaseManagers;
   leasesRef.current = leases;
 
   // Stable callbacks keyed by lease ID — created once, use refs for current values
@@ -62,9 +58,9 @@ const GridContainer = ({
 
   const handlePageSizeChange = useCallback(
     (e: React.ChangeEvent<HTMLSelectElement>) => {
-      onPageSizeChange(Number(e.target.value));
+      setPageSize(Number(e.target.value));
     },
-    [onPageSizeChange],
+    [setPageSize],
   );
 
   const rangeStart = (currentPage - 1) * pageSize + 1;
@@ -106,7 +102,7 @@ const GridContainer = ({
             <button
               className="lb-page-btn"
               disabled={currentPage <= 1}
-              onClick={() => onPageChange(currentPage - 1)}
+              onClick={() => setPage(currentPage - 1)}
               aria-label="Previous page"
               id="pagination-prev"
             >
@@ -122,7 +118,7 @@ const GridContainer = ({
                 <button
                   key={page}
                   className={`lb-page-btn${page === currentPage ? ' active' : ''}`}
-                  onClick={() => onPageChange(page)}
+                  onClick={() => setPage(page)}
                   aria-label={`Page ${page}`}
                   aria-current={page === currentPage ? 'page' : undefined}
                 >
@@ -134,7 +130,7 @@ const GridContainer = ({
             <button
               className="lb-page-btn"
               disabled={currentPage >= totalPages}
-              onClick={() => onPageChange(currentPage + 1)}
+              onClick={() => setPage(currentPage + 1)}
               aria-label="Next page"
               id="pagination-next"
             >
