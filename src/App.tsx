@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import React, { useEffect, useState, useCallback, useMemo, useContext } from 'react';
 import { invoke } from '@tauri-apps/api/core';
 import { Upload, Plus, Loader2 } from 'lucide-react';
 import { Header, FilterBar, WorkbookImportFlow, PropertyForm, TabBar, PropertyDetail } from './components/layout';
@@ -6,6 +6,7 @@ import type { Tab } from './components/layout/TabBar';
 import GridContainer from './components/layout/GridContainer';
 import { Button } from './components/ui';
 import type { Lease, Manager } from './types/lease';
+import { SearchContext } from './context';
 
 interface DbLease {
   id: number;
@@ -150,6 +151,7 @@ const ListPageContent = React.memo(function ListPageContent({
 });
 
 const App = () => {
+  const { searchQuery } = useContext(SearchContext);
   const [leases, setLeases] = useState<Lease[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState<Page>('list');
@@ -169,11 +171,12 @@ const App = () => {
 
   // Fetch a single page of leases from the backend
   const fetchPage = useCallback(
-    (page: number, size: number) => {
+    (page: number, size: number, query: string) => {
       setLoading(true);
       invoke<PaginatedResponse>('leases_with_managers_paginated', {
         page,
         pageSize: size,
+        searchQuery: query || null,
       })
         .then(resp => {
           setLeases(resp.leases.map(r => dbLeaseToUi(r, r.managers)));
@@ -187,10 +190,15 @@ const App = () => {
     [],
   );
 
-  // Load on mount and when page/size changes
+  // Load on mount and when page/size/search changes
   useEffect(() => {
-    fetchPage(dataPage, pageSize);
-  }, [dataPage, pageSize, fetchPage]);
+    fetchPage(dataPage, pageSize, searchQuery);
+  }, [dataPage, pageSize, searchQuery, fetchPage]);
+
+  // Reset to page 1 when search query changes
+  useEffect(() => {
+    setDataPage(1);
+  }, [searchQuery]);
 
   const handlePageChange = useCallback(
     (page: number) => {
@@ -223,19 +231,20 @@ const App = () => {
     // After creation, go to last page so the new entry is visible
     setCurrentPage('list');
     // Refetch to update total count, then jump to last page
-    invoke<PaginatedResponse>('leases_with_managers_paginated', {
-      page: 1,
-      pageSize,
-    })
-      .then(resp => {
-        const newTotal = resp.total_count;
-        const lastPage = Math.max(1, Math.ceil(newTotal / pageSize));
-        setTotalCount(newTotal);
-        setDataPage(lastPage);
-        fetchPage(lastPage, pageSize); // Force refetch if already on last page
+      invoke<PaginatedResponse>('leases_with_managers_paginated', {
+        page: 1,
+        pageSize,
+        searchQuery: searchQuery || null,
       })
-      .catch(err => console.error('[LeaseBook] Failed to refresh after create:', err));
-  }, [pageSize, fetchPage]);
+        .then(resp => {
+          const newTotal = resp.total_count;
+          const lastPage = Math.max(1, Math.ceil(newTotal / pageSize));
+          setTotalCount(newTotal);
+          setDataPage(lastPage);
+          fetchPage(lastPage, pageSize, searchQuery); // Force refetch if already on last page
+        })
+        .catch(err => console.error('[LeaseBook] Failed to refresh after create:', err));
+    }, [pageSize, fetchPage, searchQuery]);
 
   const handlePropertyFormCancel = useCallback(() => {
     setCurrentPage('list');
