@@ -41,7 +41,7 @@ fn test_search_leases() {
 fn test_manager_assignment() {
     let mut conn = setup_db();
     let lease = create_lease(&mut conn, "Manager Test Lease", None, None, None, None).unwrap();
-    let manager = create_manager(&mut conn, "John Doe", lease.id).unwrap();
+    let _manager = create_manager(&mut conn, "John Doe", lease.id).unwrap();
     
     let managers = get_managers(&mut conn, lease.id).unwrap();
     assert_eq!(managers.len(), 1);

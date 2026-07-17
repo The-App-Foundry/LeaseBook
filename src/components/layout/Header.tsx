@@ -34,6 +34,7 @@ const Header = ({ onNewProperty }: Readonly<HeaderProps>) => {
         <div className="lb-header-search-inner">
           <div className="lb-header-search-input-container">
             <input 
+              role="searchbox"
               type="text" 
               placeholder="Search company or address..." 
               className="lb-header-search-input"

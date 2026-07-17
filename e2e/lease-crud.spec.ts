@@ -4,34 +4,37 @@ test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => {
     let leases = [];
     let nextId = 1;
-    Object.defineProperty(window, '__TAURI_INTERNALS__', {
-      value: {
-        invoke: async (cmd: string, args: any) => {
-          if (cmd === 'leases_with_managers_paginated') {
-            return {
-              leases,
-              total_count: leases.length
-            };
-          }
-          if (cmd === 'new_lease') {
-            const lease = {
-              id: nextId++,
-              name: args.name,
-              address: args.address,
-              expiration_date: args.expirationDate,
-              managers: []
-            };
-            leases.push(lease);
-            return lease;
-          }
-          if (cmd === 'remove_lease') {
-            leases = leases.filter(l => l.id !== args.leaseId);
-            return 1;
-          }
-          return null;
-        }
+    window.__TAURI_INTERNALS__ = window.__TAURI_INTERNALS__ || {};
+    window.__TAURI_INTERNALS__.invoke = async (cmd: string, args: any) => {
+      console.log('MOCK INVOKE', cmd, args);
+      if (cmd === 'leases_with_managers_paginated') {
+        return {
+          leases: leases.map(l => ({ lease: l, managers: [] })),
+          total_count: leases.length
+        };
       }
-    });
+      if (cmd === 'new_lease') {
+        const lease = {
+          id: nextId++,
+          name: args.name,
+          address: args.address,
+          expiration_date: args.expirationDate || null,
+          size: null,
+          notes: null,
+          misc_data: null
+        };
+        leases.push(lease);
+        return lease;
+      }
+      if (cmd === 'remove_lease') {
+        leases = leases.filter(l => l.id !== args.leaseId);
+        return 1;
+      }
+      if (cmd.startsWith('plugin:dialog|')) {
+        return true;
+      }
+      return null;
+    };
   });
 });
 

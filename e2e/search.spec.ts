@@ -2,30 +2,28 @@ import { test, expect } from '@playwright/test';
 
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => {
-    Object.defineProperty(window, '__TAURI_INTERNALS__', {
-      value: {
-        invoke: async (cmd: string, args: any) => {
-          if (cmd === 'leases_with_managers_paginated') {
-            if (args.searchQuery === 'Apple') {
-              return {
-                leases: [
-                  { id: 1, name: 'Apple Store', address: '1 Infinite Loop', expiration_date: null, managers: [] }
-                ],
-                total_count: 1
-              };
-            }
-            return {
-              leases: [
-                { id: 1, name: 'Apple Store', address: '1 Infinite Loop', expiration_date: null, managers: [] },
-                { id: 2, name: 'Microsoft Store', address: 'Redmond', expiration_date: null, managers: [] }
-              ],
-              total_count: 2
-            };
-          }
-          return null;
+    window.__TAURI_INTERNALS__ = window.__TAURI_INTERNALS__ || {};
+    window.__TAURI_INTERNALS__.invoke = async (cmd: string, args: any) => {
+      console.log('MOCK INVOKE', cmd, args);
+      if (cmd === 'leases_with_managers_paginated') {
+        if (args.searchQuery === 'Apple') {
+          return {
+            leases: [
+              { lease: { id: 1, name: 'Apple Store', address: '1 Infinite Loop', expiration_date: null, managers: [] }, managers: [] }
+            ],
+            total_count: 1
+          };
         }
+        return {
+          leases: [
+            { lease: { id: 1, name: 'Apple Store', address: '1 Infinite Loop', expiration_date: null, managers: [] }, managers: [] },
+            { lease: { id: 2, name: 'Microsoft Store', address: 'Redmond', expiration_date: null, managers: [] }, managers: [] }
+          ],
+          total_count: 2
+        };
       }
-    });
+      return null;
+    };
   });
 });
 
