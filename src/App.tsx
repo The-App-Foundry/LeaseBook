@@ -1,11 +1,12 @@
-import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import React, { useEffect, useState, useCallback, useMemo, useContext } from 'react';
 import { invoke } from '@tauri-apps/api/core';
 import { Upload, Plus, Loader2 } from 'lucide-react';
 import { Header, FilterBar, WorkbookImportFlow, PropertyForm, TabBar, PropertyDetail } from './components/layout';
 import type { Tab } from './components/layout/TabBar';
 import GridContainer from './components/layout/GridContainer';
 import { Button } from './components/ui';
-import type { Lease, Manager } from './types/lease';
+import type { Lease } from './types/lease';
+import { FilterGridContext } from './context';
 
 interface DbLease {
   id: number;
@@ -67,38 +68,21 @@ type Page = 'list' | 'new-property' | 'import' | 'detail';
 interface ListPageProps {
   loading: boolean;
   hasLeases: boolean;
-  leases: Lease[];
-  onManagersChange: (leaseIndex: number, managers: Manager[]) => void;
   onPropertyClick: (id: number) => void;
   onPropertyEdit: (id: number) => void;
   onPropertyDelete: (id: number) => void;
   onNewProperty: () => void;
   onShowImport: () => void;
-  currentPage: number;
-  totalPages: number;
-  totalCount: number;
-  pageSize: number;
-  onPageChange: (page: number) => void;
-  onPageSizeChange: (size: number) => void;
 }
 
-// Module-level memo: React completely skips this subtree when navigating away
 const ListPageContent = React.memo(function ListPageContent({
   loading,
   hasLeases,
-  leases,
-  onManagersChange,
   onPropertyClick,
   onPropertyEdit,
   onPropertyDelete,
   onNewProperty,
   onShowImport,
-  currentPage,
-  totalPages,
-  totalCount,
-  pageSize,
-  onPageChange,
-  onPageSizeChange,
 }: ListPageProps) {
   if (loading) {
     return (
@@ -115,17 +99,9 @@ const ListPageContent = React.memo(function ListPageContent({
       <>
         <FilterBar />
         <GridContainer
-          leases={leases}
-          onManagersChange={onManagersChange}
           onPropertyClick={onPropertyClick}
           onPropertyEdit={onPropertyEdit}
           onPropertyDelete={onPropertyDelete}
-          currentPage={currentPage}
-          totalPages={totalPages}
-          totalCount={totalCount}
-          pageSize={pageSize}
-          onPageChange={onPageChange}
-          onPageSizeChange={onPageSizeChange}
           onNewProperty={onNewProperty}
         />
       </>
@@ -150,112 +126,25 @@ const ListPageContent = React.memo(function ListPageContent({
 });
 
 const App = () => {
-  const [leases, setLeases] = useState<Lease[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { leases, totalCount, loading, removeLease, updateLease, refresh } = useContext(FilterGridContext);
   const [currentPage, setCurrentPage] = useState<Page>('list');
   const [activeTab, setActiveTab] = useState<Tab>('properties');
   const [selectedLeaseId, setSelectedLeaseId] = useState<number | null>(null);
   const [startInEditMode, setStartInEditMode] = useState(false);
 
-  // Pagination state
-  const [dataPage, setDataPage] = useState(1);
-  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
-  const [totalCount, setTotalCount] = useState(0);
-
-  const totalPages = useMemo(
-    () => Math.max(1, Math.ceil(totalCount / pageSize)),
-    [totalCount, pageSize],
-  );
-
-  // Fetch a single page of leases from the backend
-  const fetchPage = useCallback(
-    (page: number, size: number) => {
-      setLoading(true);
-      invoke<PaginatedResponse>('leases_with_managers_paginated', {
-        page,
-        pageSize: size,
-      })
-        .then(resp => {
-          setLeases(resp.leases.map(r => dbLeaseToUi(r, r.managers)));
-          setTotalCount(resp.total_count);
-        })
-        .catch(err => {
-          console.error('[LeaseBook] Failed to load leases:', err);
-        })
-        .finally(() => setLoading(false));
-    },
-    [],
-  );
-
-  // Load on mount and when page/size changes
-  useEffect(() => {
-    fetchPage(dataPage, pageSize);
-  }, [dataPage, pageSize, fetchPage]);
-
-  const handlePageChange = useCallback(
-    (page: number) => {
-      setDataPage(page);
-      // Scroll to top of content area on page change
-      document.querySelector('.lb-app-content')?.scrollTo({ top: 0, behavior: 'smooth' });
-    },
-    [],
-  );
-
-  const handlePageSizeChange = useCallback(
-    (size: number) => {
-      setPageSize(size);
-      setDataPage(1); // Reset to first page when page size changes
-    },
-    [],
-  );
-
-  const formatManagerNames = useCallback((managers: Manager[]): string => {
-    return managers.map(m => m.name).join(', ') || '-';
-  }, []);
-
   const handleImported = useCallback((_imported: Lease[]) => {
-    // After import, refresh from page 1 so the user sees the latest data
-    setDataPage(1);
+    refresh();
     setCurrentPage('list');
-  }, []);
+  }, [refresh]);
 
   const handlePropertyCreated = useCallback((_lease: Lease) => {
-    // After creation, go to last page so the new entry is visible
+    refresh();
     setCurrentPage('list');
-    // Refetch to update total count, then jump to last page
-    invoke<PaginatedResponse>('leases_with_managers_paginated', {
-      page: 1,
-      pageSize,
-    })
-      .then(resp => {
-        const newTotal = resp.total_count;
-        const lastPage = Math.max(1, Math.ceil(newTotal / pageSize));
-        setTotalCount(newTotal);
-        setDataPage(lastPage);
-        fetchPage(lastPage, pageSize); // Force refetch if already on last page
-      })
-      .catch(err => console.error('[LeaseBook] Failed to refresh after create:', err));
-  }, [pageSize, fetchPage]);
+  }, [refresh]);
 
   const handlePropertyFormCancel = useCallback(() => {
     setCurrentPage('list');
   }, []);
-
-  const handleManagersChange = useCallback(
-    (leaseIndex: number, managers: Manager[]) => {
-      setLeases(prev =>
-        prev.map((lease, i) => {
-          if (i !== leaseIndex) return lease;
-          return {
-            ...lease,
-            managers,
-            leaseManager: formatManagerNames(managers),
-          };
-        }),
-      );
-    },
-    [formatManagerNames],
-  );
 
   const hasLeases = useMemo(() => leases.length > 0 || totalCount > 0, [leases.length, totalCount]);
 
@@ -282,9 +171,7 @@ const App = () => {
   const handlePropertyDelete = useCallback(async (id: number) => {
     try {
       await invoke('remove_lease', { leaseId: id });
-      // Remove it optimistically from the current page
-      setLeases(prev => prev.filter(l => l.id !== id));
-      setTotalCount(prev => Math.max(0, prev - 1));
+      removeLease(id);
       
       // If we're on the detail view, go back to list
       if (currentPage === 'detail' && selectedLeaseId === id) {
@@ -294,7 +181,7 @@ const App = () => {
       console.error('[LeaseBook] Failed to delete lease:', err);
       alert('Failed to delete property. Please try again.');
     }
-  }, [currentPage, selectedLeaseId]);
+  }, [currentPage, selectedLeaseId, removeLease]);
 
   const handleBackToList = useCallback(() => {
     setCurrentPage('list');
@@ -302,15 +189,13 @@ const App = () => {
   }, []);
 
   const handleLeaseSaved = useCallback((updated: Lease) => {
-    setLeases(prev =>
-      prev.map(l => (l.id === updated.id ? { ...l, ...updated } : l)),
-    );
+    updateLease(updated);
     
     // If the edit was launched directly from the grid view, go back to the grid.
     if (startInEditMode) {
       setCurrentPage('list');
     }
-  }, [startInEditMode]);
+  }, [startInEditMode, updateLease]);
 
   const isListPage = currentPage === 'list';
 
@@ -328,19 +213,11 @@ const App = () => {
         <ListPageContent
           loading={loading}
           hasLeases={hasLeases}
-          leases={leases}
-          onManagersChange={handleManagersChange}
           onPropertyClick={handlePropertyClick}
           onPropertyEdit={handlePropertyEdit}
           onPropertyDelete={handlePropertyDelete}
           onNewProperty={handleNewProperty}
           onShowImport={handleShowImportFlow}
-          currentPage={dataPage}
-          totalPages={totalPages}
-          totalCount={totalCount}
-          pageSize={pageSize}
-          onPageChange={handlePageChange}
-          onPageSizeChange={handlePageSizeChange}
         />
       </div>
 
