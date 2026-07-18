@@ -121,17 +121,8 @@
   "119": "Vitest Config",
   "120": "Vitest DOM Shims",
   "121": "Lease",
-  "122": "App.tsx",
   "123": "Property.stories.tsx",
-  "127": "package.json",
   "129": "managerDetect.ts",
   "130": "eslint-plugin-jsx-a11y",
-  "131": "@fontsource/inter",
-  "132": "lucide-react",
-  "133": "react",
-  "134": "react-bootstrap",
-  "135": "react-dom",
-  "136": "@tauri-apps/api",
-  "137": "@tauri-apps/plugin-dialog",
-  "138": "@tauri-apps/plugin-fs"
+  "133": "react"
 }

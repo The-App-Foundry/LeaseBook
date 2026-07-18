@@ -4,6 +4,7 @@ import { open } from '@tauri-apps/plugin-dialog';
 import { ChevronLeft, Upload, Table2, Link2 } from 'lucide-react';
 import { Button } from '../ui';
 import type { Lease, Manager } from '../../types/lease';
+import { getErrorMessage } from '../../utils/errors';
 import { detectManagers } from '../../utils/managerDetect';
 import './WorkbookImportFlow.css';
 
@@ -132,28 +133,6 @@ const convertBackendLeasesToUi = (rows: BackendLease[]): Lease[] =>
 const getFileName = (path: string): string => {
   const parts = path.split(/[\\/]/);
   return parts[parts.length - 1] || path;
-};
-
-const getErrorMessage = (error: unknown, fallback: string): string => {
-  if (error instanceof Error && error.message.trim()) {
-    return error.message;
-  }
-
-  if (typeof error === 'string' && error.trim()) {
-    return error;
-  }
-
-  if (
-    typeof error === 'object' &&
-    error !== null &&
-    'message' in error &&
-    typeof error.message === 'string' &&
-    error.message.trim()
-  ) {
-    return error.message;
-  }
-
-  return fallback;
 };
 
 const WorkbookImportFlow = ({

@@ -7,6 +7,7 @@ import GridContainer from './components/layout/GridContainer';
 import { Button } from './components/ui';
 import type { Lease } from './types/lease';
 import { FilterGridContext } from './context';
+import { getErrorMessage } from './utils/errors';
 
 type Page = 'list' | 'new-property' | 'import' | 'detail';
 
@@ -128,7 +129,7 @@ const App = () => {
       }
     } catch (err) {
       console.error('[LeaseBook] Failed to delete lease:', err);
-      alert('Failed to delete property. Please try again.');
+      alert(getErrorMessage(err, 'Failed to delete property. Please try again.'));
     }
   }, [currentPage, selectedLeaseId, removeLease]);
 
