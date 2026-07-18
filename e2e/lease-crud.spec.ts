@@ -8,7 +8,7 @@ test.beforeEach(async ({ page }) => {
     window.__TAURI_INTERNALS__.invoke = async (cmd: string, args: any) => {
       if (cmd === 'leases_with_managers_paginated') {
         return {
-          leases: leases.map(l => ({ lease: l, managers: [] })),
+          leases: leases.map(l => ({ ...l, managers: [] })),
           total_count: leases.length
         };
       }
@@ -20,7 +20,8 @@ test.beforeEach(async ({ page }) => {
           expiration_date: args.expirationDate || null,
           size: null,
           notes: null,
-          misc_data: null
+          misc_data: null,
+          created_on: 1_700_000_000,
         };
         leases.push(lease);
         return lease;
