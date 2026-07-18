@@ -137,13 +137,25 @@ pub fn leases_with_managers_paginated(
   page: i64,
   page_size: i64,
   search_query: Option<String>,
+  stage: Option<String>,
   sort_by: Option<String>,
+  sort_direction: Option<String>,
 ) -> Result<PaginatedResponse, String> {
   let mut conn = pool.get().map_err(|e| e.to_string())?;
   let offset = (page - 1) * page_size;
-  let (rows, total_count) = get_paginated_leases_with_managers(&mut conn, page_size, offset, search_query.as_deref(), sort_by.as_deref())
-    .map_err(|e| e.to_string())?;
-  let leases = rows.into_iter().map(|(lease, managers)| LeaseWithManagers { lease, managers }).collect();
+  let (rows, total_count) = get_paginated_leases_with_managers(
+    &mut conn,
+    page_size,
+    offset,
+    search_query.as_deref(),
+    stage.as_deref(),
+    sort_by.as_deref(),
+    sort_direction.as_deref(),
+  ).map_err(|e| e.to_string())?;
+  let leases = rows
+    .into_iter()
+    .map(|(lease, managers)| LeaseWithManagers { lease, managers })
+    .collect();
   Ok(PaginatedResponse { leases, total_count })
 }
 
