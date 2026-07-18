@@ -382,8 +382,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "storybook_stories_ui_badge_stories",
-      "community": 2,
-      "community_name": "UI Primitives (Badge/Sort/Card/Dropdown)",
+      "community": 125,
+      "community_name": "Badge.stories.tsx",
       "norm_label": "badge.stories.tsx"
     },
     {
@@ -393,8 +393,8 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "storybook_stories_ui_badge_stories_story",
-      "community": 2,
-      "community_name": "UI Primitives (Badge/Sort/Card/Dropdown)",
+      "community": 125,
+      "community_name": "Badge.stories.tsx",
       "norm_label": "story"
     },
     {
@@ -404,8 +404,8 @@
       "source_location": "L24",
       "_origin": "ast",
       "id": "storybook_stories_ui_badge_stories_emerald",
-      "community": 2,
-      "community_name": "UI Primitives (Badge/Sort/Card/Dropdown)",
+      "community": 125,
+      "community_name": "Badge.stories.tsx",
       "norm_label": "emerald"
     },
     {
@@ -415,8 +415,8 @@
       "source_location": "L31",
       "_origin": "ast",
       "id": "storybook_stories_ui_badge_stories_gray",
-      "community": 2,
-      "community_name": "UI Primitives (Badge/Sort/Card/Dropdown)",
+      "community": 125,
+      "community_name": "Badge.stories.tsx",
       "norm_label": "gray"
     },
     {
@@ -426,8 +426,8 @@
       "source_location": "L38",
       "_origin": "ast",
       "id": "storybook_stories_ui_badge_stories_transparent",
-      "community": 2,
-      "community_name": "UI Primitives (Badge/Sort/Card/Dropdown)",
+      "community": 125,
+      "community_name": "Badge.stories.tsx",
       "norm_label": "transparent"
     },
     {
@@ -437,8 +437,8 @@
       "source_location": "L45",
       "_origin": "ast",
       "id": "storybook_stories_ui_badge_stories_withnumber",
-      "community": 2,
-      "community_name": "UI Primitives (Badge/Sort/Card/Dropdown)",
+      "community": 125,
+      "community_name": "Badge.stories.tsx",
       "norm_label": "withnumber"
     },
     {
@@ -448,8 +448,8 @@
       "source_location": "L52",
       "_origin": "ast",
       "id": "storybook_stories_ui_badge_stories_qualifiedbadge",
-      "community": 2,
-      "community_name": "UI Primitives (Badge/Sort/Card/Dropdown)",
+      "community": 125,
+      "community_name": "Badge.stories.tsx",
       "norm_label": "qualifiedbadge"
     },
     {
@@ -459,8 +459,8 @@
       "source_location": "L66",
       "_origin": "ast",
       "id": "storybook_stories_ui_badge_stories_prospectbadge",
-      "community": 2,
-      "community_name": "UI Primitives (Badge/Sort/Card/Dropdown)",
+      "community": 125,
+      "community_name": "Badge.stories.tsx",
       "norm_label": "prospectbadge"
     },
     {
@@ -470,8 +470,8 @@
       "source_location": "L80",
       "_origin": "ast",
       "id": "storybook_stories_ui_badge_stories_allvariants",
-      "community": 2,
-      "community_name": "UI Primitives (Badge/Sort/Card/Dropdown)",
+      "community": 125,
+      "community_name": "Badge.stories.tsx",
       "norm_label": "allvariants"
     },
     {
@@ -679,8 +679,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "storybook_stories_ui_dropdown_stories",
-      "community": 2,
-      "community_name": "UI Primitives (Badge/Sort/Card/Dropdown)",
+      "community": 126,
+      "community_name": "Dropdown.stories.tsx",
       "norm_label": "dropdown.stories.tsx"
     },
     {
@@ -690,8 +690,8 @@
       "source_location": "L30",
       "_origin": "ast",
       "id": "storybook_stories_ui_dropdown_stories_story",
-      "community": 2,
-      "community_name": "UI Primitives (Badge/Sort/Card/Dropdown)",
+      "community": 126,
+      "community_name": "Dropdown.stories.tsx",
       "norm_label": "story"
     },
     {
@@ -701,8 +701,8 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "storybook_stories_ui_dropdown_stories_default",
-      "community": 2,
-      "community_name": "UI Primitives (Badge/Sort/Card/Dropdown)",
+      "community": 126,
+      "community_name": "Dropdown.stories.tsx",
       "norm_label": "default"
     },
     {
@@ -712,8 +712,8 @@
       "source_location": "L39",
       "_origin": "ast",
       "id": "storybook_stories_ui_dropdown_stories_withicons",
-      "community": 2,
-      "community_name": "UI Primitives (Badge/Sort/Card/Dropdown)",
+      "community": 126,
+      "community_name": "Dropdown.stories.tsx",
       "norm_label": "withicons"
     },
     {
@@ -723,8 +723,8 @@
       "source_location": "L50",
       "_origin": "ast",
       "id": "storybook_stories_ui_dropdown_stories_sortbydropdown",
-      "community": 2,
-      "community_name": "UI Primitives (Badge/Sort/Card/Dropdown)",
+      "community": 126,
+      "community_name": "Dropdown.stories.tsx",
       "norm_label": "sortbydropdown"
     },
     {
@@ -734,8 +734,8 @@
       "source_location": "L64",
       "_origin": "ast",
       "id": "storybook_stories_ui_dropdown_stories_manyitems",
-      "community": 2,
-      "community_name": "UI Primitives (Badge/Sort/Card/Dropdown)",
+      "community": 126,
+      "community_name": "Dropdown.stories.tsx",
       "norm_label": "manyitems"
     },
     {
@@ -745,8 +745,8 @@
       "source_location": "L89",
       "_origin": "ast",
       "id": "storybook_stories_ui_dropdown_stories_withinteractiontest",
-      "community": 2,
-      "community_name": "UI Primitives (Badge/Sort/Card/Dropdown)",
+      "community": 126,
+      "community_name": "Dropdown.stories.tsx",
       "norm_label": "withinteractiontest"
     },
     {
@@ -833,8 +833,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "storybook_stories_ui_sort_stories",
-      "community": 2,
-      "community_name": "UI Primitives (Badge/Sort/Card/Dropdown)",
+      "community": 124,
+      "community_name": "Sort.tsx",
       "norm_label": "sort.stories.tsx"
     },
     {
@@ -844,8 +844,8 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "storybook_stories_ui_sort_stories_story",
-      "community": 2,
-      "community_name": "UI Primitives (Badge/Sort/Card/Dropdown)",
+      "community": 124,
+      "community_name": "Sort.tsx",
       "norm_label": "story"
     },
     {
@@ -855,8 +855,8 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "storybook_stories_ui_sort_stories_default",
-      "community": 2,
-      "community_name": "UI Primitives (Badge/Sort/Card/Dropdown)",
+      "community": 124,
+      "community_name": "Sort.tsx",
       "norm_label": "default"
     },
     {
@@ -866,8 +866,8 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "storybook_stories_ui_sort_stories_withinteractiontest",
-      "community": 2,
-      "community_name": "UI Primitives (Badge/Sort/Card/Dropdown)",
+      "community": 124,
+      "community_name": "Sort.tsx",
       "norm_label": "withinteractiontest"
     },
     {
@@ -877,8 +877,8 @@
       "source_location": "L58",
       "_origin": "ast",
       "id": "storybook_stories_ui_sort_stories_incontext",
-      "community": 2,
-      "community_name": "UI Primitives (Badge/Sort/Card/Dropdown)",
+      "community": 124,
+      "community_name": "Sort.tsx",
       "norm_label": "incontext"
     },
     {
@@ -1526,8 +1526,8 @@
       "source_location": "L34",
       "_origin": "ast",
       "id": "package_dependencies_bootstrap",
-      "community": 5,
-      "community_name": "NPM Runtime Dependencies",
+      "community": 28,
+      "community_name": "Property Card Notes",
       "norm_label": "bootstrap"
     },
     {
@@ -1537,8 +1537,8 @@
       "source_location": "L34",
       "_origin": "ast",
       "id": "bootstrap",
-      "community": 5,
-      "community_name": "NPM Runtime Dependencies",
+      "community": 28,
+      "community_name": "Property Card Notes",
       "norm_label": "bootstrap"
     },
     {
@@ -1592,8 +1592,8 @@
       "source_location": "L37",
       "_origin": "ast",
       "id": "package_dependencies_react",
-      "community": 122,
-      "community_name": "App.tsx",
+      "community": 5,
+      "community_name": "NPM Runtime Dependencies",
       "norm_label": "react"
     },
     {
@@ -1603,8 +1603,8 @@
       "source_location": "L37",
       "_origin": "ast",
       "id": "react",
-      "community": 122,
-      "community_name": "App.tsx",
+      "community": 5,
+      "community_name": "NPM Runtime Dependencies",
       "norm_label": "react"
     },
     {
@@ -1669,8 +1669,8 @@
       "source_location": "L42",
       "_origin": "ast",
       "id": "package_devdependencies_chromatic_com_storybook",
-      "community": 36,
-      "community_name": "ESLint Config Prettier Package",
+      "community": 16,
+      "community_name": "NPM Dev Tooling Deps",
       "norm_label": "@chromatic-com/storybook"
     },
     {
@@ -1680,8 +1680,8 @@
       "source_location": "L42",
       "_origin": "ast",
       "id": "chromatic_com_storybook",
-      "community": 36,
-      "community_name": "ESLint Config Prettier Package",
+      "community": 16,
+      "community_name": "NPM Dev Tooling Deps",
       "norm_label": "@chromatic-com/storybook"
     },
     {
@@ -2131,8 +2131,8 @@
       "source_location": "L63",
       "_origin": "ast",
       "id": "package_devdependencies_eslint_config_prettier",
-      "community": 16,
-      "community_name": "NPM Dev Tooling Deps",
+      "community": 36,
+      "community_name": "ESLint Config Prettier Package",
       "norm_label": "eslint-config-prettier"
     },
     {
@@ -2142,8 +2142,8 @@
       "source_location": "L63",
       "_origin": "ast",
       "id": "eslint_config_prettier",
-      "community": 16,
-      "community_name": "NPM Dev Tooling Deps",
+      "community": 36,
+      "community_name": "ESLint Config Prettier Package",
       "norm_label": "eslint-config-prettier"
     },
     {
@@ -3009,8 +3009,8 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "src_tauri_src_commands_spreadsheetpreview_from",
-      "community": 0,
-      "community_name": "Spreadsheet Import Parsing",
+      "community": 8,
+      "community_name": "Spreadsheet Parser (calamine)",
       "norm_label": ".from()"
     },
     {
@@ -3020,8 +3020,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "src_tauri_src_commands_rs_self",
-      "community": 0,
-      "community_name": "Spreadsheet Import Parsing",
+      "community": 8,
+      "community_name": "Spreadsheet Parser (calamine)",
       "norm_label": "self"
     },
     {
@@ -4879,8 +4879,8 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "src_tauri_src_spreadsheet_spreadsheet",
-      "community": 0,
-      "community_name": "Spreadsheet Import Parsing",
+      "community": 8,
+      "community_name": "Spreadsheet Parser (calamine)",
       "norm_label": "spreadsheet"
     },
     {
@@ -5258,47 +5258,14 @@
       "norm_label": "icons/icon.ico"
     },
     {
-      "label": "App.test.tsx",
-      "file_type": "code",
-      "source_file": "src/App.test.tsx",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "src_app_test",
-      "community": 1,
-      "community_name": "App Shell & Filter Grid",
-      "norm_label": "app.test.tsx"
-    },
-    {
-      "label": "leaseRow()",
-      "file_type": "code",
-      "source_file": "src/App.test.tsx",
-      "source_location": "L16",
-      "_origin": "ast",
-      "id": "src_app_test_leaserow",
-      "community": 1,
-      "community_name": "App Shell & Filter Grid",
-      "norm_label": "leaserow()"
-    },
-    {
-      "label": "renderApp()",
-      "file_type": "code",
-      "source_file": "src/App.test.tsx",
-      "source_location": "L28",
-      "_origin": "ast",
-      "id": "src_app_test_renderapp",
-      "community": 1,
-      "community_name": "App Shell & Filter Grid",
-      "norm_label": "renderapp()"
-    },
-    {
       "label": "App.tsx",
       "file_type": "code",
       "source_file": "src/App.tsx",
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_app",
-      "community": 1,
-      "community_name": "App Shell & Filter Grid",
+      "community": 122,
+      "community_name": "App.tsx",
       "norm_label": "app.tsx"
     },
     {
@@ -5308,8 +5275,8 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "src_app_page",
-      "community": 1,
-      "community_name": "App Shell & Filter Grid",
+      "community": 122,
+      "community_name": "App.tsx",
       "norm_label": "page"
     },
     {
@@ -5319,8 +5286,8 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "src_app_listpageprops",
-      "community": 1,
-      "community_name": "App Shell & Filter Grid",
+      "community": 122,
+      "community_name": "App.tsx",
       "norm_label": "listpageprops"
     },
     {
@@ -5330,8 +5297,8 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "src_app_listpagecontent",
-      "community": 1,
-      "community_name": "App Shell & Filter Grid",
+      "community": 122,
+      "community_name": "App.tsx",
       "norm_label": "listpagecontent"
     },
     {
@@ -5341,8 +5308,8 @@
       "source_location": "L73",
       "_origin": "ast",
       "id": "src_app_app",
-      "community": 1,
-      "community_name": "App Shell & Filter Grid",
+      "community": 122,
+      "community_name": "App.tsx",
       "norm_label": "app()"
     },
     {
@@ -5396,8 +5363,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_components_layout_gridcontainer",
-      "community": 40,
-      "community_name": "GridContainer.tsx",
+      "community": 122,
+      "community_name": "App.tsx",
       "norm_label": "gridcontainer.tsx"
     },
     {
@@ -5407,8 +5374,8 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "src_components_layout_gridcontainer_gridcontainerprops",
-      "community": 40,
-      "community_name": "GridContainer.tsx",
+      "community": 122,
+      "community_name": "App.tsx",
       "norm_label": "gridcontainerprops"
     },
     {
@@ -5418,8 +5385,8 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "src_components_layout_gridcontainer_page_size_options",
-      "community": 40,
-      "community_name": "GridContainer.tsx",
+      "community": 122,
+      "community_name": "App.tsx",
       "norm_label": "page_size_options"
     },
     {
@@ -5429,8 +5396,8 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "src_components_layout_gridcontainer_getpagenumbers",
-      "community": 40,
-      "community_name": "GridContainer.tsx",
+      "community": 122,
+      "community_name": "App.tsx",
       "norm_label": "getpagenumbers()"
     },
     {
@@ -5440,8 +5407,8 @@
       "source_location": "L33",
       "_origin": "ast",
       "id": "src_components_layout_gridcontainer_gridcontainer",
-      "community": 40,
-      "community_name": "GridContainer.tsx",
+      "community": 122,
+      "community_name": "App.tsx",
       "norm_label": "gridcontainer()"
     },
     {
@@ -5484,8 +5451,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_components_layout_property",
-      "community": 28,
-      "community_name": "Property Card Notes",
+      "community": 35,
+      "community_name": "ESLint Package",
       "norm_label": "property.tsx"
     },
     {
@@ -5506,8 +5473,8 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "src_components_layout_property_striphtml",
-      "community": 28,
-      "community_name": "Property Card Notes",
+      "community": 35,
+      "community_name": "ESLint Package",
       "norm_label": "striphtml()"
     },
     {
@@ -5517,8 +5484,8 @@
       "source_location": "L24",
       "_origin": "ast",
       "id": "src_components_layout_property_formatnotetext",
-      "community": 28,
-      "community_name": "Property Card Notes",
+      "community": 35,
+      "community_name": "ESLint Package",
       "norm_label": "formatnotetext()"
     },
     {
@@ -5528,8 +5495,8 @@
       "source_location": "L45",
       "_origin": "ast",
       "id": "src_components_layout_property_useclampednote",
-      "community": 28,
-      "community_name": "Property Card Notes",
+      "community": 35,
+      "community_name": "ESLint Package",
       "norm_label": "useclampednote()"
     },
     {
@@ -5539,8 +5506,8 @@
       "source_location": "L121",
       "_origin": "ast",
       "id": "src_components_layout_property_property",
-      "community": 28,
-      "community_name": "Property Card Notes",
+      "community": 35,
+      "community_name": "ESLint Package",
       "norm_label": "property()"
     },
     {
@@ -5803,8 +5770,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_components_layout_tabbar",
-      "community": 1,
-      "community_name": "App Shell & Filter Grid",
+      "community": 122,
+      "community_name": "App.tsx",
       "norm_label": "tabbar.tsx"
     },
     {
@@ -5814,8 +5781,8 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "src_components_layout_tabbar_tab",
-      "community": 1,
-      "community_name": "App Shell & Filter Grid",
+      "community": 122,
+      "community_name": "App.tsx",
       "norm_label": "tab"
     },
     {
@@ -5825,8 +5792,8 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "src_components_layout_tabbar_tabbarprops",
-      "community": 1,
-      "community_name": "App Shell & Filter Grid",
+      "community": 122,
+      "community_name": "App.tsx",
       "norm_label": "tabbarprops"
     },
     {
@@ -5836,8 +5803,8 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "src_components_layout_tabbar_tabbar",
-      "community": 1,
-      "community_name": "App Shell & Filter Grid",
+      "community": 122,
+      "community_name": "App.tsx",
       "norm_label": "tabbar()"
     },
     {
@@ -6023,8 +5990,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_components_layout_index",
-      "community": 1,
-      "community_name": "App Shell & Filter Grid",
+      "community": 122,
+      "community_name": "App.tsx",
       "norm_label": "index.ts"
     },
     {
@@ -6034,8 +6001,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_components_ui_badge",
-      "community": 2,
-      "community_name": "UI Primitives (Badge/Sort/Card/Dropdown)",
+      "community": 128,
+      "community_name": "index.ts",
       "norm_label": "badge.tsx"
     },
     {
@@ -6045,8 +6012,8 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "src_components_ui_badge_badge",
-      "community": 2,
-      "community_name": "UI Primitives (Badge/Sort/Card/Dropdown)",
+      "community": 128,
+      "community_name": "index.ts",
       "norm_label": "badge()"
     },
     {
@@ -6144,8 +6111,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_components_ui_dropdown",
-      "community": 2,
-      "community_name": "UI Primitives (Badge/Sort/Card/Dropdown)",
+      "community": 128,
+      "community_name": "index.ts",
       "norm_label": "dropdown.tsx"
     },
     {
@@ -6155,8 +6122,8 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "src_components_ui_dropdown_dropdownmenuprops",
-      "community": 2,
-      "community_name": "UI Primitives (Badge/Sort/Card/Dropdown)",
+      "community": 128,
+      "community_name": "index.ts",
       "norm_label": "dropdownmenuprops"
     },
     {
@@ -6166,8 +6133,8 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "src_components_ui_dropdown_dropdown",
-      "community": 2,
-      "community_name": "UI Primitives (Badge/Sort/Card/Dropdown)",
+      "community": 128,
+      "community_name": "index.ts",
       "norm_label": "dropdown()"
     },
     {
@@ -6254,8 +6221,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_components_ui_sort",
-      "community": 2,
-      "community_name": "UI Primitives (Badge/Sort/Card/Dropdown)",
+      "community": 124,
+      "community_name": "Sort.tsx",
       "norm_label": "sort.tsx"
     },
     {
@@ -6265,8 +6232,8 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "src_components_ui_sort_sortdirection",
-      "community": 2,
-      "community_name": "UI Primitives (Badge/Sort/Card/Dropdown)",
+      "community": 124,
+      "community_name": "Sort.tsx",
       "norm_label": "sortdirection"
     },
     {
@@ -6276,8 +6243,8 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "src_components_ui_sort_sortprops",
-      "community": 2,
-      "community_name": "UI Primitives (Badge/Sort/Card/Dropdown)",
+      "community": 124,
+      "community_name": "Sort.tsx",
       "norm_label": "sortprops"
     },
     {
@@ -6287,8 +6254,8 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "src_components_ui_sort_sort",
-      "community": 2,
-      "community_name": "UI Primitives (Badge/Sort/Card/Dropdown)",
+      "community": 124,
+      "community_name": "Sort.tsx",
       "norm_label": "sort()"
     },
     {
@@ -6298,8 +6265,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_components_ui_index",
-      "community": 2,
-      "community_name": "UI Primitives (Badge/Sort/Card/Dropdown)",
+      "community": 128,
+      "community_name": "index.ts",
       "norm_label": "index.ts"
     },
     {
@@ -17640,76 +17607,6 @@
       "confidence_score": 1.0
     },
     {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/App.test.tsx",
-      "source_location": "L5",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "src_app_test",
-      "target": "src_app",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/App.test.tsx",
-      "source_location": "L16",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "src_app_test",
-      "target": "src_app_test_leaserow",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/App.test.tsx",
-      "source_location": "L28",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "src_app_test",
-      "target": "src_app_test_renderapp",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/App.test.tsx",
-      "source_location": "L6",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "src_app_test",
-      "target": "src_context_filtergridcontext_filtergridprovider",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/App.test.tsx",
-      "source_location": "L6",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "src_app_test",
-      "target": "src_context_index",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/App.test.tsx",
-      "source_location": "L6",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "src_app_test",
-      "target": "src_context_searchcontext_searchprovider",
-      "confidence_score": 1.0
-    },
-    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/App.tsx",
@@ -18006,7 +17903,7 @@
       "relation": "indirect_call",
       "confidence": "INFERRED",
       "source_file": "src/components/layout/GridContainer.tsx",
-      "source_location": "L176",
+      "source_location": "L170",
       "weight": 1.0,
       "_origin": "ast",
       "context": "argument",
@@ -18137,7 +18034,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/components/layout/GridContainer.tsx",
-      "source_location": "L118",
+      "source_location": "L112",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_components_layout_gridcontainer_gridcontainer",

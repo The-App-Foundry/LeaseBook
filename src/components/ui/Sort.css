@@ -2,3 +2,9 @@
   padding: 0;
   box-shadow: none;
 }
+
+.lb-sort-button:focus,
+.lb-sort-button:focus-visible {
+  outline: none;
+  box-shadow: none;
+}

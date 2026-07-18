@@ -2,11 +2,21 @@ import { useState } from 'react';
 import { ArrowUpDown, ArrowDownUp } from 'lucide-react';
 import './Sort.css';
 
-const Sort = () => {
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+type SortDirection = 'asc' | 'desc';
+
+interface SortProps {
+  value?: SortDirection;
+  onChange?: (direction: SortDirection) => void;
+}
+
+const Sort = ({ value, onChange }: SortProps) => {
+  const [internalSortOrder, setInternalSortOrder] = useState<SortDirection>('asc');
+  const sortOrder = value ?? internalSortOrder;
 
   const toggleSortOrder = () => {
-    setSortOrder(prevOrder => (prevOrder === 'asc' ? 'desc' : 'asc'));
+    const nextOrder = sortOrder === 'asc' ? 'desc' : 'asc';
+    setInternalSortOrder(nextOrder);
+    onChange?.(nextOrder);
   };
 
   const tooltipText = `Sort: ${sortOrder === 'asc' ? 'ascending' : 'descending'}`;
