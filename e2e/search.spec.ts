@@ -2,21 +2,31 @@ import { test, expect } from '@playwright/test';
 
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => {
+    const leaseRow = (id: number, name: string, address: string) => ({
+      id,
+      name,
+      address,
+      size: null,
+      expiration_date: null,
+      notes: null,
+      misc_data: null,
+      created_on: 1_700_000_000,
+      managers: [],
+    });
+
     window.__TAURI_INTERNALS__ = window.__TAURI_INTERNALS__ || {};
     window.__TAURI_INTERNALS__.invoke = async (cmd: string, args: any) => {
       if (cmd === 'leases_with_managers_paginated') {
         if (args.searchQuery === 'Apple') {
           return {
-            leases: [
-              { lease: { id: 1, name: 'Apple Store', address: '1 Infinite Loop', expiration_date: null, managers: [] }, managers: [] }
-            ],
+            leases: [leaseRow(1, 'Apple Store', '1 Infinite Loop')],
             total_count: 1
           };
         }
         return {
           leases: [
-            { lease: { id: 1, name: 'Apple Store', address: '1 Infinite Loop', expiration_date: null, managers: [] }, managers: [] },
-            { lease: { id: 2, name: 'Microsoft Store', address: 'Redmond', expiration_date: null, managers: [] }, managers: [] }
+            leaseRow(1, 'Apple Store', '1 Infinite Loop'),
+            leaseRow(2, 'Microsoft Store', 'Redmond'),
           ],
           total_count: 2
         };
