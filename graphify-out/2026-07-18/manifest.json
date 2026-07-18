@@ -80,14 +80,14 @@
     "semantic_hash": "9939a44a9cb3104a493cafa66d615b86"
   },
   "e2e/lease-crud.spec.ts": {
-    "mtime": 1784405833.5953853,
-    "ast_hash": "62bb5b90b38abc0466646d199153b81e",
-    "semantic_hash": ""
+    "mtime": 1784388555.0601492,
+    "ast_hash": "3885424e08538c413ef797f14ec0303c",
+    "semantic_hash": "3885424e08538c413ef797f14ec0303c"
   },
   "e2e/search.spec.ts": {
-    "mtime": 1784405827.1491227,
-    "ast_hash": "9ab2fd61e8154370da573f72841dff15",
-    "semantic_hash": ""
+    "mtime": 1784388555.0601492,
+    "ast_hash": "cab99a6de6b5e511d57b7fe9feab045b",
+    "semantic_hash": "cab99a6de6b5e511d57b7fe9feab045b"
   },
   "eslint.config.cjs": {
     "mtime": 1772901298.9901295,
@@ -270,8 +270,8 @@
     "semantic_hash": "b2691fb0b7ebc83b50c38600d28700dc"
   },
   "src/App.tsx": {
-    "mtime": 1784404327.3841708,
-    "ast_hash": "55da0d516518d8a1e0d7a27a568ad2f4",
+    "mtime": 1784391050.4262588,
+    "ast_hash": "03750c0e183c2f119d1573c6b2fadb57",
     "semantic_hash": ""
   },
   "src/components/layout/FilterBar.tsx": {
@@ -280,9 +280,9 @@
     "semantic_hash": ""
   },
   "src/components/layout/GridContainer.tsx": {
-    "mtime": 1784404333.1034024,
-    "ast_hash": "16fdbe55a854daa4751ef9e2836815e5",
-    "semantic_hash": ""
+    "mtime": 1784326681.9132144,
+    "ast_hash": "ec2821144e4c88d69498376c2b8c2cff",
+    "semantic_hash": "ec2821144e4c88d69498376c2b8c2cff"
   },
   "src/components/layout/Header.tsx": {
     "mtime": 1784388555.0681496,
@@ -822,11 +822,6 @@
   "src/context/FilterGridContext.test.tsx": {
     "mtime": 1784402234.9776127,
     "ast_hash": "76d8191b2c4e6b940a78582868e03ad7",
-    "semantic_hash": ""
-  },
-  "src/App.test.tsx": {
-    "mtime": 1784404229.3072,
-    "ast_hash": "dfbdac3d2550627e8068c86570224683",
     "semantic_hash": ""
   }
 }

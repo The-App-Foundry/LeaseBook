@@ -2,7 +2,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #6B7280;
+  color: #6b7280;
   font-size: 14px;
   font-weight: 600;
 }
@@ -27,20 +27,20 @@
 }
 
 .lb-filter-pill-active {
-  background: #2F5FE0;
-  color: #FFFFFF;
+  background: #2f5fe0;
+  color: #ffffff;
 }
 
 .lb-filter-pill-inactive {
-  background: #F0F1F4;
-  color: #4B5262;
+  background: #f0f1f4;
+  color: #4b5262;
 }
 
 .lb-filter-dot {
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  color: #FFFFFF;
+  color: #ffffff;
   font-size: 8px;
   font-weight: 700;
   display: inline-flex;
@@ -53,11 +53,17 @@
 }
 
 .lb-filter-select {
-  border: 1px solid #DADEE5;
+  border: 1px solid #dadee5;
   border-radius: 8px;
   padding: 9px 12px;
   font-size: 14px;
-  color: #1C2333;
-  background: #FFFFFF;
+  color: #1c2333;
+  background: #ffffff;
   outline: none;
+}
+
+.lb-filter-sort-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }

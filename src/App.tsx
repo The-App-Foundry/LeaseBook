@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useMemo, useContext } from 'react';
+import React, { useState, useCallback, useMemo, useContext } from 'react';
 import { invoke } from '@tauri-apps/api/core';
 import { Upload, Plus, Loader2 } from 'lucide-react';
 import { Header, FilterBar, WorkbookImportFlow, PropertyForm, TabBar, PropertyDetail } from './components/layout';
@@ -7,61 +7,6 @@ import GridContainer from './components/layout/GridContainer';
 import { Button } from './components/ui';
 import type { Lease } from './types/lease';
 import { FilterGridContext } from './context';
-
-interface DbLease {
-  id: number;
-  name: string;
-  address: string;
-  size: number | null;
-  expiration_date: number | null;
-  notes: string | null;
-  misc_data: string | null;
-  created_on: number;
-}
-
-interface DbManager {
-  id: number;
-  name: string;
-  phone_numbers: string | null;
-  email: string | null;
-}
-
-interface DbLeaseWithManagers extends DbLease {
-  managers: DbManager[];
-}
-
-interface PaginatedResponse {
-  leases: DbLeaseWithManagers[];
-  total_count: number;
-}
-
-const DEFAULT_PAGE_SIZE = 50;
-
-const unixToIso = (ts: number): string => new Date(ts * 1000).toISOString().split('T')[0];
-
-const dbLeaseToUi = (db: DbLease, mgrs: DbManager[]): Lease => {
-  const isExpired = db.expiration_date ? db.expiration_date * 1000 < Date.now() : false;
-  const managers: Manager[] = mgrs.map(m => ({
-    id: m.id,
-    name: m.name,
-    phoneNumbers: m.phone_numbers ? m.phone_numbers.split(',').map(p => p.trim()) : [],
-    email: m.email ?? undefined,
-    verified: true,
-  }));
-  return {
-    id: db.id,
-    status: isExpired ? 'prospect' : 'qualified',
-    name: db.name,
-    businessAddr: db.address,
-    size: db.size?.toString() ?? '0',
-    leaseExpiration: db.expiration_date ? unixToIso(db.expiration_date) : '-',
-    leaseManager: managers.map(m => m.name).join(', ') || '-',
-    managers,
-    note: db.notes ?? undefined,
-  };
-};
-
-
 
 type Page = 'list' | 'new-property' | 'import' | 'detail';
 
@@ -126,18 +71,19 @@ const ListPageContent = React.memo(function ListPageContent({
 });
 
 const App = () => {
-  const { leases, totalCount, loading, removeLease, updateLease, refresh } = useContext(FilterGridContext);
+  const { leases, totalCount, loading, activeStage, removeLease, updateLease, refresh } =
+    useContext(FilterGridContext);
   const [currentPage, setCurrentPage] = useState<Page>('list');
   const [activeTab, setActiveTab] = useState<Tab>('properties');
   const [selectedLeaseId, setSelectedLeaseId] = useState<number | null>(null);
   const [startInEditMode, setStartInEditMode] = useState(false);
 
-  const handleImported = useCallback((_imported: Lease[]) => {
+  const handleImported = useCallback(() => {
     refresh();
     setCurrentPage('list');
   }, [refresh]);
 
-  const handlePropertyCreated = useCallback((_lease: Lease) => {
+  const handlePropertyCreated = useCallback(() => {
     refresh();
     setCurrentPage('list');
   }, [refresh]);
@@ -146,7 +92,10 @@ const App = () => {
     setCurrentPage('list');
   }, []);
 
-  const hasLeases = useMemo(() => leases.length > 0 || totalCount > 0, [leases.length, totalCount]);
+  const hasLeases = useMemo(
+    () => leases.length > 0 || totalCount > 0 || activeStage !== null,
+    [activeStage, leases.length, totalCount],
+  );
 
   const handleNewProperty = useCallback(() => {
     setCurrentPage('new-property');

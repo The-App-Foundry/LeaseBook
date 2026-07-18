@@ -69,6 +69,12 @@ const GridContainer = ({
   return (
     <div className="lb-grid-outer">
       <div className="lb-property-grid">
+        {leases.length === 0 && (
+          <div className="lb-grid-empty" role="status">
+            No properties
+          </div>
+        )}
+
         {leases.map(lease => {
           // Get or create a stable callback for this lease ID
           let callback = callbacksMapRef.current.get(lease.id);
