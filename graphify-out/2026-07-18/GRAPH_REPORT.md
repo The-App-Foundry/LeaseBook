@@ -1,11 +1,11 @@
 # Graph Report - LeaseBook  (2026-07-18)
 
 ## Corpus Check
-- 106 files · ~80,262 words
+- 105 files · ~80,074 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 752 nodes · 1132 edges · 135 communities (59 shown, 76 thin omitted)
+- 749 nodes · 1126 edges · 139 communities (62 shown, 77 thin omitted)
 - Extraction: 95% EXTRACTED · 5% INFERRED · 0% AMBIGUOUS · INFERRED: 58 edges (avg confidence: 0.77)
 - Token cost: 0 input · 0 output
 
@@ -116,7 +116,11 @@
 - Lease
 - App.tsx
 - Property.stories.tsx
+- Sort.tsx
+- Badge.stories.tsx
+- Dropdown.stories.tsx
 - package.json
+- index.ts
 - managerDetect.ts
 - eslint-plugin-jsx-a11y
 - @fontsource/inter
@@ -159,19 +163,19 @@
 - **LeaseBook Branding Assets** — src_tauri_icons_64x64, src_tauri_icons_square107x107logo, src_tauri_icons_square142x142logo, src_tauri_icons_square150x150logo, src_tauri_icons_square284x284logo, src_tauri_icons_square30x30logo, src_tauri_icons_square310x310logo, src_tauri_icons_square44x44logo, src_tauri_icons_square71x71logo, src_tauri_icons_square89x89logo, src_tauri_icons_storelogo, src_tauri_icons_icon, src_tauri_icons_ios_appicon_20x20_1x, src_tauri_icons_ios_appicon_20x20_2x_1, src_tauri_icons_ios_appicon_20x20_2x, src_tauri_icons_ios_appicon_20x20_3x, src_tauri_icons_ios_appicon_29x29_1x, src_tauri_icons_ios_appicon_29x29_2x_1, src_tauri_icons_ios_appicon_29x29_2x, src_tauri_icons_ios_appicon_29x29_3x [EXTRACTED 1.00]
 - **LeaseBook iOS App Icons** — src_tauri_icons_ios_appicon_40x40_1x, src_tauri_icons_ios_appicon_40x40_2x_1, src_tauri_icons_ios_appicon_40x40_2x, src_tauri_icons_ios_appicon_40x40_3x, src_tauri_icons_ios_appicon_512_2x, src_tauri_icons_ios_appicon_60x60_2x, src_tauri_icons_ios_appicon_60x60_3x, src_tauri_icons_ios_appicon_76x76_1x, src_tauri_icons_ios_appicon_76x76_2x, src_tauri_icons_ios_appicon_83_5x83_5_2x [EXTRACTED 1.00]
 
-## Communities (135 total, 76 thin omitted)
+## Communities (139 total, 77 thin omitted)
 
 ### Community 0 - "Spreadsheet Import Parsing"
 Cohesion: 0.10
-Nodes (49): HashSet, NaiveDate, NaiveDateTime, Self, cell_to_string(), collect_misc_data(), map_sheet_to_leases(), map_spreadsheet_to_leases() (+41 more)
+Nodes (47): HashSet, NaiveDate, NaiveDateTime, cell_to_string(), collect_misc_data(), map_sheet_to_leases(), map_spreadsheet_to_leases(), normalize_key() (+39 more)
 
 ### Community 1 - "App Shell & Filter Grid"
-Cohesion: 0.06
-Nodes (29): ListPageContent, ListPageProps, Page, STAGE_COLORS, HeaderProps, Tab, TabBarProps, compareOptionalNumbers() (+21 more)
+Cohesion: 0.08
+Nodes (24): STAGE_COLORS, HeaderProps, compareOptionalNumbers(), DbLease, dbLeaseToUi(), DbLeaseWithManagers, DbManager, FilterGridContext (+16 more)
 
 ### Community 2 - "UI Primitives (Badge/Sort/Card/Dropdown)"
-Cohesion: 0.05
-Nodes (32): Badge(), Card(), CardProps, DropdownMenuProps, SortDirection, SortProps, AllVariants, Emerald (+24 more)
+Cohesion: 0.18
+Nodes (10): Card(), CardProps, CustomHeight, CustomSize, CustomWidth, Default, MultipleSizes, SpaceBetween (+2 more)
 
 ### Community 3 - "Tauri Lease/Manager Commands"
 Cohesion: 0.22
@@ -183,7 +187,7 @@ Nodes (35): count_leases(), create_lease(), create_manager(), current_unix_times
 
 ### Community 5 - "NPM Runtime Dependencies"
 Cohesion: 0.13
-Nodes (15): bootstrap, dependencies, bootstrap, @tauri-apps/plugin-opener, @tiptap/extension-link, @tiptap/extension-underline, @tiptap/pm, @tiptap/react (+7 more)
+Nodes (15): dependencies, react, @tauri-apps/plugin-opener, @tiptap/extension-link, @tiptap/extension-underline, @tiptap/pm, @tiptap/react, @tiptap/starter-kit (+7 more)
 
 ### Community 6 - "TypeScript Compiler & Storybook Config"
 Cohesion: 0.06
@@ -194,8 +198,8 @@ Cohesion: 0.07
 Nodes (27): $HOME/.local/share/com.openworld.leasebook/**, icons/128x128@2x.png, icons/128x128.png, icons/32x32.png, icons/icon.icns, icons/icon.ico, app, security (+19 more)
 
 ### Community 8 - "Spreadsheet Parser (calamine)"
-Cohesion: 0.14
-Nodes (24): AsRef, Data, Display, Formatter, Path, PathBuf, Range, Sheets (+16 more)
+Cohesion: 0.12
+Nodes (26): AsRef, Data, Display, Formatter, Path, PathBuf, Range, Sheets (+18 more)
 
 ### Community 9 - "NPM Scripts"
 Cohesion: 0.12
@@ -227,7 +231,7 @@ Nodes (11): Lease, LeaseManager, LeasesManagers, NewLease, NewManager, Option, S
 
 ### Community 16 - "NPM Dev Tooling Deps"
 Cohesion: 0.18
-Nodes (11): cross-env, eslint-config-prettier, devDependencies, cross-env, eslint-config-prettier, prettier, @storybook/react-vite, @vitest/browser-playwright (+3 more)
+Nodes (11): @chromatic-com/storybook, cross-env, devDependencies, @chromatic-com/storybook, cross-env, prettier, @storybook/react-vite, @vitest/browser-playwright (+3 more)
 
 ### Community 17 - "Import Pipeline Lease Struct"
 Cohesion: 0.20
@@ -269,10 +273,6 @@ Nodes (3): Bundle, MainActivity, TauriActivity
 Cohesion: 0.40
 Nodes (4): compat, { FlatCompat }, js, legacy
 
-### Community 28 - "Property Card Notes"
-Cohesion: 0.70
-Nodes (4): formatNoteText(), Property(), stripHtml(), useClampedNote()
-
 ### Community 29 - "Android Gradle Wrapper Script"
 Cohesion: 0.60
 Nodes (3): gradlew script, die(), warn()
@@ -282,20 +282,36 @@ Cohesion: 0.67
 Nodes (3): establish_pool(), DbPool, run()
 
 ### Community 35 - "ESLint Package"
-Cohesion: 0.21
-Nodes (9): PropertyProps, PropertyDetailProps, WorkbookImportFlowProps, FilterGridContextType, Lease, Manager, ManagerCreate, ManagerEdit (+1 more)
+Cohesion: 0.18
+Nodes (13): formatNoteText(), Property(), PropertyProps, stripHtml(), useClampedNote(), PropertyDetailProps, WorkbookImportFlowProps, FilterGridContextType (+5 more)
 
 ### Community 40 - "GridContainer.tsx"
-Cohesion: 0.18
-Nodes (10): getPageNumbers(), GridContainer(), GridContainerProps, PAGE_SIZE_OPTIONS, Empty, ManyItems, sampleProperty, Story (+2 more)
+Cohesion: 0.29
+Nodes (6): Empty, ManyItems, sampleProperty, Story, WithCards, WithContent
 
 ### Community 121 - "Lease"
 Cohesion: 0.31
 Nodes (8): dateToUnixTimestamp(), DbLease, dbLeaseToFrontend(), FormErrors, PropertyForm(), PropertyFormProps, STAGE_OPTIONS, unixTimestampToIso()
 
+### Community 122 - "App.tsx"
+Cohesion: 0.17
+Nodes (9): ListPageContent, ListPageProps, Page, getPageNumbers(), GridContainer(), GridContainerProps, PAGE_SIZE_OPTIONS, Tab (+1 more)
+
 ### Community 123 - "Property.stories.tsx"
 Cohesion: 0.20
 Nodes (9): ActiveLease, Default, defaultData, Expired, ExpiringSoon, MultipleProperties, Prospect, Qualified (+1 more)
+
+### Community 124 - "Sort.tsx"
+Cohesion: 0.22
+Nodes (6): SortDirection, SortProps, Default, InContext, Story, WithInteractionTest
+
+### Community 125 - "Badge.stories.tsx"
+Cohesion: 0.22
+Nodes (8): AllVariants, Emerald, Gray, ProspectBadge, QualifiedBadge, Story, Transparent, WithNumber
+
+### Community 126 - "Dropdown.stories.tsx"
+Cohesion: 0.29
+Nodes (6): Default, ManyItems, SortByDropdown, Story, WithIcons, WithInteractionTest
 
 ### Community 127 - "package.json"
 Cohesion: 0.33
@@ -308,12 +324,12 @@ Nodes (4): detectManagers(), parseEntry(), splitEntries(), uid()
 ## Knowledge Gaps
 - **320 isolated node(s):** `config`, `preview`, `Story`, `Default`, `WithPadding` (+315 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **76 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **77 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `dependencies` connect `NPM Runtime Dependencies` to `@fontsource/inter`, `lucide-react`, `react-bootstrap`, `react-dom`, `@tauri-apps/api`, `@tauri-apps/plugin-dialog`, `Lease Detail & RTF Editing`, `@tauri-apps/plugin-fs`, `App.tsx`, `package.json`?**
+- **Why does `dependencies` connect `NPM Runtime Dependencies` to `@fontsource/inter`, `lucide-react`, `react-bootstrap`, `react-dom`, `@tauri-apps/api`, `@tauri-apps/plugin-dialog`, `Lease Detail & RTF Editing`, `@tauri-apps/plugin-fs`, `Property Card Notes`, `package.json`?**
   _High betweenness centrality (0.105) - this node is a cross-community bridge._
 - **Why does `dompurify` connect `Lease Detail & RTF Editing` to `NPM Runtime Dependencies`?**
   _High betweenness centrality (0.094) - this node is a cross-community bridge._
@@ -322,8 +338,8 @@ _Questions this graph is uniquely positioned to answer:_
 - **What connects `config`, `preview`, `Story` to the rest of the system?**
   _320 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Spreadsheet Import Parsing` be split into smaller, more focused modules?**
-  _Cohesion score 0.09796806966618288 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.10448979591836735 - nodes in this community are weakly interconnected._
 - **Should `App Shell & Filter Grid` be split into smaller, more focused modules?**
-  _Cohesion score 0.05878084179970972 - nodes in this community are weakly interconnected._
-- **Should `UI Primitives (Badge/Sort/Card/Dropdown)` be split into smaller, more focused modules?**
-  _Cohesion score 0.048726467331118496 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.07564102564102564 - nodes in this community are weakly interconnected._
+- **Should `NPM Runtime Dependencies` be split into smaller, more focused modules?**
+  _Cohesion score 0.13333333333333333 - nodes in this community are weakly interconnected._

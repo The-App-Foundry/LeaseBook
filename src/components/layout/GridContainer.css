@@ -1,3 +1,12 @@
+.lb-grid-empty {
+  color: #6b7280;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 32px 16px;
+  text-align: center;
+  width: 100%;
+}
+
 .lb-grid-new-property-wrapper {
   display: flex;
   justify-content: center;
