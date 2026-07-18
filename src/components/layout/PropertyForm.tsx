@@ -1,6 +1,7 @@
 import { ChangeEvent, FC, ReactElement, useEffect, useRef, useState } from 'react';
 import { invoke } from '@tauri-apps/api/core';
 import type { Lease, Manager } from '../../types/lease';
+import { getErrorMessage } from '../../utils/errors';
 import './PropertyForm.css';
 
 interface PropertyFormProps {
@@ -141,7 +142,7 @@ const PropertyForm: FC<PropertyFormProps> = ({ initial, onClose, onCreated }): R
     setSubmitting(true);
     setSubmitError(null);
 
-    let expirationDate = dateToUnixTimestamp(expiration);
+    const expirationDate = dateToUnixTimestamp(expiration);
 
     try {
       let dbLease: DbLease;
@@ -227,9 +228,7 @@ const PropertyForm: FC<PropertyFormProps> = ({ initial, onClose, onCreated }): R
       onCreated(lease);
       onClose();
     } catch (err) {
-      setSubmitError(
-        typeof err === 'string' ? err : 'Failed to save property. Please try again.',
-      );
+      setSubmitError(getErrorMessage(err, 'Failed to save property. Please try again.'));
     } finally {
       setSubmitting(false);
     }
