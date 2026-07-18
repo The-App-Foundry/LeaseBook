@@ -10,6 +10,7 @@ import LinkExtension from '@tiptap/extension-link';
 import { Link2, Unlink } from 'lucide-react';
 import Modal from '../ui/Modal';
 import type { Lease, Manager } from '../../types/lease';
+import { getErrorMessage } from '../../utils/errors';
 import './PropertyDetail.css';
 
 // ---------------------------------------------------------------------------
@@ -259,7 +260,7 @@ const PropertyDetail = ({ lease, onBack, onSaved, onDelete, initialEditMode }: R
   const handleApplyLink = useCallback(() => {
     if (!editor || !activeRange) return;
     let url = linkUrl.trim();
-    let text = linkText.trim();
+    const text = linkText.trim();
 
     if (url) {
       if (!/^(https?:\/\/|mailto:|tel:|#)/i.test(url)) {
@@ -438,7 +439,7 @@ const PropertyDetail = ({ lease, onBack, onSaved, onDelete, initialEditMode }: R
       setIsEditing(false);
     } catch (err) {
       console.error('[PropertyDetail] saveEdit failed:', err);
-      setSaveError(typeof err === 'string' ? err : 'Failed to save. Please try again.');
+      setSaveError(getErrorMessage(err, 'Failed to save. Please try again.'));
     } finally {
       setSaving(false);
     }
