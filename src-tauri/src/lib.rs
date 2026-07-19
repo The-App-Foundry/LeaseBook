@@ -1,4 +1,5 @@
 mod commands;
+mod error;
 mod parser;
 mod spreadsheet;
 mod property;
@@ -19,6 +20,9 @@ mod parser_tests;
 
 #[cfg(test)]
 mod prop_map_tests;
+
+#[cfg(test)]
+mod error_tests;
 
 pub type DbPool = r2d2::Pool<ConnectionManager<SqliteConnection>>;
 
