@@ -195,28 +195,28 @@
     "semantic_hash": "c9b6d9865f7ab2c75ce3f93f32d8ed38"
   },
   "src-tauri/src/commands.rs": {
-    "mtime": 1784406993.865502,
+    "mtime": 1784408198.7594993,
     "ast_hash": "7b82873b0d7bb8cbcacce3e76c2d8b95",
     "semantic_hash": ""
   },
   "src-tauri/src/db/mod.rs": {
-    "mtime": 1784407181.9502535,
+    "mtime": 1784408784.541771,
     "ast_hash": "47f9df61cf67d1966b037fcdc03726db",
     "semantic_hash": ""
   },
   "src-tauri/src/db/operations.rs": {
-    "mtime": 1784407181.9501743,
+    "mtime": 1784408784.541652,
     "ast_hash": "ff483f40c21b3f4697fed38b42ddd7b6",
     "semantic_hash": ""
   },
   "src-tauri/src/db/operations_tests.rs": {
-    "mtime": 1784407181.9500496,
+    "mtime": 1784408784.5414586,
     "ast_hash": "3e4d3d59b07f9be680762b09a1f0c6e0",
     "semantic_hash": ""
   },
   "src-tauri/src/lib.rs": {
-    "mtime": 1784406892.724396,
-    "ast_hash": "1edc545f5b5e3ac004a85c563b5809bd",
+    "mtime": 1784408654.4579935,
+    "ast_hash": "c0e5679b2db1f76d98e354b3cfdd2f73",
     "semantic_hash": ""
   },
   "src-tauri/src/main.rs": {
@@ -225,32 +225,32 @@
     "semantic_hash": "683fea16c3c1b9757d93e578f1f3e928"
   },
   "src-tauri/src/models.rs": {
-    "mtime": 1784407181.9500496,
+    "mtime": 1784408784.5414586,
     "ast_hash": "5dd3e87c40c5ad027828fefd1ea9576c",
     "semantic_hash": ""
   },
   "src-tauri/src/parser.rs": {
-    "mtime": 1784407181.9499958,
+    "mtime": 1784408784.541355,
     "ast_hash": "fa3964cb8ca1f0e807c3077cef407141",
     "semantic_hash": ""
   },
   "src-tauri/src/parser_tests.rs": {
-    "mtime": 1784407181.9499414,
+    "mtime": 1784408784.5412688,
     "ast_hash": "e880a00ba0942198c0a139aec4433495",
     "semantic_hash": ""
   },
   "src-tauri/src/prop_map.rs": {
-    "mtime": 1784407181.94988,
+    "mtime": 1784408784.5411732,
     "ast_hash": "f4a643aeb2b812e35ed7ab24195220d4",
     "semantic_hash": ""
   },
   "src-tauri/src/prop_map_tests.rs": {
-    "mtime": 1784407181.9497876,
+    "mtime": 1784408784.5410683,
     "ast_hash": "fa2183a1db3a7a9ae0de736487064cdd",
     "semantic_hash": ""
   },
   "src-tauri/src/property.rs": {
-    "mtime": 1784407181.9494135,
+    "mtime": 1784408784.540273,
     "ast_hash": "50d242541b91e90ca3cc120e1ea260a2",
     "semantic_hash": ""
   },
@@ -270,7 +270,7 @@
     "semantic_hash": "b2691fb0b7ebc83b50c38600d28700dc"
   },
   "src/App.tsx": {
-    "mtime": 1784407064.3963714,
+    "mtime": 1784408198.7604992,
     "ast_hash": "509b278f3f1984b889ac0a6b8b6e43a8",
     "semantic_hash": ""
   },
@@ -295,12 +295,12 @@
     "semantic_hash": "59ed72940d9585909c2b6bf7732128e7"
   },
   "src/components/layout/PropertyDetail.tsx": {
-    "mtime": 1784407186.3063307,
+    "mtime": 1784408198.7604992,
     "ast_hash": "15b43b1bf11a43d57c62a57c4cbc441c",
     "semantic_hash": ""
   },
   "src/components/layout/PropertyForm.tsx": {
-    "mtime": 1784407190.6965091,
+    "mtime": 1784408198.7604992,
     "ast_hash": "46081ced33a8a722a24865042bb81287",
     "semantic_hash": ""
   },
@@ -310,7 +310,7 @@
     "semantic_hash": "2c1ff2987ce7c9623b8c8df375478b53"
   },
   "src/components/layout/WorkbookImportFlow.tsx": {
-    "mtime": 1784407040.716408,
+    "mtime": 1784408198.7604992,
     "ast_hash": "f02e107cd154d9581f21ec23ce46860e",
     "semantic_hash": ""
   },
@@ -830,18 +830,23 @@
     "semantic_hash": ""
   },
   "src-tauri/src/error.rs": {
-    "mtime": 1784406834.3050246,
+    "mtime": 1784408198.7604992,
     "ast_hash": "ba9cb5271f3c51dc23496f35b15d4422",
     "semantic_hash": ""
   },
   "src-tauri/src/error_tests.rs": {
-    "mtime": 1784406760.1760154,
+    "mtime": 1784408198.7604992,
     "ast_hash": "0650287dd5670e173f0d4a53d589dd32",
     "semantic_hash": ""
   },
   "src/utils/errors.ts": {
-    "mtime": 1784407023.826721,
+    "mtime": 1784408198.7614994,
     "ast_hash": "f505e104c86878687a2da699ffc1e329",
+    "semantic_hash": ""
+  },
+  "src-tauri/src/logging.rs": {
+    "mtime": 1784408654.4599936,
+    "ast_hash": "105b063a29e183f9fdc0d2adfa9a6c3a",
     "semantic_hash": ""
   }
 }
