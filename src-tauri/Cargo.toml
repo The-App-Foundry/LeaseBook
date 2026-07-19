@@ -30,7 +30,9 @@ tauri-plugin-sql = { version = "2.3.2", features = ["sqlite"] }
 diesel = { version = "2.3.8", features = ["r2d2", "returning_clauses_for_sqlite_3_35", "sqlite"] }
 diesel_migrations = "2.3"
 dotenvy = { version = "0.15.7", features = ["cli"] }
+tracing = "0.1"
+tracing-appender = "0.2"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
 
 [dev-dependencies]
 rust_xlsxwriter = "0.94.0"
-

@@ -1,5 +1,6 @@
 mod commands;
 mod error;
+mod logging;
 mod parser;
 mod spreadsheet;
 mod property;
@@ -39,6 +40,12 @@ pub fn run() {
                 .expect("failed to resolve app data directory");
             fs::create_dir_all(&app_data)
                 .expect("failed to create app data directory");
+            let log_guard =
+                logging::init(&app_data).expect("failed to initialize application logging");
+            tracing::info!(
+                log_dir = %logging::log_dir(&app_data).display(),
+                "application logging initialized"
+            );
 
             let db_path = app_data.join("database.sqlite");
             let db_url = db_path.to_string_lossy().to_string();
@@ -49,7 +56,9 @@ pub fn run() {
             let mut conn = pool.get().expect("failed to get DB connection for migrations");
             conn.run_pending_migrations(MIGRATIONS)
                 .expect("failed to run database migrations");
+            tracing::info!("database migrations completed");
 
+            app.manage(log_guard);
             app.manage(pool);
             Ok(())
         })
