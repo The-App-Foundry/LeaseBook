@@ -8,6 +8,9 @@ use rust_xlsxwriter::{ExcelDateTime, Format, Workbook};
 use crate::parser::{parse_spreadsheet_from_path, ParserError};
 use crate::spreadsheet::Cell;
 
+const MAX_IMPORT_FILE_BYTES: usize = 25 * 1024 * 1024;
+const MAX_IMPORT_DATA_ROWS: u32 = 10_000;
+
 #[test]
 fn parses_complex_workbook_from_unknown_extension() {
     let file_path = build_complex_workbook_file();
@@ -22,7 +25,10 @@ fn parses_complex_workbook_from_unknown_extension() {
         .find(|sheet| sheet.name == "Leases")
         .expect("Leases sheet should exist");
 
-    assert_eq!(leases_sheet.headers, vec!["Property", "Rent", "Active", "StartDate"]);
+    assert_eq!(
+        leases_sheet.headers,
+        vec!["Property", "Rent", "Active", "StartDate"]
+    );
     assert_eq!(leases_sheet.rows.len(), 2);
     assert!(matches!(leases_sheet.rows[0].cells[0], Cell::String(ref v) if v == "Sunset Villas"));
     assert!(matches!(leases_sheet.rows[0].cells[1], Cell::Float(v) if (v - 1250.75).abs() < 0.001));
@@ -67,6 +73,97 @@ fn returns_open_workbook_error_for_missing_file() {
         matches!(result, Err(ParserError::OpenWorkbook(_))),
         "expected OpenWorkbook error for missing file path"
     );
+}
+
+#[test]
+fn rejects_spreadsheets_larger_than_import_limit() {
+    let file_path = unique_temp_path("oversized-spreadsheet", "xlsx");
+    fs::write(&file_path, vec![0; MAX_IMPORT_FILE_BYTES + 1])
+        .expect("oversized bytes should be written");
+
+    let result = parse_spreadsheet_from_path(&file_path);
+    assert!(
+        matches!(result, Err(ParserError::InputLimit(_))),
+        "expected InputLimit error for oversized spreadsheet"
+    );
+
+    fs::remove_file(file_path).expect("oversized workbook should be removed");
+}
+
+#[test]
+fn rejects_spreadsheets_with_too_many_data_rows() {
+    let mut workbook = Workbook::new();
+    let sheet = workbook.add_worksheet();
+    sheet
+        .set_name("TooManyRows")
+        .expect("sheet name should be valid");
+    sheet
+        .write_string(0, 0, "Property")
+        .expect("write string should succeed");
+
+    for row in 1..=MAX_IMPORT_DATA_ROWS + 1 {
+        sheet
+            .write_string(row, 0, "Sunset Villas")
+            .expect("write string should succeed");
+    }
+
+    let bytes = workbook
+        .save_to_buffer()
+        .expect("workbook should serialize to bytes");
+    let file_path = unique_temp_path("too-many-rows", "xlsx");
+    fs::write(&file_path, bytes).expect("workbook bytes should be written");
+
+    let result = parse_spreadsheet_from_path(&file_path);
+    assert!(
+        matches!(result, Err(ParserError::InputLimit(_))),
+        "expected InputLimit error for spreadsheet with too many rows"
+    );
+
+    fs::remove_file(file_path).expect("test workbook should be removed");
+}
+
+#[test]
+fn sanitizes_imported_text_and_formula_like_values() {
+    let mut workbook = Workbook::new();
+    let sheet = workbook.add_worksheet();
+    sheet
+        .set_name("Sanitize")
+        .expect("sheet name should be valid");
+    sheet
+        .write_string(0, 0, "Property\0\nName")
+        .expect("write string should succeed");
+    sheet
+        .write_string(0, 1, "Notes")
+        .expect("write string should succeed");
+    sheet
+        .write_string(1, 0, "=cmd|' /C calc'!A0")
+        .expect("write string should succeed");
+    sheet
+        .write_string(1, 1, "Line one\u{0007}\nLine two")
+        .expect("write string should succeed");
+
+    let bytes = workbook
+        .save_to_buffer()
+        .expect("workbook should serialize to bytes");
+    let file_path = unique_temp_path("sanitize-text", "xlsx");
+    fs::write(&file_path, bytes).expect("workbook bytes should be written");
+
+    let parsed = parse_spreadsheet_from_path(&file_path).expect("parser should sanitize workbook");
+    let sheet = parsed
+        .sheets
+        .iter()
+        .find(|sheet| sheet.name == "Sanitize")
+        .expect("sheet should exist");
+
+    assert_eq!(sheet.headers, vec!["Property Name", "Notes"]);
+    assert!(
+        matches!(sheet.rows[0].cells[0], Cell::String(ref value) if value == "'=cmd|' /C calc'!A0")
+    );
+    assert!(
+        matches!(sheet.rows[0].cells[1], Cell::String(ref value) if value == "Line one Line two")
+    );
+
+    fs::remove_file(file_path).expect("test workbook should be removed");
 }
 
 #[test]
@@ -133,7 +230,9 @@ fn build_complex_workbook_file() -> std::path::PathBuf {
     let mut workbook = Workbook::new();
 
     let leases = workbook.add_worksheet();
-    leases.set_name("Leases").expect("sheet name should be valid");
+    leases
+        .set_name("Leases")
+        .expect("sheet name should be valid");
     leases
         .write_string(0, 0, "Property")
         .expect("write string should succeed");
