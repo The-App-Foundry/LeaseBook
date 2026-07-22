@@ -198,7 +198,12 @@ fn convert_cell(cell: &Data) -> Result<Cell, ParserError> {
 }
 
 fn sanitize_text(value: &str, neutralize_formula: bool) -> Result<String, ParserError> {
-    if value.chars().count() > MAX_IMPORT_CELL_TEXT_CHARS {
+    if value
+        .chars()
+        .take(MAX_IMPORT_CELL_TEXT_CHARS.saturating_add(1))
+        .count()
+        > MAX_IMPORT_CELL_TEXT_CHARS
+    {
         return Err(ParserError::InputLimit(format!(
             "spreadsheet text values must be {MAX_IMPORT_CELL_TEXT_CHARS} characters or fewer"
         )));
