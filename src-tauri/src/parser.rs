@@ -233,14 +233,19 @@ fn sanitize_text(value: &str, neutralize_formula: bool) -> Result<String, Parser
         }
     }
 
-    let sanitized = sanitized.trim().to_string();
+    let mut sanitized = sanitized.trim().to_string();
     if neutralize_formula
         && sanitized
             .chars()
             .next()
             .is_some_and(|ch| matches!(ch, '=' | '+' | '-' | '@'))
     {
-        return Ok(format!("'{sanitized}"));
+        if sanitized.chars().count() >= MAX_IMPORT_CELL_TEXT_CHARS {
+            return Err(ParserError::InputLimit(format!(
+                "spreadsheet text values must be {MAX_IMPORT_CELL_TEXT_CHARS} characters or fewer"
+            )));
+        }
+        sanitized.insert(0, '\'');
     }
 
     Ok(sanitized)
