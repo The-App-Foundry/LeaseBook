@@ -17,11 +17,11 @@ jobs:
       matrix:
         include:
           - name: macOS Apple Silicon
-            platform: macos-latest
+            platform: macos-15
             rust_target: aarch64-apple-darwin
             args: --target aarch64-apple-darwin --bundles app,dmg
           - name: macOS Intel
-            platform: macos-latest
+            platform: macos-15-intel
             rust_target: x86_64-apple-darwin
             args: --target x86_64-apple-darwin --bundles app,dmg
           - name: Linux
@@ -64,6 +64,13 @@ jobs:
             pkg-config \
             rpm \
             xdg-utils
+
+      - name: Install macOS dependencies
+        if: startsWith(matrix.platform, 'macos-')
+        run: |
+          brew install pkg-config openssl@3
+          echo "OPENSSL_DIR=$(brew --prefix openssl@3)" >> "$GITHUB_ENV"
+          echo "PKG_CONFIG_PATH=$(brew --prefix openssl@3)/lib/pkgconfig:$PKG_CONFIG_PATH" >> "$GITHUB_ENV"
 
       - name: Install frontend dependencies
         run: pnpm install --frozen-lockfile
