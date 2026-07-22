@@ -226,7 +226,7 @@ fn sanitizes_imported_text_and_formula_like_values() {
         .write_string(1, 0, "=cmd|' /C calc'!A0")
         .expect("write string should succeed");
     sheet
-        .write_string(1, 1, "Line one\u{0007}\nLine two")
+        .write_string(1, 1, "Line one\u{0007}\r\n\tLine two")
         .expect("write string should succeed");
 
     let bytes = workbook
@@ -242,12 +242,12 @@ fn sanitizes_imported_text_and_formula_like_values() {
         .find(|sheet| sheet.name == "Sanitize")
         .expect("sheet should exist");
 
-    assert_eq!(sheet.headers, vec!["Property Name", "Notes"]);
+    assert_eq!(sheet.headers, vec!["Property\nName", "Notes"]);
     assert!(
         matches!(sheet.rows[0].cells[0], Cell::String(ref value) if value == "'=cmd|' /C calc'!A0")
     );
     assert!(
-        matches!(sheet.rows[0].cells[1], Cell::String(ref value) if value == "Line one Line two")
+        matches!(sheet.rows[0].cells[1], Cell::String(ref value) if value == "Line one\n\tLine two")
     );
 
     fs::remove_file(file_path).expect("test workbook should be removed");
