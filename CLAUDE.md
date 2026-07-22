@@ -133,6 +133,10 @@ TypeScript autocomplete is enabled via `src/styles/styled.d.ts` which extends th
 - **Prettier**: Configured for 100-char line width, single quotes, trailing commas, LF line endings
 - **TypeScript**: Strict mode enabled with unused locals/parameters checks
 
+## Guidelines
+
+- Do not weaken tests to make them pass
+
 ## Important Notes
 
 - Main branch is `base` (use this for PRs)
