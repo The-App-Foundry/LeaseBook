@@ -5,11 +5,11 @@ use calamine::{Data, Reader, Sheets, open_workbook_auto};
 
 use crate::spreadsheet::{Cell, Row, Sheet, Spreadsheet};
 
-const MAX_IMPORT_FILE_BYTES: u64 = 25 * 1024 * 1024;
-const MAX_IMPORT_SHEETS: usize = 32;
-const MAX_IMPORT_COLUMNS: usize = 256;
-const MAX_IMPORT_DATA_ROWS: usize = 10_000;
-const MAX_IMPORT_CELL_TEXT_CHARS: usize = 4_096;
+pub(crate) const MAX_IMPORT_FILE_BYTES: u64 = 25 * 1024 * 1024;
+pub(crate) const MAX_IMPORT_SHEETS: usize = 32;
+pub(crate) const MAX_IMPORT_COLUMNS: usize = 256;
+pub(crate) const MAX_IMPORT_DATA_ROWS: usize = 10_000;
+pub(crate) const MAX_IMPORT_CELL_TEXT_CHARS: usize = 4_096;
 
 #[derive(Debug)]
 pub enum ParserError {

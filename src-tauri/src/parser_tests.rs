@@ -5,11 +5,11 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 use rust_xlsxwriter::{ExcelDateTime, Format, Workbook};
 
-use crate::parser::{ParserError, parse_spreadsheet_from_path};
+use crate::parser::{
+    MAX_IMPORT_CELL_TEXT_CHARS, MAX_IMPORT_COLUMNS, MAX_IMPORT_DATA_ROWS, MAX_IMPORT_FILE_BYTES,
+    MAX_IMPORT_SHEETS, ParserError, parse_spreadsheet_from_path,
+};
 use crate::spreadsheet::Cell;
-
-const MAX_IMPORT_FILE_BYTES: usize = 25 * 1024 * 1024;
-const MAX_IMPORT_DATA_ROWS: u32 = 10_000;
 
 #[test]
 fn parses_complex_workbook_from_unknown_extension() {
@@ -78,7 +78,7 @@ fn returns_open_workbook_error_for_missing_file() {
 #[test]
 fn rejects_spreadsheets_larger_than_import_limit() {
     let file_path = unique_temp_path("oversized-spreadsheet", "xlsx");
-    fs::write(&file_path, vec![0; MAX_IMPORT_FILE_BYTES + 1])
+    fs::write(&file_path, vec![0; MAX_IMPORT_FILE_BYTES as usize + 1])
         .expect("oversized bytes should be written");
 
     let result = parse_spreadsheet_from_path(&file_path);
@@ -88,6 +88,64 @@ fn rejects_spreadsheets_larger_than_import_limit() {
     );
 
     fs::remove_file(file_path).expect("oversized workbook should be removed");
+}
+
+#[test]
+fn rejects_spreadsheets_with_too_many_sheets() {
+    let mut workbook = Workbook::new();
+
+    for index in 0..=MAX_IMPORT_SHEETS {
+        let sheet = workbook.add_worksheet();
+        sheet
+            .set_name(format!("Sheet{index}"))
+            .expect("sheet name should be valid");
+        sheet
+            .write_string(0, 0, "Property")
+            .expect("write string should succeed");
+    }
+
+    let bytes = workbook
+        .save_to_buffer()
+        .expect("workbook should serialize to bytes");
+    let file_path = unique_temp_path("too-many-sheets", "xlsx");
+    fs::write(&file_path, bytes).expect("workbook bytes should be written");
+
+    let result = parse_spreadsheet_from_path(&file_path);
+    assert!(
+        matches!(result, Err(ParserError::InputLimit(_))),
+        "expected InputLimit error for spreadsheet with too many sheets"
+    );
+
+    fs::remove_file(file_path).expect("test workbook should be removed");
+}
+
+#[test]
+fn rejects_spreadsheets_with_too_many_columns() {
+    let mut workbook = Workbook::new();
+    let sheet = workbook.add_worksheet();
+    sheet
+        .set_name("TooManyColumns")
+        .expect("sheet name should be valid");
+
+    for column in 0..=MAX_IMPORT_COLUMNS as u16 {
+        sheet
+            .write_string(0, column, "Property")
+            .expect("write string should succeed");
+    }
+
+    let bytes = workbook
+        .save_to_buffer()
+        .expect("workbook should serialize to bytes");
+    let file_path = unique_temp_path("too-many-columns", "xlsx");
+    fs::write(&file_path, bytes).expect("workbook bytes should be written");
+
+    let result = parse_spreadsheet_from_path(&file_path);
+    assert!(
+        matches!(result, Err(ParserError::InputLimit(_))),
+        "expected InputLimit error for spreadsheet with too many columns"
+    );
+
+    fs::remove_file(file_path).expect("test workbook should be removed");
 }
 
 #[test]
@@ -101,7 +159,7 @@ fn rejects_spreadsheets_with_too_many_data_rows() {
         .write_string(0, 0, "Property")
         .expect("write string should succeed");
 
-    for row in 1..=MAX_IMPORT_DATA_ROWS + 1 {
+    for row in 1..=(MAX_IMPORT_DATA_ROWS as u32 + 1) {
         sheet
             .write_string(row, 0, "Sunset Villas")
             .expect("write string should succeed");
@@ -117,6 +175,35 @@ fn rejects_spreadsheets_with_too_many_data_rows() {
     assert!(
         matches!(result, Err(ParserError::InputLimit(_))),
         "expected InputLimit error for spreadsheet with too many rows"
+    );
+
+    fs::remove_file(file_path).expect("test workbook should be removed");
+}
+
+#[test]
+fn rejects_spreadsheets_with_cell_text_longer_than_import_limit() {
+    let mut workbook = Workbook::new();
+    let sheet = workbook.add_worksheet();
+    sheet
+        .set_name("TooMuchText")
+        .expect("sheet name should be valid");
+    sheet
+        .write_string(0, 0, "Property")
+        .expect("write string should succeed");
+    sheet
+        .write_string(1, 0, "A".repeat(MAX_IMPORT_CELL_TEXT_CHARS + 1))
+        .expect("write string should succeed");
+
+    let bytes = workbook
+        .save_to_buffer()
+        .expect("workbook should serialize to bytes");
+    let file_path = unique_temp_path("too-much-text", "xlsx");
+    fs::write(&file_path, bytes).expect("workbook bytes should be written");
+
+    let result = parse_spreadsheet_from_path(&file_path);
+    assert!(
+        matches!(result, Err(ParserError::InputLimit(_))),
+        "expected InputLimit error for spreadsheet with too much cell text"
     );
 
     fs::remove_file(file_path).expect("test workbook should be removed");
