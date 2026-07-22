@@ -192,7 +192,7 @@ fn convert_cell(cell: &Data) -> Result<Cell, ParserError> {
             .unwrap_or_else(|| Cell::Float(value.as_f64())),
         Data::DateTimeIso(value) => Cell::String(sanitize_text(value, true)?),
         Data::DurationIso(value) => Cell::String(sanitize_text(value, true)?),
-        Data::Error(_) => Cell::Empty,
+        Data::Error(value) => Cell::String(format!("#ERROR({value:?})")),
     };
 
     Ok(converted)
