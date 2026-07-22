@@ -10,7 +10,7 @@ const legacy = {
     ecmaFeatures: { jsx: true },
     project: ['./tsconfig.json', './.storybook/tsconfig.json'],
   },
-  ignorePatterns: ['dist/**', 'src-tauri/**', 'eslint.config.cjs'],
+  ignorePatterns: ['dist/**', 'src-tauri/**', 'graphify-out/**', 'eslint.config.cjs'],
   env: {
     browser: true,
     es2021: true,

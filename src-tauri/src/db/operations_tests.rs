@@ -56,7 +56,8 @@ fn test_search_leases() {
     let count_apple = count_leases(&mut conn, Some("Apple"), None).unwrap();
     assert_eq!(count_apple, 1);
 
-    let results = get_leases_paginated(&mut conn, 10, 0, Some("Redmond"), None, None, None).unwrap();
+    let results =
+        get_leases_paginated(&mut conn, 10, 0, Some("Redmond"), None, None, None).unwrap();
     assert_eq!(results.len(), 1);
     assert_eq!(results[0].name, "Microsoft Store");
 }
@@ -166,10 +167,10 @@ fn test_stage_filter_uses_derived_expiration_status() {
     )
     .unwrap();
 
-    let contacted = get_leases_paginated(&mut conn, 10, 0, None, Some("Contacted"), None, None)
-        .unwrap();
-    let qualified = get_leases_paginated(&mut conn, 10, 0, None, Some("Qualified"), None, None)
-        .unwrap();
+    let contacted =
+        get_leases_paginated(&mut conn, 10, 0, None, Some("Contacted"), None, None).unwrap();
+    let qualified =
+        get_leases_paginated(&mut conn, 10, 0, None, Some("Qualified"), None, None).unwrap();
 
     assert_eq!(
         contacted
