@@ -211,25 +211,19 @@ fn sanitize_text(value: &str, neutralize_formula: bool) -> Result<String, Parser
     }
 
     let mut sanitized = String::with_capacity(value.len());
-    let mut previous_was_space = false;
+    let mut chars = value.chars().peekable();
 
-    for ch in value.chars() {
-        let replacement = match ch {
-            '\r' | '\n' | '\t' => Some(' '),
-            _ if ch.is_control() => None,
-            _ => Some(ch),
-        };
-
-        if let Some(ch) = replacement {
-            if ch.is_whitespace() {
-                if !previous_was_space {
-                    sanitized.push(' ');
-                    previous_was_space = true;
+    while let Some(ch) = chars.next() {
+        match ch {
+            '\r' => {
+                if chars.peek() == Some(&'\n') {
+                    chars.next();
                 }
-            } else {
-                sanitized.push(ch);
-                previous_was_space = false;
+                sanitized.push('\n');
             }
+            '\n' | '\t' => sanitized.push(ch),
+            _ if ch.is_control() => {}
+            _ => sanitized.push(ch),
         }
     }
 
