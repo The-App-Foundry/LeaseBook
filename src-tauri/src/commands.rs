@@ -1,9 +1,11 @@
 use std::collections::HashMap;
 
 use serde::Serialize;
-use tauri::State;
+use tauri::{AppHandle, State};
+use tauri_plugin_opener::OpenerExt;
 
 use crate::DbPool;
+use crate::auth::{AuthManager, AuthStatus};
 use crate::db::operations::*;
 use crate::error::{AppError, CommandResult, ErrorResponse};
 use crate::models::{
@@ -11,12 +13,122 @@ use crate::models::{
     UpdateManagerInput,
 };
 use crate::parser::parse_spreadsheet_from_path;
+use crate::passkey_browser;
 use crate::prop_map::map_spreadsheet_to_leases;
 use crate::property::Lease;
 use crate::spreadsheet::Spreadsheet;
+use webauthn_rs::prelude::{
+    CreationChallengeResponse, PublicKeyCredential, RegisterPublicKeyCredential,
+    RequestChallengeResponse,
+};
 
 fn pool_error(error: impl std::fmt::Display) -> ErrorResponse {
     AppError::internal(error.to_string()).into()
+}
+
+#[tauri::command]
+pub fn auth_status(auth: State<'_, AuthManager>) -> CommandResult<AuthStatus> {
+    auth.status().map_err(Into::into)
+}
+
+#[tauri::command]
+pub fn create_auth_password(
+    auth: State<'_, AuthManager>,
+    password: String,
+) -> CommandResult<AuthStatus> {
+    auth.create_password(&password).map_err(Into::into)
+}
+
+#[tauri::command]
+pub fn change_auth_password(
+    auth: State<'_, AuthManager>,
+    current_password: String,
+    new_password: String,
+) -> CommandResult<AuthStatus> {
+    auth.change_password(&current_password, &new_password)
+        .map_err(Into::into)
+}
+
+#[tauri::command]
+pub fn disable_auth_password(
+    auth: State<'_, AuthManager>,
+    current_password: String,
+) -> CommandResult<AuthStatus> {
+    auth.disable_password(&current_password).map_err(Into::into)
+}
+
+#[tauri::command]
+pub fn start_passkey_registration(
+    auth: State<'_, AuthManager>,
+) -> CommandResult<CreationChallengeResponse> {
+    auth.start_passkey_registration().map_err(Into::into)
+}
+
+#[tauri::command]
+pub fn finish_passkey_registration(
+    auth: State<'_, AuthManager>,
+    credential: RegisterPublicKeyCredential,
+) -> CommandResult<AuthStatus> {
+    auth.finish_passkey_registration(credential)
+        .map_err(Into::into)
+}
+
+#[tauri::command]
+pub fn browser_passkey_registration(
+    app: AppHandle,
+    auth: State<'_, AuthManager>,
+) -> CommandResult<AuthStatus> {
+    passkey_browser::register(auth.inner(), |url| open_passkey_window(&app, url))
+        .map_err(Into::into)
+}
+
+#[tauri::command]
+pub fn disable_auth_passkeys(auth: State<'_, AuthManager>) -> CommandResult<AuthStatus> {
+    auth.disable_passkeys().map_err(Into::into)
+}
+
+#[tauri::command]
+pub fn auth_login(auth: State<'_, AuthManager>, password: String) -> CommandResult<AuthStatus> {
+    auth.login(&password).map_err(Into::into)
+}
+
+#[tauri::command]
+pub fn start_passkey_login(
+    auth: State<'_, AuthManager>,
+) -> CommandResult<RequestChallengeResponse> {
+    auth.start_passkey_login().map_err(Into::into)
+}
+
+#[tauri::command]
+pub fn finish_passkey_login(
+    auth: State<'_, AuthManager>,
+    credential: PublicKeyCredential,
+) -> CommandResult<AuthStatus> {
+    auth.finish_passkey_login(credential).map_err(Into::into)
+}
+
+#[tauri::command]
+pub fn browser_passkey_login(
+    app: AppHandle,
+    auth: State<'_, AuthManager>,
+) -> CommandResult<AuthStatus> {
+    passkey_browser::login(auth.inner(), |url| open_passkey_window(&app, url)).map_err(Into::into)
+}
+
+#[tauri::command]
+pub fn auth_logout(auth: State<'_, AuthManager>) -> CommandResult<AuthStatus> {
+    auth.logout().map_err(Into::into)
+}
+
+fn open_passkey_window(
+    app: &AppHandle,
+    url: &str,
+) -> Result<passkey_browser::CeremonyCleanup, AppError> {
+    app.opener()
+        .open_url(url, None::<&str>)
+        .map_err(|_| AppError::validation("Unable to open your browser for passkey sign-in."))?;
+
+    Ok(Box::new(|| {}))
 }
 
 #[derive(Serialize)]

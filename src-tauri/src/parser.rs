@@ -1,7 +1,7 @@
 use std::fmt;
 use std::path::Path;
 
-use calamine::{open_workbook_auto, Data, Reader, Sheets};
+use calamine::{Data, Reader, Sheets, open_workbook_auto};
 
 use crate::spreadsheet::{Cell, Row, Sheet, Spreadsheet};
 

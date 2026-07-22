@@ -5,7 +5,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 use rust_xlsxwriter::{ExcelDateTime, Format, Workbook};
 
-use crate::parser::{parse_spreadsheet_from_path, ParserError};
+use crate::parser::{ParserError, parse_spreadsheet_from_path};
 use crate::spreadsheet::Cell;
 
 const MAX_IMPORT_FILE_BYTES: usize = 25 * 1024 * 1024;

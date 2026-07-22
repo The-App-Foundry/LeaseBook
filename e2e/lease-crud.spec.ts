@@ -6,10 +6,18 @@ test.beforeEach(async ({ page }) => {
     let nextId = 1;
     window.__TAURI_INTERNALS__ = window.__TAURI_INTERNALS__ || {};
     window.__TAURI_INTERNALS__.invoke = async (cmd: string, args: any) => {
+      if (cmd === 'auth_status') {
+        return {
+          password_enabled: false,
+          passkey_enabled: false,
+          authenticated: true,
+        };
+      }
+
       if (cmd === 'leases_with_managers_paginated') {
         return {
           leases: leases.map(l => ({ ...l, managers: [] })),
-          total_count: leases.length
+          total_count: leases.length,
         };
       }
       if (cmd === 'new_lease') {
@@ -58,15 +66,15 @@ test('can create and delete a lease', async ({ page }) => {
   // Click to delete
   // The GridContainer probably has a row or card we can click, let's just find the property and click it to open details
   await page.click('text=New Test Property');
-  
+
   // Assuming there is a delete button in detail view
   // Wait for detail view
   await expect(page.locator('text=Delete')).toBeVisible();
-  
+
   // Click delete
   page.on('dialog', dialog => dialog.accept());
   await page.click('text=Delete');
-  
+
   // Should be back to empty state
   await expect(page.locator('text=No leases yet')).toBeVisible();
 });
