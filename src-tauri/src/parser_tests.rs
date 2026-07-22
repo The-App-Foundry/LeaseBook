@@ -5,7 +5,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 use rust_xlsxwriter::{ExcelDateTime, Format, Workbook};
 
-use crate::parser::{parse_spreadsheet_from_path, ParserError};
+use crate::parser::{ParserError, parse_spreadsheet_from_path};
 use crate::spreadsheet::Cell;
 
 #[test]
@@ -22,7 +22,10 @@ fn parses_complex_workbook_from_unknown_extension() {
         .find(|sheet| sheet.name == "Leases")
         .expect("Leases sheet should exist");
 
-    assert_eq!(leases_sheet.headers, vec!["Property", "Rent", "Active", "StartDate"]);
+    assert_eq!(
+        leases_sheet.headers,
+        vec!["Property", "Rent", "Active", "StartDate"]
+    );
     assert_eq!(leases_sheet.rows.len(), 2);
     assert!(matches!(leases_sheet.rows[0].cells[0], Cell::String(ref v) if v == "Sunset Villas"));
     assert!(matches!(leases_sheet.rows[0].cells[1], Cell::Float(v) if (v - 1250.75).abs() < 0.001));
@@ -133,7 +136,9 @@ fn build_complex_workbook_file() -> std::path::PathBuf {
     let mut workbook = Workbook::new();
 
     let leases = workbook.add_worksheet();
-    leases.set_name("Leases").expect("sheet name should be valid");
+    leases
+        .set_name("Leases")
+        .expect("sheet name should be valid");
     leases
         .write_string(0, 0, "Property")
         .expect("write string should succeed");

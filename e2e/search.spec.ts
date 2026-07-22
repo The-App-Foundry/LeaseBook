@@ -16,11 +16,19 @@ test.beforeEach(async ({ page }) => {
 
     window.__TAURI_INTERNALS__ = window.__TAURI_INTERNALS__ || {};
     window.__TAURI_INTERNALS__.invoke = async (cmd: string, args: any) => {
+      if (cmd === 'auth_status') {
+        return {
+          password_enabled: false,
+          passkey_enabled: false,
+          authenticated: true,
+        };
+      }
+
       if (cmd === 'leases_with_managers_paginated') {
         if (args.searchQuery === 'Apple') {
           return {
             leases: [leaseRow(1, 'Apple Store', '1 Infinite Loop')],
-            total_count: 1
+            total_count: 1,
           };
         }
         return {
@@ -28,7 +36,7 @@ test.beforeEach(async ({ page }) => {
             leaseRow(1, 'Apple Store', '1 Infinite Loop'),
             leaseRow(2, 'Microsoft Store', 'Redmond'),
           ],
-          total_count: 2
+          total_count: 2,
         };
       }
       return null;
@@ -46,7 +54,7 @@ test('search feature filters results correctly', async ({ page }) => {
   // Type in search bar
   const searchInput = page.locator('input[role="searchbox"]');
   await searchInput.fill('Apple');
-  
+
   // Microsoft should disappear based on our mock
   await expect(page.locator('text=Microsoft Store')).not.toBeVisible();
   await expect(page.locator('text=Apple Store')).toBeVisible();

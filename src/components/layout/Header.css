@@ -1,3 +1,8 @@
+.lb-header-brand {
+  grid-area: brand;
+  min-width: 0;
+}
+
 .lb-header-logo {
   height: 48px;
   width: auto;
@@ -64,6 +69,32 @@
   line-height: 1;
 }
 
-.lb-header-spacer {
-  flex: 1;
+.lb-header-actions {
+  grid-area: actions;
+  display: flex;
+  justify-content: flex-end;
+  align-self: start;
+}
+
+.lb-header-logout-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  padding: 0 14px;
+  border: 1px solid var(--lb-border);
+  border-radius: var(--lb-radius-md);
+  background: var(--lb-surface);
+  color: var(--lb-text);
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.lb-header-logout-btn:hover {
+  background: var(--lb-muted);
+}
+
+.lb-header-search-wrapper {
+  grid-area: search;
 }
