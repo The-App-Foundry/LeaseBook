@@ -5,6 +5,12 @@ use calamine::{Data, Reader, Sheets, open_workbook_auto};
 
 use crate::spreadsheet::{Cell, Row, Sheet, Spreadsheet};
 
+pub(crate) const MAX_IMPORT_FILE_BYTES: u64 = 25 * 1024 * 1024;
+pub(crate) const MAX_IMPORT_SHEETS: usize = 32;
+pub(crate) const MAX_IMPORT_COLUMNS: usize = 256;
+pub(crate) const MAX_IMPORT_DATA_ROWS: usize = 10_000;
+pub(crate) const MAX_IMPORT_CELL_TEXT_CHARS: usize = 4_096;
+
 #[derive(Debug)]
 pub enum ParserError {
     OpenWorkbook(calamine::Error),
@@ -12,6 +18,7 @@ pub enum ParserError {
         name: String,
         source: calamine::Error,
     },
+    InputLimit(String),
 }
 
 impl fmt::Display for ParserError {
@@ -21,6 +28,7 @@ impl fmt::Display for ParserError {
             Self::ReadSheet { name, source } => {
                 write!(f, "failed to read worksheet '{name}': {source}")
             }
+            Self::InputLimit(message) => write!(f, "{message}"),
         }
     }
 }
@@ -28,6 +36,16 @@ impl fmt::Display for ParserError {
 impl std::error::Error for ParserError {}
 
 pub fn parse_spreadsheet_from_path(path: impl AsRef<Path>) -> Result<Spreadsheet, ParserError> {
+    let path = path.as_ref();
+    if let Ok(metadata) = std::fs::metadata(path) {
+        if metadata.len() > MAX_IMPORT_FILE_BYTES {
+            return Err(ParserError::InputLimit(format!(
+                "spreadsheet exceeds the {} MiB import limit",
+                MAX_IMPORT_FILE_BYTES / 1024 / 1024
+            )));
+        }
+    }
+
     let mut workbook = open_workbook_auto(path).map_err(ParserError::OpenWorkbook)?;
     parse_workbook(&mut workbook)
 }
@@ -37,6 +55,12 @@ where
     RS: std::io::Read + std::io::Seek,
 {
     let sheet_names = workbook.sheet_names().to_owned();
+    if sheet_names.len() > MAX_IMPORT_SHEETS {
+        return Err(ParserError::InputLimit(format!(
+            "spreadsheet has too many sheets; maximum is {MAX_IMPORT_SHEETS}"
+        )));
+    }
+
     let mut sheets = Vec::with_capacity(sheet_names.len());
 
     for sheet_name in sheet_names {
@@ -44,16 +68,37 @@ where
             workbook
                 .worksheet_range(&sheet_name)
                 .map_err(|source| ParserError::ReadSheet {
-                    name: sheet_name.clone(),
+                    name: sanitize_text(&sheet_name, false)
+                        .unwrap_or_else(|_| "<invalid sheet name>".to_string()),
                     source,
                 })?;
 
+        let (height, width) = range.get_size();
+        if width > MAX_IMPORT_COLUMNS {
+            return Err(ParserError::InputLimit(format!(
+                "worksheet '{}' has too many columns; maximum is {MAX_IMPORT_COLUMNS}",
+                sanitize_text(&sheet_name, false)
+                    .unwrap_or_else(|_| "<invalid sheet name>".to_string())
+            )));
+        }
+
         let header_row_index = detect_header_row_index(&range);
+        let data_row_count = height.saturating_sub(header_row_index.saturating_add(1));
+        if data_row_count > MAX_IMPORT_DATA_ROWS {
+            return Err(ParserError::InputLimit(format!(
+                "worksheet '{}' has too many data rows; maximum is {MAX_IMPORT_DATA_ROWS}",
+                sanitize_text(&sheet_name, false)
+                    .unwrap_or_else(|_| "<invalid sheet name>".to_string())
+            )));
+        }
+
         let headers = range
             .rows()
             .nth(header_row_index)
             .map(|cells| {
-                let mut headers: Vec<String> = cells.iter().map(cell_to_header).collect();
+                let headers_result: Result<Vec<String>, ParserError> =
+                    cells.iter().map(cell_to_header).collect();
+                let mut headers = headers_result?;
                 // Some workbooks report header rows with trailing empty cells when later rows are wider.
                 while headers
                     .last()
@@ -61,20 +106,25 @@ where
                 {
                     headers.pop();
                 }
-                headers
+                Ok(headers)
             })
+            .transpose()?
             .unwrap_or_default();
 
         let rows = range
             .rows()
             .skip(header_row_index.saturating_add(1))
-            .map(|cells| Row {
-                cells: cells.iter().map(convert_cell).collect(),
+            .map(|cells| {
+                let cells = cells
+                    .iter()
+                    .map(convert_cell)
+                    .collect::<Result<Vec<_>, ParserError>>()?;
+                Ok(Row { cells })
             })
-            .collect();
+            .collect::<Result<Vec<_>, ParserError>>()?;
 
         sheets.push(Sheet {
-            name: sheet_name,
+            name: sanitize_text(&sheet_name, false)?,
             headers,
             rows,
         });
@@ -118,21 +168,21 @@ fn cell_is_empty(cell: &Data) -> bool {
     }
 }
 
-fn cell_to_header(cell: &Data) -> String {
-    match convert_cell(cell) {
-        Cell::Empty => String::new(),
-        Cell::String(value) => value,
-        Cell::Float(value) => value.to_string(),
-        Cell::Int(value) => value.to_string(),
-        Cell::Bool(value) => value.to_string(),
-        Cell::Date(value) => value.format("%Y-%m-%d %H:%M:%S").to_string(),
+fn cell_to_header(cell: &Data) -> Result<String, ParserError> {
+    match convert_cell(cell)? {
+        Cell::Empty => Ok(String::new()),
+        Cell::String(value) => Ok(value),
+        Cell::Float(value) => Ok(value.to_string()),
+        Cell::Int(value) => Ok(value.to_string()),
+        Cell::Bool(value) => Ok(value.to_string()),
+        Cell::Date(value) => Ok(value.format("%Y-%m-%d %H:%M:%S").to_string()),
     }
 }
 
-fn convert_cell(cell: &Data) -> Cell {
-    match cell {
+fn convert_cell(cell: &Data) -> Result<Cell, ParserError> {
+    let converted = match cell {
         Data::Empty => Cell::Empty,
-        Data::String(value) => Cell::String(value.clone()),
+        Data::String(value) => Cell::String(sanitize_text(value, true)?),
         Data::Float(value) => Cell::Float(*value),
         Data::Int(value) => Cell::Int(*value),
         Data::Bool(value) => Cell::Bool(*value),
@@ -140,8 +190,57 @@ fn convert_cell(cell: &Data) -> Cell {
             .as_datetime()
             .map(Cell::Date)
             .unwrap_or_else(|| Cell::Float(value.as_f64())),
-        Data::DateTimeIso(value) => Cell::String(value.clone()),
-        Data::DurationIso(value) => Cell::String(value.clone()),
+        Data::DateTimeIso(value) => Cell::String(sanitize_text(value, true)?),
+        Data::DurationIso(value) => Cell::String(sanitize_text(value, true)?),
         Data::Error(value) => Cell::String(format!("#ERROR({value:?})")),
+    };
+
+    Ok(converted)
+}
+
+fn sanitize_text(value: &str, neutralize_formula: bool) -> Result<String, ParserError> {
+    if value
+        .chars()
+        .take(MAX_IMPORT_CELL_TEXT_CHARS.saturating_add(1))
+        .count()
+        > MAX_IMPORT_CELL_TEXT_CHARS
+    {
+        return Err(ParserError::InputLimit(format!(
+            "spreadsheet text values must be {MAX_IMPORT_CELL_TEXT_CHARS} characters or fewer"
+        )));
     }
+
+    let mut sanitized = String::with_capacity(value.len());
+    let mut chars = value.chars().peekable();
+
+    while let Some(ch) = chars.next() {
+        match ch {
+            '\r' => {
+                if chars.peek() == Some(&'\n') {
+                    chars.next();
+                }
+                sanitized.push('\n');
+            }
+            '\n' | '\t' => sanitized.push(ch),
+            _ if ch.is_control() => {}
+            _ => sanitized.push(ch),
+        }
+    }
+
+    let mut sanitized = sanitized.trim().to_string();
+    if neutralize_formula
+        && sanitized
+            .chars()
+            .next()
+            .is_some_and(|ch| matches!(ch, '=' | '+' | '-' | '@'))
+    {
+        if sanitized.chars().count() >= MAX_IMPORT_CELL_TEXT_CHARS {
+            return Err(ParserError::InputLimit(format!(
+                "spreadsheet text values must be {MAX_IMPORT_CELL_TEXT_CHARS} characters or fewer"
+            )));
+        }
+        sanitized.insert(0, '\'');
+    }
+
+    Ok(sanitized)
 }
