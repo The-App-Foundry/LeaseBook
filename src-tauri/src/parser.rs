@@ -68,7 +68,8 @@ where
             workbook
                 .worksheet_range(&sheet_name)
                 .map_err(|source| ParserError::ReadSheet {
-                    name: sheet_name.clone(),
+                    name: sanitize_text(&sheet_name, false)
+                        .unwrap_or_else(|_| "<invalid sheet name>".to_string()),
                     source,
                 })?;
 
