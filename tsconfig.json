@@ -31,5 +31,6 @@
     ".storybook/stories/ui/SearchBar.stories.tsx",
     ".storybook/stories/ui/Sort.stories.tsx"
   ],
+  "exclude": ["graphify-out"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

@@ -25,8 +25,8 @@ export default defineConfig(async () => ({
         }
       : undefined,
     watch: {
-      // 3. tell Vite to ignore watching `src-tauri`
-      ignored: ['**/src-tauri/**'],
+      // 3. tell Vite to ignore backend and generated graph artifacts
+      ignored: ['**/src-tauri/**', '**/graphify-out/**'],
     },
   },
 }));
