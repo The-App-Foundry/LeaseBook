@@ -448,8 +448,15 @@ pub fn get_paginated_leases_with_managers(
     use crate::schema::lease_managers;
 
     let total = count_leases(conn, search_query, stage)?;
-    let page_leases =
-        get_leases_paginated(conn, limit, offset, search_query, stage, sort_by, sort_direction)?;
+    let page_leases = get_leases_paginated(
+        conn,
+        limit,
+        offset,
+        search_query,
+        stage,
+        sort_by,
+        sort_direction,
+    )?;
 
     if page_leases.is_empty() {
         return Ok((vec![], total));

@@ -1,4 +1,5 @@
 import { memo, useContext, useState, useEffect } from 'react';
+import { LogOut } from 'lucide-react';
 import { SearchContext } from '../../context';
 import logo from '../../assets/leasebook.webp';
 import logoMobile from '../../assets/leasebook_mobile.webp';
@@ -6,9 +7,11 @@ import './Header.css';
 
 interface HeaderProps {
   onNewProperty?: () => void;
+  showLogout?: boolean;
+  onLogout?: () => void;
 }
 
-const Header = ({ onNewProperty }: Readonly<HeaderProps>) => {
+const Header = ({ onNewProperty, showLogout = false, onLogout }: Readonly<HeaderProps>) => {
   const { searchQuery, setSearchQuery } = useContext(SearchContext);
   const [localSearch, setLocalSearch] = useState(searchQuery);
 
@@ -23,12 +26,20 @@ const Header = ({ onNewProperty }: Readonly<HeaderProps>) => {
 
   return (
     <header className="lb-header">
-      <div>
+      <div className="lb-header-brand">
         <picture>
           <source media="(max-width: 768px)" srcSet={logoMobile} />
           <img className="lb-header-logo" src={logo} alt="LeaseBook logo" />
         </picture>
         <div className="lb-header-subtitle">Track and manage property leases and expirations</div>
+      </div>
+      <div className="lb-header-actions">
+        {showLogout && (
+          <button type="button" onClick={onLogout} className="lb-header-logout-btn">
+            <LogOut size={16} />
+            Log out
+          </button>
+        )}
       </div>
       <div className="lb-header-search-wrapper">
         <div className="lb-header-search-inner">
@@ -51,7 +62,6 @@ const Header = ({ onNewProperty }: Readonly<HeaderProps>) => {
           </button>
         </div>
       </div>
-      <div className="lb-header-spacer"></div>
     </header>
   );
 };

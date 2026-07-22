@@ -21,7 +21,7 @@
       }
     ],
     "security": {
-      "csp": "default-src asset: https://asset.localhost data: https",
+      "csp": "default-src 'self' asset: https://asset.localhost data: https; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' asset: https://asset.localhost data:; connect-src 'self' ipc: http://ipc.localhost",
       "assetProtocol": {
         "enable": true,
         "scope": ["$HOME/.local/share/com.openworld.leasebook/**"]

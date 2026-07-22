@@ -1,7 +1,7 @@
 use std::fmt;
 use std::path::Path;
 
-use calamine::{open_workbook_auto, Data, Reader, Sheets};
+use calamine::{Data, Reader, Sheets, open_workbook_auto};
 
 use crate::spreadsheet::{Cell, Row, Sheet, Spreadsheet};
 
@@ -40,12 +40,13 @@ where
     let mut sheets = Vec::with_capacity(sheet_names.len());
 
     for sheet_name in sheet_names {
-        let range = workbook
-            .worksheet_range(&sheet_name)
-            .map_err(|source| ParserError::ReadSheet {
-                name: sheet_name.clone(),
-                source,
-            })?;
+        let range =
+            workbook
+                .worksheet_range(&sheet_name)
+                .map_err(|source| ParserError::ReadSheet {
+                    name: sheet_name.clone(),
+                    source,
+                })?;
 
         let header_row_index = detect_header_row_index(&range);
         let headers = range
@@ -54,7 +55,10 @@ where
             .map(|cells| {
                 let mut headers: Vec<String> = cells.iter().map(cell_to_header).collect();
                 // Some workbooks report header rows with trailing empty cells when later rows are wider.
-                while headers.last().is_some_and(|header| header.trim().is_empty()) {
+                while headers
+                    .last()
+                    .is_some_and(|header| header.trim().is_empty())
+                {
                     headers.pop();
                 }
                 headers

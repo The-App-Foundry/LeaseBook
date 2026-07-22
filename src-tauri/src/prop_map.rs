@@ -23,7 +23,11 @@ pub fn map_spreadsheet_to_leases(
 }
 
 fn map_sheet_to_leases(sheet: &Sheet, column_mapping: &HashMap<String, String>) -> Vec<Lease> {
-    let name_header = resolve_header_for_field(sheet, column_mapping, &["name", "property", "company name", "company_name"]);
+    let name_header = resolve_header_for_field(
+        sheet,
+        column_mapping,
+        &["name", "property", "company name", "company_name"],
+    );
     let address_header = resolve_header_for_field(
         sheet,
         column_mapping,
@@ -39,19 +43,30 @@ fn map_sheet_to_leases(sheet: &Sheet, column_mapping: &HashMap<String, String>) 
     let manager_phone_header = resolve_header_for_field(
         sheet,
         column_mapping,
-        &["manager_phone_number", "manager_phone", "phone", "phone_number"],
+        &[
+            "manager_phone_number",
+            "manager_phone",
+            "phone",
+            "phone_number",
+        ],
     );
     let expiration_header = resolve_header_for_field(
         sheet,
         column_mapping,
-        &["expiration_date", "lease_expiration", "expiration", "expiry_date"],
+        &[
+            "expiration_date",
+            "lease_expiration",
+            "expiration",
+            "expiry_date",
+        ],
     );
     let days_to_expire_header = resolve_header_for_field(
         sheet,
         column_mapping,
         &["days_to_expire", "days_until_expiry"],
     );
-    let expired_header = resolve_header_for_field(sheet, column_mapping, &["expired", "is_expired"]);
+    let expired_header =
+        resolve_header_for_field(sheet, column_mapping, &["expired", "is_expired"]);
     let notes_header =
         resolve_header_for_field(sheet, column_mapping, &["notes", "note", "comments"]);
 
@@ -78,7 +93,8 @@ fn map_sheet_to_leases(sheet: &Sheet, column_mapping: &HashMap<String, String>) 
             let mut lease = Lease::default();
 
             lease.name = read_cell_by_header(row.cells.as_slice(), sheet, name_header.as_deref());
-            lease.address = read_cell_by_header(row.cells.as_slice(), sheet, address_header.as_deref());
+            lease.address =
+                read_cell_by_header(row.cells.as_slice(), sheet, address_header.as_deref());
             lease.lease_manager.name =
                 read_cell_by_header(row.cells.as_slice(), sheet, manager_header.as_deref());
             lease.lease_manager.email =
@@ -87,7 +103,8 @@ fn map_sheet_to_leases(sheet: &Sheet, column_mapping: &HashMap<String, String>) 
                 read_cell_by_header(row.cells.as_slice(), sheet, manager_phone_header.as_deref());
             lease.notes = read_cell_by_header(row.cells.as_slice(), sheet, notes_header.as_deref());
 
-            let expiration_cell = read_raw_cell_by_header(row.cells.as_slice(), sheet, expiration_header.as_deref());
+            let expiration_cell =
+                read_raw_cell_by_header(row.cells.as_slice(), sheet, expiration_header.as_deref());
             lease.expiration_date = expiration_cell.and_then(parse_datetime_from_cell);
 
             let days_cell = read_raw_cell_by_header(
@@ -155,7 +172,11 @@ fn read_cell_by_header(cells: &[Cell], sheet: &Sheet, header: Option<&str>) -> S
         .unwrap_or_default()
 }
 
-fn read_raw_cell_by_header<'a>(cells: &'a [Cell], sheet: &Sheet, header: Option<&str>) -> Option<&'a Cell> {
+fn read_raw_cell_by_header<'a>(
+    cells: &'a [Cell],
+    sheet: &Sheet,
+    header: Option<&str>,
+) -> Option<&'a Cell> {
     let header = header?;
     let target = normalize_key(header);
     let index = sheet
