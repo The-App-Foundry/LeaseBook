@@ -382,8 +382,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "storybook_stories_ui_badge_stories",
-      "community": 12,
-      "community_name": "Button Component",
+      "community": 128,
+      "community_name": "Badge.stories.tsx",
       "norm_label": "badge.stories.tsx"
     },
     {
@@ -393,8 +393,8 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "storybook_stories_ui_badge_stories_story",
-      "community": 12,
-      "community_name": "Button Component",
+      "community": 128,
+      "community_name": "Badge.stories.tsx",
       "norm_label": "story"
     },
     {
@@ -404,8 +404,8 @@
       "source_location": "L24",
       "_origin": "ast",
       "id": "storybook_stories_ui_badge_stories_emerald",
-      "community": 12,
-      "community_name": "Button Component",
+      "community": 128,
+      "community_name": "Badge.stories.tsx",
       "norm_label": "emerald"
     },
     {
@@ -415,8 +415,8 @@
       "source_location": "L31",
       "_origin": "ast",
       "id": "storybook_stories_ui_badge_stories_gray",
-      "community": 12,
-      "community_name": "Button Component",
+      "community": 128,
+      "community_name": "Badge.stories.tsx",
       "norm_label": "gray"
     },
     {
@@ -426,8 +426,8 @@
       "source_location": "L38",
       "_origin": "ast",
       "id": "storybook_stories_ui_badge_stories_transparent",
-      "community": 12,
-      "community_name": "Button Component",
+      "community": 128,
+      "community_name": "Badge.stories.tsx",
       "norm_label": "transparent"
     },
     {
@@ -437,8 +437,8 @@
       "source_location": "L45",
       "_origin": "ast",
       "id": "storybook_stories_ui_badge_stories_withnumber",
-      "community": 12,
-      "community_name": "Button Component",
+      "community": 128,
+      "community_name": "Badge.stories.tsx",
       "norm_label": "withnumber"
     },
     {
@@ -448,8 +448,8 @@
       "source_location": "L52",
       "_origin": "ast",
       "id": "storybook_stories_ui_badge_stories_qualifiedbadge",
-      "community": 12,
-      "community_name": "Button Component",
+      "community": 128,
+      "community_name": "Badge.stories.tsx",
       "norm_label": "qualifiedbadge"
     },
     {
@@ -459,8 +459,8 @@
       "source_location": "L66",
       "_origin": "ast",
       "id": "storybook_stories_ui_badge_stories_prospectbadge",
-      "community": 12,
-      "community_name": "Button Component",
+      "community": 128,
+      "community_name": "Badge.stories.tsx",
       "norm_label": "prospectbadge"
     },
     {
@@ -470,8 +470,8 @@
       "source_location": "L80",
       "_origin": "ast",
       "id": "storybook_stories_ui_badge_stories_allvariants",
-      "community": 12,
-      "community_name": "Button Component",
+      "community": 128,
+      "community_name": "Badge.stories.tsx",
       "norm_label": "allvariants"
     },
     {
@@ -679,8 +679,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "storybook_stories_ui_dropdown_stories",
-      "community": 12,
-      "community_name": "Button Component",
+      "community": 132,
+      "community_name": "Dropdown.stories.tsx",
       "norm_label": "dropdown.stories.tsx"
     },
     {
@@ -690,8 +690,8 @@
       "source_location": "L30",
       "_origin": "ast",
       "id": "storybook_stories_ui_dropdown_stories_story",
-      "community": 12,
-      "community_name": "Button Component",
+      "community": 132,
+      "community_name": "Dropdown.stories.tsx",
       "norm_label": "story"
     },
     {
@@ -701,8 +701,8 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "storybook_stories_ui_dropdown_stories_default",
-      "community": 12,
-      "community_name": "Button Component",
+      "community": 132,
+      "community_name": "Dropdown.stories.tsx",
       "norm_label": "default"
     },
     {
@@ -712,8 +712,8 @@
       "source_location": "L39",
       "_origin": "ast",
       "id": "storybook_stories_ui_dropdown_stories_withicons",
-      "community": 12,
-      "community_name": "Button Component",
+      "community": 132,
+      "community_name": "Dropdown.stories.tsx",
       "norm_label": "withicons"
     },
     {
@@ -723,8 +723,8 @@
       "source_location": "L50",
       "_origin": "ast",
       "id": "storybook_stories_ui_dropdown_stories_sortbydropdown",
-      "community": 12,
-      "community_name": "Button Component",
+      "community": 132,
+      "community_name": "Dropdown.stories.tsx",
       "norm_label": "sortbydropdown"
     },
     {
@@ -734,8 +734,8 @@
       "source_location": "L64",
       "_origin": "ast",
       "id": "storybook_stories_ui_dropdown_stories_manyitems",
-      "community": 12,
-      "community_name": "Button Component",
+      "community": 132,
+      "community_name": "Dropdown.stories.tsx",
       "norm_label": "manyitems"
     },
     {
@@ -745,8 +745,8 @@
       "source_location": "L89",
       "_origin": "ast",
       "id": "storybook_stories_ui_dropdown_stories_withinteractiontest",
-      "community": 12,
-      "community_name": "Button Component",
+      "community": 132,
+      "community_name": "Dropdown.stories.tsx",
       "norm_label": "withinteractiontest"
     },
     {
@@ -833,8 +833,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "storybook_stories_ui_sort_stories",
-      "community": 12,
-      "community_name": "Button Component",
+      "community": 127,
+      "community_name": "Sort.tsx",
       "norm_label": "sort.stories.tsx"
     },
     {
@@ -844,8 +844,8 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "storybook_stories_ui_sort_stories_story",
-      "community": 12,
-      "community_name": "Button Component",
+      "community": 127,
+      "community_name": "Sort.tsx",
       "norm_label": "story"
     },
     {
@@ -855,8 +855,8 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "storybook_stories_ui_sort_stories_default",
-      "community": 12,
-      "community_name": "Button Component",
+      "community": 127,
+      "community_name": "Sort.tsx",
       "norm_label": "default"
     },
     {
@@ -866,8 +866,8 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "storybook_stories_ui_sort_stories_withinteractiontest",
-      "community": 12,
-      "community_name": "Button Component",
+      "community": 127,
+      "community_name": "Sort.tsx",
       "norm_label": "withinteractiontest"
     },
     {
@@ -877,8 +877,8 @@
       "source_location": "L58",
       "_origin": "ast",
       "id": "storybook_stories_ui_sort_stories_incontext",
-      "community": 12,
-      "community_name": "Button Component",
+      "community": 127,
+      "community_name": "Sort.tsx",
       "norm_label": "incontext"
     },
     {
@@ -5525,7 +5525,7 @@
       "label": "ParserError",
       "file_type": "code",
       "source_file": "src-tauri/src/parser.rs",
-      "source_location": "L15",
+      "source_location": "L9",
       "_origin": "ast",
       "id": "src_tauri_src_parser_parsererror",
       "community": 8,
@@ -5569,7 +5569,7 @@
       "label": ".fmt()",
       "file_type": "code",
       "source_file": "src-tauri/src/parser.rs",
-      "source_location": "L25",
+      "source_location": "L18",
       "_origin": "ast",
       "id": "src_tauri_src_parser_parsererror_fmt",
       "community": 8,
@@ -5602,7 +5602,7 @@
       "label": "parse_spreadsheet_from_path()",
       "file_type": "code",
       "source_file": "src-tauri/src/parser.rs",
-      "source_location": "L38",
+      "source_location": "L30",
       "_origin": "ast",
       "id": "src_tauri_src_parser_parse_spreadsheet_from_path",
       "community": 8,
@@ -5635,7 +5635,7 @@
       "label": "parse_workbook()",
       "file_type": "code",
       "source_file": "src-tauri/src/parser.rs",
-      "source_location": "L53",
+      "source_location": "L35",
       "_origin": "ast",
       "id": "src_tauri_src_parser_parse_workbook",
       "community": 8,
@@ -5720,17 +5720,6 @@
       "norm_label": "convert_cell()"
     },
     {
-      "label": "sanitize_text()",
-      "file_type": "code",
-      "source_file": "src-tauri/src/parser.rs",
-      "source_location": "L197",
-      "_origin": "ast",
-      "id": "src_tauri_src_parser_sanitize_text",
-      "community": 8,
-      "community_name": "Spreadsheet Parser (calamine)",
-      "norm_label": "sanitize_text()"
-    },
-    {
       "label": "parser_tests.rs",
       "file_type": "code",
       "source_file": "src-tauri/src/parser_tests.rs",
@@ -5745,7 +5734,7 @@
       "label": "parses_complex_workbook_from_unknown_extension()",
       "file_type": "code",
       "source_file": "src-tauri/src/parser_tests.rs",
-      "source_location": "L15",
+      "source_location": "L12",
       "_origin": "ast",
       "id": "src_tauri_src_parser_tests_parses_complex_workbook_from_unknown_extension",
       "community": 8,
@@ -5773,39 +5762,6 @@
       "community": 8,
       "community_name": "Spreadsheet Parser (calamine)",
       "norm_label": "returns_open_workbook_error_for_missing_file()"
-    },
-    {
-      "label": "rejects_spreadsheets_larger_than_import_limit()",
-      "file_type": "code",
-      "source_file": "src-tauri/src/parser_tests.rs",
-      "source_location": "L79",
-      "_origin": "ast",
-      "id": "src_tauri_src_parser_tests_rejects_spreadsheets_larger_than_import_limit",
-      "community": 8,
-      "community_name": "Spreadsheet Parser (calamine)",
-      "norm_label": "rejects_spreadsheets_larger_than_import_limit()"
-    },
-    {
-      "label": "rejects_spreadsheets_with_too_many_data_rows()",
-      "file_type": "code",
-      "source_file": "src-tauri/src/parser_tests.rs",
-      "source_location": "L94",
-      "_origin": "ast",
-      "id": "src_tauri_src_parser_tests_rejects_spreadsheets_with_too_many_data_rows",
-      "community": 8,
-      "community_name": "Spreadsheet Parser (calamine)",
-      "norm_label": "rejects_spreadsheets_with_too_many_data_rows()"
-    },
-    {
-      "label": "sanitizes_imported_text_and_formula_like_values()",
-      "file_type": "code",
-      "source_file": "src-tauri/src/parser_tests.rs",
-      "source_location": "L126",
-      "_origin": "ast",
-      "id": "src_tauri_src_parser_tests_sanitizes_imported_text_and_formula_like_values",
-      "community": 8,
-      "community_name": "Spreadsheet Parser (calamine)",
-      "norm_label": "sanitizes_imported_text_and_formula_like_values()"
     },
     {
       "label": "prefers_top_text_header_over_late_dense_data_row()",
@@ -8267,8 +8223,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_components_ui_sort",
-      "community": 12,
-      "community_name": "Button Component",
+      "community": 127,
+      "community_name": "Sort.tsx",
       "norm_label": "sort.tsx"
     },
     {
@@ -8278,8 +8234,8 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "src_components_ui_sort_sortdirection",
-      "community": 12,
-      "community_name": "Button Component",
+      "community": 127,
+      "community_name": "Sort.tsx",
       "norm_label": "sortdirection"
     },
     {
@@ -8289,8 +8245,8 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "src_components_ui_sort_sortprops",
-      "community": 12,
-      "community_name": "Button Component",
+      "community": 127,
+      "community_name": "Sort.tsx",
       "norm_label": "sortprops"
     },
     {
@@ -8300,8 +8256,8 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "src_components_ui_sort_sort",
-      "community": 12,
-      "community_name": "Button Component",
+      "community": 127,
+      "community_name": "Sort.tsx",
       "norm_label": "sort()"
     },
     {
@@ -21754,7 +21710,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src-tauri/src/parser.rs",
-      "source_location": "L38",
+      "source_location": "L30",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_tauri_src_parser",
@@ -21765,7 +21721,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "src-tauri/src/parser.rs",
-      "source_location": "L53",
+      "source_location": "L35",
       "weight": 1.0,
       "_origin": "ast",
       "context": "generic_arg",
@@ -21777,7 +21733,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src-tauri/src/parser.rs",
-      "source_location": "L15",
+      "source_location": "L9",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_tauri_src_parser",
@@ -21794,17 +21750,6 @@
       "_origin": "ast",
       "source": "src_tauri_src_parser",
       "target": "src_tauri_src_parser_rs_path",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src-tauri/src/parser.rs",
-      "source_location": "L197",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "src_tauri_src_parser",
-      "target": "src_tauri_src_parser_sanitize_text",
       "confidence_score": 1.0
     },
     {
@@ -21835,31 +21780,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "src-tauri/src/parser.rs",
-      "source_location": "L167",
-      "weight": 1.0,
-      "context": "generic_arg",
-      "_origin": "ast",
-      "source": "src_tauri_src_parser_cell_to_header",
-      "target": "src_tauri_src_parser_parsererror",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "src-tauri/src/parser.rs",
-      "source_location": "L178",
-      "weight": 1.0,
-      "context": "generic_arg",
-      "_origin": "ast",
-      "source": "src_tauri_src_parser_convert_cell",
-      "target": "src_tauri_src_parser_parsererror",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "src-tauri/src/parser.rs",
-      "source_location": "L38",
+      "source_location": "L30",
       "weight": 1.0,
       "context": "generic_arg",
       "_origin": "ast",
@@ -21871,7 +21792,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "src-tauri/src/parser.rs",
-      "source_location": "L53",
+      "source_location": "L35",
       "weight": 1.0,
       "context": "generic_arg",
       "_origin": "ast",
@@ -21883,7 +21804,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "src-tauri/src/parser.rs",
-      "source_location": "L25",
+      "source_location": "L18",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_tauri_src_parser_parsererror",
@@ -21894,7 +21815,7 @@
       "relation": "implements",
       "confidence": "EXTRACTED",
       "source_file": "src-tauri/src/parser.rs",
-      "source_location": "L24",
+      "source_location": "L17",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_tauri_src_parser_parsererror",
@@ -21905,7 +21826,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "src-tauri/src/parser.rs",
-      "source_location": "L19",
+      "source_location": "L13",
       "weight": 1.0,
       "_origin": "ast",
       "context": "field",
@@ -21917,7 +21838,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "src-tauri/src/parser.rs",
-      "source_location": "L21",
+      "source_location": "L12",
       "weight": 1.0,
       "context": "field",
       "_origin": "ast",
@@ -21931,19 +21852,7 @@
       "source_file": "src-tauri/src/parser.rs",
       "source_location": "L121",
       "weight": 1.0,
-      "context": "generic_arg",
-      "_origin": "ast",
-      "source": "src_tauri_src_parser_sanitize_text",
-      "target": "src_tauri_src_parser_parsererror",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "src-tauri/src/parser.rs",
-      "source_location": "L167",
-      "weight": 1.0,
-      "context": "generic_arg",
+      "context": "return_type",
       "_origin": "ast",
       "source": "src_tauri_src_parser_cell_to_header",
       "target": "src_tauri_src_parser_rs_string",
@@ -21953,19 +21862,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "src-tauri/src/parser.rs",
-      "source_location": "L197",
-      "weight": 1.0,
-      "context": "generic_arg",
-      "_origin": "ast",
-      "source": "src_tauri_src_parser_sanitize_text",
-      "target": "src_tauri_src_parser_rs_string",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "src-tauri/src/parser.rs",
-      "source_location": "L25",
+      "source_location": "L18",
       "weight": 1.0,
       "context": "parameter_type",
       "_origin": "ast",
@@ -21977,7 +21874,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "src-tauri/src/parser.rs",
-      "source_location": "L25",
+      "source_location": "L18",
       "weight": 1.0,
       "context": "return_type",
       "_origin": "ast",
@@ -21989,31 +21886,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "src-tauri/src/parser.rs",
-      "source_location": "L167",
-      "weight": 1.0,
-      "context": "return_type",
-      "_origin": "ast",
-      "source": "src_tauri_src_parser_cell_to_header",
-      "target": "src_tauri_src_parser_rs_result",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "src-tauri/src/parser.rs",
-      "source_location": "L178",
-      "weight": 1.0,
-      "context": "return_type",
-      "_origin": "ast",
-      "source": "src_tauri_src_parser_convert_cell",
-      "target": "src_tauri_src_parser_rs_result",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "src-tauri/src/parser.rs",
-      "source_location": "L38",
+      "source_location": "L30",
       "weight": 1.0,
       "context": "return_type",
       "_origin": "ast",
@@ -22025,7 +21898,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "src-tauri/src/parser.rs",
-      "source_location": "L53",
+      "source_location": "L35",
       "weight": 1.0,
       "context": "return_type",
       "_origin": "ast",
@@ -22037,19 +21910,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "src-tauri/src/parser.rs",
-      "source_location": "L197",
-      "weight": 1.0,
-      "context": "return_type",
-      "_origin": "ast",
-      "source": "src_tauri_src_parser_sanitize_text",
-      "target": "src_tauri_src_parser_rs_result",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "src-tauri/src/parser.rs",
-      "source_location": "L38",
+      "source_location": "L30",
       "weight": 1.0,
       "context": "parameter_type",
       "_origin": "ast",
@@ -22062,7 +21923,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src-tauri/src/parser.rs",
-      "source_location": "L50",
+      "source_location": "L32",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_tauri_src_parser_parse_spreadsheet_from_path",
@@ -22073,7 +21934,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "src-tauri/src/parser.rs",
-      "source_location": "L38",
+      "source_location": "L30",
       "weight": 1.0,
       "context": "generic_arg",
       "_origin": "ast",
@@ -22085,7 +21946,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "src-tauri/src/parser.rs",
-      "source_location": "L38",
+      "source_location": "L30",
       "weight": 1.0,
       "context": "generic_arg",
       "_origin": "ast",
@@ -22099,7 +21960,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "src-tauri/src/parser_tests.rs",
-      "source_location": "L17",
+      "source_location": "L14",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_tauri_src_parser_tests_parses_complex_workbook_from_unknown_extension",
@@ -22126,30 +21987,6 @@
       "source_location": "L67",
       "weight": 1.0,
       "_origin": "ast",
-      "source": "src_tauri_src_parser_tests_rejects_spreadsheets_larger_than_import_limit",
-      "target": "src_tauri_src_parser_parse_spreadsheet_from_path"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "src-tauri/src/parser_tests.rs",
-      "source_location": "L116",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "src_tauri_src_parser_tests_rejects_spreadsheets_with_too_many_data_rows",
-      "target": "src_tauri_src_parser_parse_spreadsheet_from_path"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "src-tauri/src/parser_tests.rs",
-      "source_location": "L70",
-      "weight": 1.0,
-      "_origin": "ast",
       "source": "src_tauri_src_parser_tests_returns_open_workbook_error_for_missing_file",
       "target": "src_tauri_src_parser_parse_spreadsheet_from_path"
     },
@@ -22166,22 +22003,10 @@
       "target": "src_tauri_src_parser_parse_spreadsheet_from_path"
     },
     {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "src-tauri/src/parser_tests.rs",
-      "source_location": "L151",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "src_tauri_src_parser_tests_sanitizes_imported_text_and_formula_like_values",
-      "target": "src_tauri_src_parser_parse_spreadsheet_from_path"
-    },
-    {
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "src-tauri/src/parser.rs",
-      "source_location": "L53",
+      "source_location": "L35",
       "weight": 1.0,
       "context": "parameter_type",
       "_origin": "ast",
@@ -22202,22 +22027,10 @@
       "confidence_score": 1.0
     },
     {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "src-tauri/src/parser.rs",
-      "source_location": "L123",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "src_tauri_src_parser_parse_workbook",
-      "target": "src_tauri_src_parser_sanitize_text",
-      "confidence_score": 1.0
-    },
-    {
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "src-tauri/src/parser.rs",
-      "source_location": "L53",
+      "source_location": "L35",
       "weight": 1.0,
       "context": "generic_arg",
       "_origin": "ast",
@@ -22310,24 +22123,12 @@
       "confidence_score": 1.0
     },
     {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "src-tauri/src/parser.rs",
-      "source_location": "L181",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "src_tauri_src_parser_convert_cell",
-      "target": "src_tauri_src_parser_sanitize_text",
-      "confidence_score": 1.0
-    },
-    {
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "src-tauri/src/parser.rs",
       "source_location": "L132",
       "weight": 1.0,
-      "context": "generic_arg",
+      "context": "return_type",
       "_origin": "ast",
       "source": "src_tauri_src_parser_convert_cell",
       "target": "src_tauri_src_spreadsheet_cell",
@@ -22348,7 +22149,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src-tauri/src/parser_tests.rs",
-      "source_location": "L15",
+      "source_location": "L12",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_tauri_src_parser_tests",
@@ -22374,28 +22175,6 @@
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_tauri_src_parser_tests",
-      "target": "src_tauri_src_parser_tests_rejects_spreadsheets_larger_than_import_limit",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src-tauri/src/parser_tests.rs",
-      "source_location": "L94",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "src_tauri_src_parser_tests",
-      "target": "src_tauri_src_parser_tests_rejects_spreadsheets_with_too_many_data_rows",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src-tauri/src/parser_tests.rs",
-      "source_location": "L68",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "src_tauri_src_parser_tests",
       "target": "src_tauri_src_parser_tests_returns_open_workbook_error_for_missing_file",
       "confidence_score": 1.0
     },
@@ -22418,17 +22197,6 @@
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_tauri_src_parser_tests",
-      "target": "src_tauri_src_parser_tests_sanitizes_imported_text_and_formula_like_values",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src-tauri/src/parser_tests.rs",
-      "source_location": "L305",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "src_tauri_src_parser_tests",
       "target": "src_tauri_src_parser_tests_unique_temp_path",
       "confidence_score": 1.0
     },
@@ -22437,7 +22205,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src-tauri/src/parser_tests.rs",
-      "source_location": "L16",
+      "source_location": "L13",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_tauri_src_parser_tests_parses_complex_workbook_from_unknown_extension",
@@ -22474,42 +22242,6 @@
       "confidence": "EXTRACTED",
       "source_file": "src-tauri/src/parser_tests.rs",
       "source_location": "L114",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "src_tauri_src_parser_tests_rejects_spreadsheets_larger_than_import_limit",
-      "target": "src_tauri_src_parser_tests_unique_temp_path",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "src-tauri/src/parser_tests.rs",
-      "source_location": "L113",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "src_tauri_src_parser_tests_rejects_spreadsheets_with_too_many_data_rows",
-      "target": "src_tauri_src_parser_tests_unique_temp_path",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "src-tauri/src/parser_tests.rs",
-      "source_location": "L148",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "src_tauri_src_parser_tests_sanitizes_imported_text_and_formula_like_values",
-      "target": "src_tauri_src_parser_tests_unique_temp_path",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "src-tauri/src/parser_tests.rs",
-      "source_location": "L208",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_tauri_src_parser_tests_prefers_top_text_header_over_late_dense_data_row",
