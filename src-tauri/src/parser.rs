@@ -75,7 +75,9 @@ where
         let (height, width) = range.get_size();
         if width > MAX_IMPORT_COLUMNS {
             return Err(ParserError::InputLimit(format!(
-                "worksheet '{sheet_name}' has too many columns; maximum is {MAX_IMPORT_COLUMNS}"
+                "worksheet '{}' has too many columns; maximum is {MAX_IMPORT_COLUMNS}",
+                sanitize_text(&sheet_name, false)
+                    .unwrap_or_else(|_| "<invalid sheet name>".to_string())
             )));
         }
 
@@ -83,7 +85,9 @@ where
         let data_row_count = height.saturating_sub(header_row_index.saturating_add(1));
         if data_row_count > MAX_IMPORT_DATA_ROWS {
             return Err(ParserError::InputLimit(format!(
-                "worksheet '{sheet_name}' has too many data rows; maximum is {MAX_IMPORT_DATA_ROWS}"
+                "worksheet '{}' has too many data rows; maximum is {MAX_IMPORT_DATA_ROWS}",
+                sanitize_text(&sheet_name, false)
+                    .unwrap_or_else(|_| "<invalid sheet name>".to_string())
             )));
         }
 
