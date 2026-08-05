@@ -1,0 +1,149 @@
+/* Tabular lease view — see LeaseList.tsx */
+
+.lb-lease-list {
+  background: var(--lb-surface);
+  border: 1px solid var(--lb-border);
+  border-radius: 14px;
+  /* Clips the table's square corners to the container's radius. */
+  overflow: hidden;
+}
+
+.lb-lease-table {
+  width: 100%;
+  /*
+   * `table-layout: fixed` makes the percentage column widths authoritative,
+   * but it also means the table would squash instead of overflowing — the
+   * `.table-responsive` wrapper would then never scroll. `min-width` is what
+   * actually triggers horizontal scroll on narrow viewports.
+   */
+  min-width: 820px;
+  table-layout: fixed;
+  border-collapse: collapse;
+  margin: 0;
+}
+
+.lb-lease-table thead th {
+  background: #f9fafb;
+  padding: 13px 20px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #9aa1ac;
+  text-align: left;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--lb-border);
+}
+
+.lb-col-stage {
+  width: 13%;
+}
+.lb-col-company {
+  width: 30%;
+}
+.lb-col-expiration {
+  width: 15%;
+}
+.lb-col-status {
+  width: 15%;
+}
+.lb-col-manager {
+  width: 16%;
+}
+.lb-col-size {
+  width: 11%;
+}
+
+.lb-lease-table tbody td {
+  padding: 13px 20px;
+  font-size: 13px;
+  color: #12172a;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--lb-border);
+  /* Without this, `text-overflow: ellipsis` never engages inside a table cell. */
+  min-width: 0;
+  overflow: hidden;
+}
+
+.lb-lease-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.lb-lease-row {
+  cursor: pointer;
+}
+
+.lb-lease-row:hover td,
+.lb-lease-row:focus-visible td {
+  background: #f6f8fc;
+}
+
+.lb-lease-row:focus-visible {
+  outline: 2px solid #2f5fe0;
+  outline-offset: -2px;
+}
+
+/* --- Cells --- */
+
+.lb-stage-chip {
+  display: inline-block;
+  max-width: 100%;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lb-lease-company-name,
+.lb-lease-company-address,
+.lb-cell-manager,
+.lb-cell-expiration,
+.lb-cell-size {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.lb-lease-company-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #12172a;
+}
+
+.lb-lease-company-address {
+  font-size: 12px;
+  color: #9aa1ac;
+}
+
+.lb-cell-expiration {
+  font-weight: 600;
+}
+
+.lb-status-pill {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+.lb-status-text {
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.lb-cell-size {
+  color: #4b5563;
+}
+
+/* Empty state — reuses `.lb-grid-empty` from the card grid for identical
+   presentation; the cell only needs to stop imposing row padding. */
+.lb-lease-empty-cell {
+  padding: 0 !important;
+}

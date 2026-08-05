@@ -46,6 +46,7 @@ pub struct AuthManager {
     path: PathBuf,
     authenticated: Mutex<bool>,
     password_factor_verified: Mutex<bool>,
+    passkey_factor_verified: Mutex<bool>,
     webauthn: Webauthn,
     passkey_registration: Mutex<Option<PasskeyRegistration>>,
     passkey_authentication: Mutex<Option<PasskeyAuthentication>>,
@@ -58,6 +59,7 @@ impl AuthManager {
             path,
             authenticated: Mutex::new(authenticated),
             password_factor_verified: Mutex::new(false),
+            passkey_factor_verified: Mutex::new(false),
             webauthn: build_webauthn(),
             passkey_registration: Mutex::new(None),
             passkey_authentication: Mutex::new(None),
@@ -115,6 +117,12 @@ impl AuthManager {
         self.status()
     }
 
+    pub fn verify_password_factor(&self, password: &str) -> Result<AuthStatus, AppError> {
+        self.verify_password(password)?;
+        self.set_password_factor_verified(true)?;
+        self.status()
+    }
+
     pub fn start_passkey_registration(&self) -> Result<CreationChallengeResponse, AppError> {
         self.require_authenticated()?;
         let config = self.read_config()?.unwrap_or_default();
@@ -164,14 +172,28 @@ impl AuthManager {
     }
 
     pub fn disable_passkeys(&self) -> Result<AuthStatus, AppError> {
-        self.require_authenticated()?;
         let mut config = self.read_config()?.unwrap_or_default();
+        if config.has_passkey_factor() {
+            if config.password_hash.is_some() && !self.is_password_factor_verified()? {
+                return Err(AppError::validation(
+                    "Password is required before removing passkeys.",
+                ));
+            }
+            if !self.is_passkey_factor_verified()? {
+                return Err(AppError::validation(
+                    "Passkey is required before removing passkeys.",
+                ));
+            }
+        }
+
+        self.require_authenticated()?;
         config.passkeys.clear();
         #[cfg(test)]
         {
             config.test_passkey_enabled = false;
         }
         self.write_or_remove_config(&config)?;
+        self.set_passkey_factor_verified(false)?;
         self.status()
     }
 
@@ -269,12 +291,14 @@ impl AuthManager {
         }
 
         self.write_config(&config)?;
+        self.set_passkey_factor_verified(true)?;
         self.complete_authentication()?;
         self.status()
     }
 
     pub fn logout(&self) -> Result<AuthStatus, AppError> {
         self.set_password_factor_verified(false)?;
+        self.set_passkey_factor_verified(false)?;
         self.set_authenticated(!self.auth_enabled()?)?;
         self.status()
     }
@@ -284,6 +308,13 @@ impl AuthManager {
         let mut config = self.read_config()?.unwrap_or_default();
         config.test_passkey_enabled = true;
         self.write_config(&config)?;
+        self.status()
+    }
+
+    #[cfg(test)]
+    pub(crate) fn verify_test_passkey_factor(&self) -> Result<AuthStatus, AppError> {
+        self.set_passkey_factor_verified(true)?;
+        self.complete_authentication()?;
         self.status()
     }
 
@@ -362,8 +393,23 @@ impl AuthManager {
         Ok(())
     }
 
+    fn is_passkey_factor_verified(&self) -> Result<bool, AppError> {
+        self.passkey_factor_verified
+            .lock()
+            .map(|guard| *guard)
+            .map_err(|_| AppError::internal("auth factor lock was poisoned"))
+    }
+
+    fn set_passkey_factor_verified(&self, value: bool) -> Result<(), AppError> {
+        let mut guard = self
+            .passkey_factor_verified
+            .lock()
+            .map_err(|_| AppError::internal("auth factor lock was poisoned"))?;
+        *guard = value;
+        Ok(())
+    }
+
     fn complete_authentication(&self) -> Result<(), AppError> {
-        self.set_password_factor_verified(false)?;
         self.set_authenticated(true)
     }
 

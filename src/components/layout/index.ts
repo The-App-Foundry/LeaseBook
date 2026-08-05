@@ -6,3 +6,4 @@ export { default as GridContainer } from './GridContainer';
 export { default as WorkbookImportFlow } from './WorkbookImportFlow';
 export { default as PropertyForm } from './PropertyForm';
 export { default as TabBar } from './TabBar';
+export { default as LeaseList } from './LeaseList';

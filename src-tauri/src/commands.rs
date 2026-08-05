@@ -9,8 +9,8 @@ use crate::auth::{AuthManager, AuthStatus};
 use crate::db::operations::*;
 use crate::error::{AppError, CommandResult, ErrorResponse};
 use crate::models::{
-    Lease as DbLease, LeaseManager, UpdateLease, UpdateLeaseInput, UpdateManager,
-    UpdateManagerInput,
+    Lease as DbLease, LeaseManager, ManagerWithPrimary, Stage, UpdateLease, UpdateLeaseInput,
+    UpdateManager, UpdateManagerInput,
 };
 use crate::parser::parse_spreadsheet_from_path;
 use crate::passkey_browser;
@@ -55,6 +55,14 @@ pub fn disable_auth_password(
     current_password: String,
 ) -> CommandResult<AuthStatus> {
     auth.disable_password(&current_password).map_err(Into::into)
+}
+
+#[tauri::command]
+pub fn verify_auth_password(
+    auth: State<'_, AuthManager>,
+    password: String,
+) -> CommandResult<AuthStatus> {
+    auth.verify_password_factor(&password).map_err(Into::into)
 }
 
 #[tauri::command]
@@ -186,8 +194,15 @@ pub fn new_lease(
     expiration_date: Option<i32>,
     notes: Option<String>,
     size: Option<String>,
+    stage: Option<String>,
 ) -> CommandResult<DbLease> {
     let mut conn = pool.get().map_err(pool_error)?;
+
+    // Omitted stage means a brand-new lease at the top of the pipeline.
+    let stage = match stage.as_deref() {
+        Some(value) => parse_stage(value)?,
+        None => Stage::New,
+    };
 
     create_lease(
         &mut conn,
@@ -196,6 +211,7 @@ pub fn new_lease(
         expiration_date,
         notes.as_deref(),
         size.as_deref(),
+        stage,
     )
     .map_err(Into::into)
 }
@@ -229,7 +245,16 @@ pub fn leases(pool: State<'_, DbPool>) -> CommandResult<Vec<DbLease>> {
 pub struct LeaseWithManagers {
     #[serde(flatten)]
     pub lease: DbLease,
-    pub managers: Vec<LeaseManager>,
+    pub managers: Vec<ManagerWithPrimary>,
+}
+
+/// Parses a caller-supplied stage into the canonical lowercase enum value,
+/// rejecting anything outside the six-value set. This is the only enforcement
+/// point — `ALTER TABLE ADD COLUMN` cannot carry a `CHECK` constraint.
+fn parse_stage(value: &str) -> Result<Stage, ErrorResponse> {
+    value
+        .parse::<Stage>()
+        .map_err(|error| AppError::validation(error.to_string()).into())
 }
 
 #[tauri::command]
@@ -246,6 +271,37 @@ pub fn leases_with_managers(pool: State<'_, DbPool>) -> CommandResult<Vec<LeaseW
 pub struct PaginatedResponse {
     pub leases: Vec<LeaseWithManagers>,
     pub total_count: i64,
+}
+
+#[derive(Serialize)]
+pub struct StageCountsResponse {
+    pub total: i64,
+    pub new: i64,
+    pub contacted: i64,
+    pub qualified: i64,
+    pub negotiating: i64,
+    pub won: i64,
+    pub lost: i64,
+}
+
+/// Counts for every filter pill, decoupled from `leases_with_managers_paginated`
+/// so selecting a different stage pill never re-triggers this query.
+#[tauri::command]
+pub fn lease_stage_counts(
+    pool: State<'_, DbPool>,
+    search_query: Option<String>,
+) -> CommandResult<StageCountsResponse> {
+    let mut conn = pool.get().map_err(pool_error)?;
+    let counts = get_stage_counts(&mut conn, search_query.as_deref())?;
+    Ok(StageCountsResponse {
+        total: counts.total,
+        new: counts.new,
+        contacted: counts.contacted,
+        qualified: counts.qualified,
+        negotiating: counts.negotiating,
+        won: counts.won,
+        lost: counts.lost,
+    })
 }
 
 #[tauri::command]
@@ -295,7 +351,7 @@ pub fn manager(pool: State<'_, DbPool>, manager_id: i32) -> CommandResult<LeaseM
 }
 
 #[tauri::command]
-pub fn managers(pool: State<'_, DbPool>, lease_id: i32) -> CommandResult<Vec<LeaseManager>> {
+pub fn managers(pool: State<'_, DbPool>, lease_id: i32) -> CommandResult<Vec<ManagerWithPrimary>> {
     let mut conn = pool.get().map_err(pool_error)?;
 
     get_managers(&mut conn, lease_id).map_err(Into::into)
@@ -315,6 +371,14 @@ pub fn edit_lease(
     changes: UpdateLeaseInput,
 ) -> CommandResult<DbLease> {
     let mut conn = pool.get().map_err(pool_error)?;
+
+    // Validate the owned input up front, then hand the borrowed changeset the
+    // canonical `&'static str` so a display-cased value is normalized on write.
+    let stage = match changes.stage.as_deref() {
+        Some(value) => Some(parse_stage(value)?.as_str()),
+        None => None,
+    };
+
     let diesel_changes = UpdateLease {
         name: changes.name.as_deref(),
         address: changes.address.as_deref(),
@@ -323,8 +387,24 @@ pub fn edit_lease(
         notes: changes.notes.as_deref(),
         misc_data: changes.misc_data.as_deref(),
         last_modified: changes.last_modified.as_ref(),
+        stage,
     };
     update_lease(&mut conn, lease_id, diesel_changes).map_err(Into::into)
+}
+
+/// Promotes `manager_id` to primary decision maker for `lease_id`, demoting any
+/// previous primary. Errors if the pair is not linked.
+#[tauri::command]
+pub fn set_primary_manager(
+    pool: State<'_, DbPool>,
+    lease_id: i32,
+    manager_id: i32,
+) -> CommandResult<()> {
+    let mut conn = pool.get().map_err(pool_error)?;
+
+    crate::db::operations::set_primary_manager(&mut conn, lease_id, manager_id)?;
+
+    Ok(())
 }
 
 #[tauri::command]

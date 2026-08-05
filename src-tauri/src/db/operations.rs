@@ -1,7 +1,8 @@
 use diesel::prelude::*;
 
 use crate::models::{
-    Lease, LeaseManager, LeasesManagers, NewLease, NewManager, UpdateLease, UpdateManager,
+    Lease, LeaseManager, LeasesManagers, ManagerWithPrimary, NewLease, NewManager, Stage,
+    UpdateLease, UpdateManager,
 };
 
 fn current_unix_timestamp() -> i32 {
@@ -18,13 +19,11 @@ pub fn create_lease(
     expiration_date: Option<i32>,
     notes: Option<&str>,
     misc_data: Option<&str>,
+    stage: Stage,
 ) -> Result<Lease, diesel::result::Error> {
     use crate::schema::leases;
 
-    let now = std::time::SystemTime::now()
-        .duration_since(std::time::UNIX_EPOCH)
-        .unwrap_or_default()
-        .as_secs() as i32;
+    let now = current_unix_timestamp();
 
     let new_lease = NewLease {
         name,
@@ -33,6 +32,7 @@ pub fn create_lease(
         notes,
         misc_data,
         created_on: now,
+        stage: stage.as_str(),
     };
 
     diesel::insert_into(leases::table)
@@ -48,11 +48,10 @@ pub fn create_manager(
 ) -> Result<LeaseManager, diesel::result::Error> {
     use crate::schema::lease_managers;
     use crate::schema::leases_managers;
+    use diesel::dsl::exists;
+    use diesel::select;
 
-    let now = std::time::SystemTime::now()
-        .duration_since(std::time::UNIX_EPOCH)
-        .unwrap_or_default()
-        .as_secs() as i32;
+    let now = current_unix_timestamp();
 
     let new_mgr = NewManager {
         name,
@@ -73,7 +72,61 @@ pub fn create_manager(
         ))
         .execute(conn)?;
 
+    // Preserve the invariant the add_manager_primary backfill establishes: a
+    // lease that has any managers has exactly one primary. Without this the
+    // first manager attached to a lease would leave DECISION MAKER blank.
+    let has_primary: bool = select(exists(
+        leases_managers::table
+            .filter(leases_managers::lease_id.eq(lease_id))
+            .filter(leases_managers::is_primary.eq(1)),
+    ))
+    .get_result(conn)?;
+
+    if !has_primary {
+        diesel::update(
+            leases_managers::table
+                .filter(leases_managers::lease_id.eq(lease_id))
+                .filter(leases_managers::manager_id.eq(manager_id)),
+        )
+        .set(leases_managers::is_primary.eq(1))
+        .execute(conn)?;
+    }
+
     Ok(manager)
+}
+
+/// Marks `manager_id` as the primary decision maker for `lease_id`, clearing any
+/// previous primary for that lease first.
+///
+/// Both statements run in one transaction, so if the target pair does not exist
+/// the clear is rolled back and the lease keeps its previous primary. The
+/// `NotFound` surfaces to the frontend as a 404 via `From<DieselError>`.
+pub fn set_primary_manager(
+    conn: &mut SqliteConnection,
+    lease_id: i32,
+    manager_id: i32,
+) -> Result<(), diesel::result::Error> {
+    use crate::schema::leases_managers;
+
+    conn.transaction(|conn| {
+        diesel::update(leases_managers::table.filter(leases_managers::lease_id.eq(lease_id)))
+            .set(leases_managers::is_primary.eq(0))
+            .execute(conn)?;
+
+        let updated = diesel::update(
+            leases_managers::table
+                .filter(leases_managers::lease_id.eq(lease_id))
+                .filter(leases_managers::manager_id.eq(manager_id)),
+        )
+        .set(leases_managers::is_primary.eq(1))
+        .execute(conn)?;
+
+        if updated == 0 {
+            return Err(diesel::result::Error::NotFound);
+        }
+
+        Ok(())
+    })
 }
 
 pub fn get_leases(
@@ -100,30 +153,42 @@ pub fn get_lease(
     Ok(lease)
 }
 
+/// Managers for one lease, each carrying its join-row `is_primary` flag.
+///
+/// Shape must match the managers embedded in `get_paginated_leases_with_managers`
+/// — the frontend's `DbManager` type is shared between both call sites.
 pub fn get_managers(
     conn: &mut SqliteConnection,
     lease_id: i32,
-) -> Result<Vec<LeaseManager>, diesel::result::Error> {
+) -> Result<Vec<ManagerWithPrimary>, diesel::result::Error> {
     use crate::schema::lease_managers;
     use crate::schema::leases;
+    use crate::schema::leases_managers;
 
     let lease = leases::table
         .find(lease_id)
         .select(Lease::as_select())
         .get_result(conn)?;
 
-    let managers = LeasesManagers::belonging_to(&lease)
+    // Still one query: the flag is selected alongside the manager row.
+    let rows: Vec<(LeaseManager, i32)> = LeasesManagers::belonging_to(&lease)
         .inner_join(lease_managers::table)
-        .select(LeaseManager::as_select())
+        .select((LeaseManager::as_select(), leases_managers::is_primary))
         .get_results(conn)?;
 
-    Ok(managers)
+    Ok(rows
+        .into_iter()
+        .map(|(manager, is_primary)| ManagerWithPrimary {
+            manager,
+            is_primary,
+        })
+        .collect())
 }
 
 /// Returns all leases paired with their managers in a single call (avoids N+1 queries).
 pub fn get_all_leases_with_managers(
     conn: &mut SqliteConnection,
-) -> Result<Vec<(Lease, Vec<LeaseManager>)>, diesel::result::Error> {
+) -> Result<Vec<(Lease, Vec<ManagerWithPrimary>)>, diesel::result::Error> {
     use crate::schema::lease_managers;
 
     let all_leases = get_leases(conn)?;
@@ -151,9 +216,15 @@ pub fn get_all_leases_with_managers(
         .into_iter()
         .zip(junctions_grouped)
         .map(|(lease, junctions)| {
-            let managers: Vec<LeaseManager> = junctions
+            // `is_primary` comes off the junction row, not the manager row.
+            let managers: Vec<ManagerWithPrimary> = junctions
                 .iter()
-                .filter_map(|j| mgr_map.get(&j.manager_id).map(|m| (*m).clone()))
+                .filter_map(|j| {
+                    mgr_map.get(&j.manager_id).map(|m| ManagerWithPrimary {
+                        manager: (*m).clone(),
+                        is_primary: j.is_primary,
+                    })
+                })
                 .collect();
             (lease, managers)
         })
@@ -309,6 +380,82 @@ pub fn delete_manager(
     })
 }
 
+/// Per-stage lease counts, one field per filter pill.
+///
+/// Being a fixed-field struct rather than a map is what guarantees the wire
+/// contract's "all seven keys always present" rule: every field serializes
+/// whether or not the query returned a row for that stage.
+#[derive(Debug, Default, Clone, Copy)]
+pub struct StageCounts {
+    pub total: i64,
+    pub new: i64,
+    pub contacted: i64,
+    pub qualified: i64,
+    pub negotiating: i64,
+    pub won: i64,
+    pub lost: i64,
+}
+
+/// Returns lease counts for every filter pill in a single grouped query,
+/// independent of the currently selected stage — so switching the active pill
+/// never requires refetching the counts themselves (only the page's `stage`
+/// changes; `search_query` is still applied since it narrows the visible set).
+pub fn get_stage_counts(
+    conn: &mut SqliteConnection,
+    search_query: Option<&str>,
+) -> Result<StageCounts, diesel::result::Error> {
+    use crate::schema::leases;
+    use diesel::dsl::count_star;
+
+    let pattern = search_query
+        .map(str::trim)
+        .filter(|q| !q.is_empty())
+        .map(|q| format!("%{}%", q));
+
+    // A GROUP BY clause cannot be boxed in Diesel, so the optional search
+    // filter is branched rather than applied to a single boxed query.
+    let rows: Vec<(String, i64)> = match pattern {
+        Some(pattern) => leases::table
+            .filter(
+                leases::name
+                    .like(pattern.clone())
+                    .or(leases::address.like(pattern)),
+            )
+            .group_by(leases::stage)
+            .select((leases::stage, count_star()))
+            .load(conn)?,
+        None => leases::table
+            .group_by(leases::stage)
+            .select((leases::stage, count_star()))
+            .load(conn)?,
+    };
+
+    // GROUP BY only returns rows for stages that have data, so start from a
+    // zeroed struct and fill in what came back. Stages with no rows stay 0
+    // rather than going missing — FilterBar renders an empty `( )` otherwise.
+    let mut counts = StageCounts::default();
+
+    for (stage_value, count) in rows {
+        // `total` sums every row, including any value outside the enum, so the
+        // "All Properties" pill stays honest.
+        counts.total += count;
+
+        match stage_value.parse::<Stage>() {
+            Ok(Stage::New) => counts.new += count,
+            Ok(Stage::Contacted) => counts.contacted += count,
+            Ok(Stage::Qualified) => counts.qualified += count,
+            Ok(Stage::Negotiating) => counts.negotiating += count,
+            Ok(Stage::Won) => counts.won += count,
+            Ok(Stage::Lost) => counts.lost += count,
+            // No DB CHECK backs the column, so an unrecognized value is
+            // possible. Count it in `total` but drop it rather than erroring.
+            Err(_) => {}
+        }
+    }
+
+    Ok(counts)
+}
+
 /// Returns the total number of leases in the database.
 pub fn count_leases(
     conn: &mut SqliteConnection,
@@ -331,29 +478,13 @@ pub fn count_leases(
         }
     }
 
-    if let Some(stage_name) = stage {
-        let now = current_unix_timestamp();
-
-        match stage_name.trim().to_lowercase().as_str() {
-            "contacted" | "prospect" => {
-                query = query.filter(
-                    leases::expiration_date
-                        .is_not_null()
-                        .and(leases::expiration_date.lt(now)),
-                );
-            }
-            "qualified" => {
-                query = query.filter(
-                    leases::expiration_date
-                        .is_null()
-                        .or(leases::expiration_date.ge(now)),
-                );
-            }
-            "new" | "negotiating" | "won" | "lost" => {
-                query = query.filter(leases::id.eq(-1));
-            }
-            _ => {}
-        }
+    if let Some(raw) = stage.map(str::trim).filter(|s| !s.is_empty()) {
+        // An unparseable stage canonicalizes to a value no row can hold (the
+        // column is NOT NULL and only ever written from `Stage`), so a contract
+        // violation surfaces as an empty result set instead of silently
+        // returning every lease the way the old `_ => {}` arm did.
+        let canonical = raw.parse::<Stage>().map(Stage::as_str).unwrap_or("");
+        query = query.filter(leases::stage.eq(canonical));
     }
 
     query.select(count_star()).get_result(conn)
@@ -386,29 +517,11 @@ pub fn get_leases_paginated(
         }
     }
 
-    if let Some(stage_name) = stage {
-        let now = current_unix_timestamp();
-
-        match stage_name.trim().to_lowercase().as_str() {
-            "contacted" | "prospect" => {
-                query = query.filter(
-                    leases::expiration_date
-                        .is_not_null()
-                        .and(leases::expiration_date.lt(now)),
-                );
-            }
-            "qualified" => {
-                query = query.filter(
-                    leases::expiration_date
-                        .is_null()
-                        .or(leases::expiration_date.ge(now)),
-                );
-            }
-            "new" | "negotiating" | "won" | "lost" => {
-                query = query.filter(leases::id.eq(-1));
-            }
-            _ => {}
-        }
+    if let Some(raw) = stage.map(str::trim).filter(|s| !s.is_empty()) {
+        // See `count_leases`: unparseable stages match nothing rather than
+        // everything, keeping the two functions' totals in agreement.
+        let canonical = raw.parse::<Stage>().map(Stage::as_str).unwrap_or("");
+        query = query.filter(leases::stage.eq(canonical));
     }
 
     let is_descending = matches!(sort_direction, Some("desc"));
@@ -444,7 +557,7 @@ pub fn get_paginated_leases_with_managers(
     stage: Option<&str>,
     sort_by: Option<&str>,
     sort_direction: Option<&str>,
-) -> Result<(Vec<(Lease, Vec<LeaseManager>)>, i64), diesel::result::Error> {
+) -> Result<(Vec<(Lease, Vec<ManagerWithPrimary>)>, i64), diesel::result::Error> {
     use crate::schema::lease_managers;
 
     let total = count_leases(conn, search_query, stage)?;
@@ -482,9 +595,15 @@ pub fn get_paginated_leases_with_managers(
         .into_iter()
         .zip(junctions_grouped)
         .map(|(lease, junctions)| {
-            let managers: Vec<LeaseManager> = junctions
+            // `is_primary` comes off the junction row, not the manager row.
+            let managers: Vec<ManagerWithPrimary> = junctions
                 .iter()
-                .filter_map(|j| mgr_map.get(&j.manager_id).map(|m| (*m).clone()))
+                .filter_map(|j| {
+                    mgr_map.get(&j.manager_id).map(|m| ManagerWithPrimary {
+                        manager: (*m).clone(),
+                        is_primary: j.is_primary,
+                    })
+                })
                 .collect();
             (lease, managers)
         })
@@ -501,10 +620,7 @@ pub fn import_leases(
         leases
             .iter()
             .map(|lease| {
-                let now = std::time::SystemTime::now()
-                    .duration_since(std::time::UNIX_EPOCH)
-                    .unwrap_or_default()
-                    .as_secs() as i32;
+                let now = current_unix_timestamp();
 
                 let new_lease = NewLease {
                     name: &lease.name,
@@ -517,6 +633,10 @@ pub fn import_leases(
                         .filter(|s| !s.is_empty())
                         .map(|s| s.as_str()),
                     created_on: now,
+                    // Imports land at the top of the pipeline. `property::Lease`
+                    // carries no stage and the import command takes none, so
+                    // this is fixed rather than plumbed through the parser.
+                    stage: Stage::New.as_str(),
                 };
                 let db_lease = diesel::insert_into(crate::schema::leases::table)
                     .values(&new_lease)

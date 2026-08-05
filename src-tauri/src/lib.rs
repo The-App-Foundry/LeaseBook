@@ -77,6 +77,7 @@ pub fn run() {
             commands::create_auth_password,
             commands::change_auth_password,
             commands::disable_auth_password,
+            commands::verify_auth_password,
             commands::start_passkey_registration,
             commands::finish_passkey_registration,
             commands::browser_passkey_registration,
@@ -104,7 +105,9 @@ pub fn run() {
             commands::parse_spreadsheet_to_leases,
             commands::import_parsed_leases,
             commands::leases_with_managers,
-            commands::leases_with_managers_paginated
+            commands::leases_with_managers_paginated,
+            commands::lease_stage_counts,
+            commands::set_primary_manager
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

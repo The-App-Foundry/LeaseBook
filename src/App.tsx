@@ -41,7 +41,7 @@ interface AuthenticatedAppProps {
   onChangePassword: (currentPassword: string, newPassword: string) => Promise<void>;
   onDisablePassword: (currentPassword: string) => Promise<void>;
   onCreatePasskey: () => Promise<void>;
-  onDisablePasskeys: () => Promise<void>;
+  onDisablePasskeys: (currentPassword?: string) => Promise<void>;
   onLogout: () => Promise<void>;
 }
 
@@ -303,7 +303,7 @@ interface SettingsPageProps {
   onChangePassword: (currentPassword: string, newPassword: string) => Promise<void>;
   onDisablePassword: (currentPassword: string) => Promise<void>;
   onCreatePasskey: () => Promise<void>;
-  onDisablePasskeys: () => Promise<void>;
+  onDisablePasskeys: (currentPassword?: string) => Promise<void>;
 }
 
 const SettingsPage = ({
@@ -317,6 +317,7 @@ const SettingsPage = ({
   const [showCreatePassword, setShowCreatePassword] = useState(false);
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [showDisablePassword, setShowDisablePassword] = useState(false);
+  const [showDisablePasskeys, setShowDisablePasskeys] = useState(false);
   const [passkeySubmitting, setPasskeySubmitting] = useState(false);
   const [passkeyError, setPasskeyError] = useState<string | null>(null);
 
@@ -358,18 +359,29 @@ const SettingsPage = ({
     }
   }, [onCreatePasskey]);
 
-  const handleDisablePasskeys = useCallback(async () => {
+  const handleDisablePasskeys = useCallback(async (currentPassword?: string) => {
     setPasskeySubmitting(true);
     setPasskeyError(null);
 
     try {
-      await onDisablePasskeys();
+      await onDisablePasskeys(currentPassword);
+      setShowDisablePasskeys(false);
     } catch (err) {
       setPasskeyError(getErrorMessage(err, 'Unable to remove passkeys. Please try again.'));
     } finally {
       setPasskeySubmitting(false);
     }
   }, [onDisablePasskeys]);
+
+  const handleRemovePasskeysClick = useCallback(() => {
+    setPasskeyError(null);
+    if (authStatus.password_enabled) {
+      setShowDisablePasskeys(value => !value);
+      return;
+    }
+
+    void handleDisablePasskeys();
+  }, [authStatus.password_enabled, handleDisablePasskeys]);
 
   const authSummary =
     authStatus.password_enabled || authStatus.passkey_enabled
@@ -446,12 +458,19 @@ const SettingsPage = ({
         <div className="lb-auth-method-list">
           <button
             type="button"
-            onClick={authStatus.passkey_enabled ? handleDisablePasskeys : handleCreatePasskey}
+            onClick={authStatus.passkey_enabled ? handleRemovePasskeysClick : handleCreatePasskey}
             disabled={passkeySubmitting}
           >
             {authStatus.passkey_enabled ? 'Remove passkeys' : 'Create passkey'}
           </button>
         </div>
+        {authStatus.passkey_enabled && authStatus.password_enabled && showDisablePasskeys && (
+          <PasswordForm
+            submitLabel="Continue"
+            onSubmit={handleDisablePasskeys}
+            autoComplete="current-password"
+          />
+        )}
         {!authStatus.passkey_enabled && (
           <div className="lb-auth-note">A browser tab will open to finish setup.</div>
         )}
@@ -673,10 +692,21 @@ const App = () => {
     setAuthStatus(nextStatus);
   }, []);
 
-  const handleDisablePasskeys = useCallback(async () => {
-    const nextStatus = await invoke<AuthStatus>('disable_auth_passkeys');
-    setAuthStatus(nextStatus);
-  }, []);
+  const handleDisablePasskeys = useCallback(
+    async (currentPassword?: string) => {
+      if (authStatus?.password_enabled) {
+        if (currentPassword === undefined) {
+          throw new Error('Password is required before removing passkeys.');
+        }
+        await invoke<AuthStatus>('verify_auth_password', { password: currentPassword });
+      }
+
+      await invoke<AuthStatus>('browser_passkey_login');
+      const nextStatus = await invoke<AuthStatus>('disable_auth_passkeys');
+      setAuthStatus(nextStatus);
+    },
+    [authStatus?.password_enabled],
+  );
 
   const handleLogin = useCallback(async (password: string) => {
     const nextStatus = await invoke<AuthStatus>('auth_login', { password });

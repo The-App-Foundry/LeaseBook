@@ -22,14 +22,12 @@
   },
   "include": [
     "src",
-    ".storybook",
-    ".storybook/stories/layout/FilterBar.stories.tsx",
-    ".storybook/stories/ui/Badge.stories.tsx",
-    ".storybook/stories/ui/Button.stories.tsx",
-    ".storybook/stories/ui/Card.stories.tsx",
-    ".storybook/stories/ui/Dropdown.stories.tsx",
-    ".storybook/stories/ui/SearchBar.stories.tsx",
-    ".storybook/stories/ui/Sort.stories.tsx"
+    // TypeScript's wildcard expansion skips dot-prefixed directories, so a bare
+    // ".storybook" entry silently contributes ZERO files — which is why the
+    // story paths below used to be enumerated by hand, and why stories missing
+    // from that list escaped typechecking entirely. Glob explicitly instead.
+    ".storybook/**/*.ts",
+    ".storybook/**/*.tsx"
   ],
   "exclude": ["graphify-out"],
   "references": [{ "path": "./tsconfig.node.json" }]

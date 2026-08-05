@@ -117,15 +117,9 @@ diesel migration run   # also regenerates schema.rs
 2. **Production**: `pnpm build` runs TypeScript compilation + Vite build, then Tauri bundles the app
 3. **Vite Config**: Uses `@vitejs/plugin-react`, configured to ignore `src-tauri/` in watch mode
 
-## Theme Configuration
+## Theming
 
-The theme object (`src/styles/theme.ts`) provides:
-
-- **Colors**: primary, background, text, surface, muted, border, success, danger, focus
-- **Typography**: System font stacks for body and mono
-- **Radii**: sm (6px), md (8px), lg (12px)
-
-TypeScript autocomplete is enabled via `src/styles/styled.d.ts` which extends the `DefaultTheme` interface.
+There is no `src/styles/` directory and no styled-components — both were removed in the April 2026 Bootstrap migration. Theming is CSS custom properties declared at the top of `src/App.css` (`--lb-surface`, `--lb-border`, `--lb-radius-md`, `--app-header-height`, …). Use those variables rather than hardcoded hex.
 
 ## Code Style
 
@@ -139,8 +133,19 @@ TypeScript autocomplete is enabled via `src/styles/styled.d.ts` which extends th
 
 ## Important Notes
 
-- Main branch is `base` (use this for PRs)
-- All UI components should use the theme system rather than hardcoded colors
-- Use transient props (`$prop`) in styled-components to avoid React DOM warnings
-- Timestamps in the DB are Unix epoch seconds stored as `i32`; the frontend converts them with `unixToIso` in `App.tsx`
-- `Lease.status` is derived client-side from `expiration_date` — expired → `'prospect'`, active → `'qualified'`; there is no status column in the DB
+- Main branch is `main` (use this for PRs) — `origin/HEAD` points at it
+- All UI components should use the `--lb-*` CSS custom properties from `src/App.css` rather than hardcoded colors
+- The transient-prop convention (`$prop`) is still live on the plain React components that kept it (`Card.$width`, `Button.$variant`) — it is no longer a styled-components mechanism, just a naming convention
+- Timestamps in the DB are Unix epoch seconds stored as `i32`; the frontend converts them with `unixToIso`, exported from `src/context/FilterGridContext.tsx`
+- `Lease.stage` is a real DB column (`leases.stage`, TEXT, lowercase: `new`/`contacted`/`qualified`/`negotiating`/`won`/`lost`). Lowercase is canonical everywhere — DB, Rust serde, TS type, wire payloads; display-casing happens only at render time
+- `Lease.status` (`'qualified' | 'prospect'`) is a legacy client-side derivation from `expiration_date` with no DB column. It is retained for import branching only — **do not render it**, render `stage` instead, or the UI shows two contradictory badges
+
+## graphify
+
+This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.
+
+Rules:
+- For codebase questions, first run `graphify query "<question>"` when graphify-out/graph.json exists. Use `graphify path "<A>" "<B>"` for relationships and `graphify explain "<concept>"` for focused concepts. These return a scoped subgraph, usually much smaller than GRAPH_REPORT.md or raw grep output.
+- If graphify-out/wiki/index.md exists, use it for broad navigation instead of raw source browsing.
+- Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context.
+- After modifying code, run `graphify update .` to keep the graph current (AST-only, no API cost).
