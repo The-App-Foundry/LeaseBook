@@ -65,7 +65,16 @@ export const detectManagers = (raw: string): DetectionResult => {
   const managers: Manager[] = entries.map(entry => {
     const { name, phone, email } = parseEntry(entry);
     const verified = name.length > 0;
-    return { id: uid(), name: name || entry.trim(), phoneNumbers: phone ? [phone] : [], email, verified };
+    // isPrimary is a property of the leases_managers join row, which does not
+    // exist yet at detection time — the backend's backfill/insert decides it.
+    return {
+      id: uid(),
+      name: name || entry.trim(),
+      phoneNumbers: phone ? [phone] : [],
+      email,
+      verified,
+      isPrimary: false,
+    };
   });
 
   const allVerified = managers.length > 0 && managers.every(m => m.verified);

@@ -1,6 +1,7 @@
 import { useRef, memo, useCallback, useContext } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Property from './Property';
+import LeaseList from './LeaseList';
 import { Manager } from '../../types/lease';
 import { FilterGridContext } from '../../context';
 import { Button } from '../ui';
@@ -43,8 +44,9 @@ const GridContainer = ({
     totalCount, 
     totalPages, 
     setPage, 
-    setPageSize, 
-    updateLeaseManagers 
+    setPageSize,
+    updateLeaseManagers,
+    viewMode,
   } = useContext(FilterGridContext);
 
   // Stable references updated on every render
@@ -68,6 +70,14 @@ const GridContainer = ({
 
   return (
     <div className="lb-grid-outer">
+      {/*
+        Only the rows swap on `viewMode` — the pagination bar and the
+        "Create New Lease" footer below stay shared. Rendering `LeaseList` as
+        a sibling of `GridContainer` instead would duplicate or lose them.
+      */}
+      {viewMode === 'list' ? (
+        <LeaseList onPropertyClick={onPropertyClick} />
+      ) : (
       <div className="lb-property-grid">
         {leases.length === 0 && (
           <div className="lb-grid-empty" role="status">
@@ -93,6 +103,7 @@ const GridContainer = ({
           return <Property key={lease.id} data={lease} onManagersChange={callback} onClick={() => onPropertyClick?.(lease.id)} onEdit={() => onPropertyEdit?.(lease.id)} onDelete={() => onPropertyDelete?.(lease.id)} />;
         })}
       </div>
+      )}
 
       {/* Pagination bar */}
       {totalCount > 0 && (

@@ -4,6 +4,30 @@ test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => {
     let leases = [];
     let nextId = 1;
+
+    // `leases.stage` is a real, NOT NULL column. Lowercase is canonical on the
+    // wire — the frontend runs it through `parseStage`, and a missing or
+    // TitleCase value would silently collapse to 'new'.
+    const DEFAULT_STAGE = 'new';
+
+    // Mirrors the `StageCounts` struct the Rust command returns. The context
+    // fetches this independently of the paginated query on every search change,
+    // and `FilterBar` reads `stageCounts.total` unguarded — returning null here
+    // crashes the page before any assertion runs.
+    const stageCounts = () => {
+      const counts = {
+        total: leases.length,
+        new: 0,
+        contacted: 0,
+        qualified: 0,
+        negotiating: 0,
+        won: 0,
+        lost: 0,
+      };
+      for (const lease of leases) counts[lease.stage] += 1;
+      return counts;
+    };
+
     window.__TAURI_INTERNALS__ = window.__TAURI_INTERNALS__ || {};
     window.__TAURI_INTERNALS__.invoke = async (cmd: string, args: any) => {
       if (cmd === 'auth_status') {
@@ -12,6 +36,10 @@ test.beforeEach(async ({ page }) => {
           passkey_enabled: false,
           authenticated: true,
         };
+      }
+
+      if (cmd === 'lease_stage_counts') {
+        return stageCounts();
       }
 
       if (cmd === 'leases_with_managers_paginated') {
@@ -30,6 +58,7 @@ test.beforeEach(async ({ page }) => {
           notes: null,
           misc_data: null,
           created_on: 1_700_000_000,
+          stage: DEFAULT_STAGE,
         };
         leases.push(lease);
         return lease;
@@ -37,6 +66,9 @@ test.beforeEach(async ({ page }) => {
       if (cmd === 'remove_lease') {
         leases = leases.filter(l => l.id !== args.leaseId);
         return 1;
+      }
+      if (cmd === 'managers') {
+        return [];
       }
       if (cmd.startsWith('plugin:dialog|')) {
         return true;

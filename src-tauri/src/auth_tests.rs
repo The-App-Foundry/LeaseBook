@@ -242,3 +242,59 @@ fn passkey_only_auth_prompts_for_passkey_first() {
 
     let _ = fs::remove_file(path);
 }
+
+#[test]
+fn disabling_passkeys_requires_password_then_passkey_when_password_is_enabled() {
+    let path = test_auth_path("disable-passkeys-mfa");
+    let manager = AuthManager::new(path.clone());
+    manager.create_password("correct password").unwrap();
+    manager.enable_test_passkey_factor().unwrap();
+
+    assert!(manager.disable_passkeys().is_err());
+    manager.verify_password_factor("correct password").unwrap();
+    assert!(manager.disable_passkeys().is_err());
+
+    assert_eq!(
+        manager.verify_test_passkey_factor().unwrap(),
+        AuthStatus {
+            password_enabled: true,
+            passkey_enabled: true,
+            authenticated: true,
+            next_factor: None,
+        }
+    );
+    assert_eq!(
+        manager.disable_passkeys().unwrap(),
+        AuthStatus {
+            password_enabled: true,
+            passkey_enabled: false,
+            authenticated: true,
+            next_factor: None,
+        }
+    );
+
+    let _ = fs::remove_file(path);
+}
+
+#[test]
+fn disabling_passkeys_requires_passkey_when_passkey_is_the_only_factor() {
+    let path = test_auth_path("disable-passkey-only");
+    let manager = AuthManager::new(path.clone());
+    manager.enable_test_passkey_factor().unwrap();
+
+    assert!(manager.disable_passkeys().is_err());
+
+    manager.verify_test_passkey_factor().unwrap();
+    assert_eq!(
+        manager.disable_passkeys().unwrap(),
+        AuthStatus {
+            password_enabled: false,
+            passkey_enabled: false,
+            authenticated: true,
+            next_factor: None,
+        }
+    );
+    assert!(!path.exists());
+
+    let _ = fs::remove_file(path);
+}

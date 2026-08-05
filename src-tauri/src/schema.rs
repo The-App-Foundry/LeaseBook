@@ -22,6 +22,7 @@ diesel::table! {
         misc_data -> Nullable<Text>,
         created_on -> Integer,
         last_modified -> Nullable<Integer>,
+        stage -> Text,
     }
 }
 
@@ -29,6 +30,7 @@ diesel::table! {
     leases_managers (manager_id, lease_id) {
         manager_id -> Integer,
         lease_id -> Integer,
+        is_primary -> Integer,
     }
 }
 
