@@ -416,4 +416,65 @@ describe('App auth flow', () => {
     await waitFor(() => expect(invoke).toHaveBeenCalledWith('browser_passkey_registration'));
     expect(await screen.findByText('Passkey enabled')).toBeInTheDocument();
   });
+
+  it('requires password and passkey confirmation before removing passkeys from Settings', async () => {
+    const user = userEvent.setup();
+
+    vi.mocked(invoke).mockImplementation(command => {
+      if (command === 'auth_status') {
+        return Promise.resolve({
+          password_enabled: true,
+          passkey_enabled: true,
+          authenticated: true,
+        });
+      }
+
+      if (command === 'auth_login') {
+        return Promise.resolve({
+          password_enabled: true,
+          passkey_enabled: true,
+          authenticated: false,
+          next_factor: 'passkey',
+        });
+      }
+
+      if (command === 'browser_passkey_login') {
+        return Promise.resolve({
+          password_enabled: true,
+          passkey_enabled: true,
+          authenticated: true,
+        });
+      }
+
+      if (command === 'disable_auth_passkeys') {
+        return Promise.resolve({
+          password_enabled: true,
+          passkey_enabled: false,
+          authenticated: true,
+        });
+      }
+
+      return Promise.resolve({
+        leases: [],
+        total_count: 0,
+      });
+    });
+
+    renderApp();
+
+    await user.click(await screen.findByRole('button', { name: /Settings/i }));
+    await user.click(screen.getByRole('button', { name: /Remove passkeys/i }));
+
+    expect(invoke).not.toHaveBeenCalledWith('disable_auth_passkeys');
+
+    await user.type(screen.getByLabelText('Password'), 'correct-password');
+    await user.click(screen.getByRole('button', { name: /Continue/i }));
+
+    await waitFor(() =>
+      expect(invoke).toHaveBeenCalledWith('verify_auth_password', { password: 'correct-password' }),
+    );
+    expect(invoke).toHaveBeenCalledWith('browser_passkey_login');
+    expect(invoke).toHaveBeenCalledWith('disable_auth_passkeys');
+    expect(await screen.findByText('Add a passkey with your browser.')).toBeInTheDocument();
+  });
 });

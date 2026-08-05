@@ -2,6 +2,8 @@ import React, { useState, useRef, useLayoutEffect, useMemo } from 'react';
 import { Pencil, Trash2 } from 'lucide-react';
 import { confirm } from '@tauri-apps/plugin-dialog';
 import { Lease, Manager } from '../../types/lease';
+import { getExpirationMeta } from '../../utils/leaseStatus';
+import { STAGE_COLORS, stageLabel } from '../../utils/stageColors';
 import './Property.css';
 interface PropertyProps {
   data: Lease;
@@ -120,7 +122,7 @@ function useClampedNote(
 
 const Property = ({ data, onClick, onEdit, onDelete }: Readonly<PropertyProps>) => {
   const {
-    status,
+    stage,
     name,
     businessAddr,
     leaseExpiration,
@@ -134,27 +136,11 @@ const Property = ({ data, onClick, onEdit, onDelete }: Readonly<PropertyProps>) 
   const plainNote = useMemo(() => note ? stripHtml(note) : undefined, [note]);
   const clampedNote = useClampedNote(plainNote, notesBoxRef);
 
-  const getStatusBadge = (s: string) => {
-    const v = s.toLowerCase();
-    if (v.includes('qualified')) return { text: 'QL', color: '#10b981', label: 'QUALIFIED' };
-    if (v.includes('prospect')) return { text: 'CN', color: '#3b82f6', label: 'CONTACTED' }; // fallback for prospect
-    if (v.includes('negotiating')) return { text: 'NG', color: '#f59e0b', label: 'NEGOTIATING' };
-    if (v.includes('won')) return { text: 'WN', color: '#10b981', label: 'WON' };
-    if (v.includes('lost')) return { text: 'LT', color: '#6b7280', label: 'LOST' };
-    if (v.includes('new')) return { text: 'NW', color: '#9ca3af', label: 'NEW' };
-    return { text: '??', color: '#6b7280', label: s.toUpperCase() };
-  };
-
-  const badgeInfo = getStatusBadge(status);
-  const isExpired = status === 'prospect'; // we keep this logic for now
-
-  // Calculate days remaining or status string for the expiration badge
-  let expirationBadgeText = isExpired ? 'EXPIRED' : '...';
-  let expirationBadgeBg = isExpired ? '#ef4444' : '#fff';
-  if (!isExpired) {
-    // Just a placeholder calculation based on the string for now
-    expirationBadgeText = 'ACTIVE';
-  }
+  // Stage avatar + label come straight from the shared stage map; the
+  // expiration badge comes from the shared RULESET so the card and the list
+  // view can never disagree.
+  const stageInfo = STAGE_COLORS[stage];
+  const expiration = useMemo(() => getExpirationMeta(data), [data]);
 
   // Determine verification status from managers array
   const allVerified = managers.length > 0 && managers.every(m => m.verified);
@@ -200,8 +186,8 @@ const Property = ({ data, onClick, onEdit, onDelete }: Readonly<PropertyProps>) 
         </button>
       )}
       <div className="lb-property-info-header">
-        <div className="lb-property-badge" style={{ background: badgeInfo.color }}>
-          {badgeInfo.text}
+        <div className="lb-property-badge" style={{ background: stageInfo.bg }}>
+          {stageInfo.abbr}
         </div>
         <div>
           <div className="lb-property-name">{name}</div>
@@ -210,20 +196,40 @@ const Property = ({ data, onClick, onEdit, onDelete }: Readonly<PropertyProps>) 
           </div>
         </div>
       </div>
+      {/* `.lb-property-badge-label` is text-transform:uppercase in CSS. */}
       <div className="lb-property-badge-label">
-        {badgeInfo.label}
+        {stageLabel(stage)}
       </div>
 
-      <div className="lb-property-expiration-row" style={{ background: isExpired ? expirationBadgeBg : 'rgb(244, 245, 247)', border: `1px solid ${isExpired ? '#F7C9C9' : 'rgb(225, 227, 232)'}` }}>
+      {/* Row chrome, tag and date colors all resolve from the shared RULESET,
+          so the card and the list view can never disagree about a lease. */}
+      <div
+        className="lb-property-expiration-row"
+        style={{
+          background: expiration.rowBg,
+          border: `1px solid ${expiration.rowBorder}`,
+        }}
+      >
         <div className="lb-property-expiration-info">
           <span className="lb-property-emoji">📅</span>
           <div>
-            <div className="lb-property-exp-label" style={{ color: isExpired ? '#fff' : 'rgb(107, 114, 128)' }}>Lease Expiration</div>
-            <div className="lb-property-exp-date" style={{ color: isExpired ? '#fff' : 'rgb(107, 114, 128)' }}>{leaseExpiration}</div>
+            <div className="lb-property-exp-label" style={{ color: 'rgb(107, 114, 128)' }}>
+              Lease Expiration
+            </div>
+            <div className="lb-property-exp-date" style={{ color: expiration.dateColor }}>
+              {leaseExpiration}
+            </div>
           </div>
         </div>
-        <div className="lb-property-exp-badge" style={{ background: isExpired ? '#D64545' : '#FFFFFF', color: isExpired ? '#FFFFFF' : '#0F7A55' }}>
-          {expirationBadgeText}
+        <div
+          className="lb-property-exp-badge"
+          style={{
+            background: expiration.isPill ? expiration.tagBg : 'transparent',
+            color: expiration.tagColor,
+            padding: expiration.isPill ? undefined : 0,
+          }}
+        >
+          {expiration.tag}
         </div>
       </div>
 

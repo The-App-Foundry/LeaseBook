@@ -1,21 +1,13 @@
 import { memo, useContext } from 'react';
 import { FilterGridContext } from '../../context';
 import type { SortOption } from '../../context/FilterGridContext';
-import { Sort } from '../ui';
+import type { Stage } from '../../types/lease';
+import { STAGE_COLORS, STAGE_ORDER, stageLabel } from '../../utils/stageColors';
+import { Sort, ViewToggle } from '../ui';
 import './FilterBar.css';
 
-const STAGE_COLORS: Record<string, { bg: string; abbr: string }> = {
-  New: { bg: '#94A3B8', abbr: 'NW' },
-  Contacted: { bg: '#3B82F6', abbr: 'CN' },
-  Qualified: { bg: '#10B981', abbr: 'QL' },
-  Negotiating: { bg: '#F59E0B', abbr: 'NG' },
-  Won: { bg: '#0D9488', abbr: 'WN' },
-  Lost: { bg: '#94A3B8', abbr: 'LT' },
-};
-
-const Dot = ({ stage }: { stage: string }) => {
+const Dot = ({ stage }: { stage: Stage }) => {
   const color = STAGE_COLORS[stage];
-  if (!color) return null;
   return (
     <span className="lb-filter-dot" style={{ background: color.bg }}>
       {color.abbr}
@@ -31,10 +23,8 @@ const FilterBar = () => {
     setSortOption,
     sortDirection,
     setSortDirection,
-    totalCount,
+    stageCounts,
   } = useContext(FilterGridContext);
-
-  const stages = Object.keys(STAGE_COLORS);
 
   return (
     <div className="lb-filter-outer">
@@ -47,20 +37,21 @@ const FilterBar = () => {
             className={`lb-filter-pill ${activeStage === null ? 'lb-filter-pill-active' : 'lb-filter-pill-inactive'}`}
             onClick={() => setActiveStage(null)}
           >
-            All Properties {activeStage === null && `( ${totalCount} )`}
+            All Properties ( {stageCounts.total} )
           </button>
 
-          {stages.map(stage => (
+          {STAGE_ORDER.map(stage => (
             <button
               key={stage}
               className={`lb-filter-pill ${activeStage === stage ? 'lb-filter-pill-active' : 'lb-filter-pill-inactive'}`}
               onClick={() => setActiveStage(stage)}
             >
-              <Dot stage={stage} /> {stage} {activeStage === stage && `( ${totalCount} )`}
+              <Dot stage={stage} /> {stageLabel(stage)} ( {stageCounts[stage]} )
             </button>
           ))}
         </div>
         <div className="lb-filter-spacer"></div>
+        <ViewToggle />
         <div className="lb-filter-sort-controls">
           <select
             className="lb-filter-select"

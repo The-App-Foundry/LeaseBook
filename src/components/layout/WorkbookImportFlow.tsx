@@ -115,12 +115,14 @@ const convertBackendLeasesToUi = (rows: BackendLease[]): Lease[] =>
     // If no managers were detected but backend had a name, create an unverified entry
     const finalManagers: Manager[] =
       managers.length === 0 && item.lease_manager?.name
-        ? [{ id: Date.now() + Math.floor(Math.random() * 1000), name: item.lease_manager.name, verified: false, phoneNumbers: [] }]
+        ? [{ id: Date.now() + Math.floor(Math.random() * 1000), name: item.lease_manager.name, verified: false, phoneNumbers: [], isPrimary: true }]
         : managers;
 
     return {
       id: 0,
       status: item.expired ? 'prospect' : 'qualified',
+      // Imported rows are always fresh leads.
+      stage: 'new',
       name: item.name || 'Unnamed',
       businessAddr: item.address || '-',
       leaseExpiration: item.expiration_date ? formatExpirationDate(item.expiration_date) : '-',
@@ -246,7 +248,10 @@ const WorkbookImportFlow = ({
         sheetName: selectedSheetName,
       });
 
-      // Persist all parsed leases to the database
+      // Persist all parsed leases to the database. Note the wire type here is
+      // `property::Lease` (the import-time intermediate), NOT `models::Lease` —
+      // it has no `stage` field. Rust seeds `stage: "new"` when it maps
+      // property::Lease -> NewLease, so nothing to send from this side.
       await invoke('import_parsed_leases', { leases: imported });
 
       onImported(convertBackendLeasesToUi(imported));

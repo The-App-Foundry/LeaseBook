@@ -1,7 +1,8 @@
 import { ChangeEvent, FC, ReactElement, useEffect, useRef, useState } from 'react';
 import { invoke } from '@tauri-apps/api/core';
-import type { Lease, Manager } from '../../types/lease';
+import type { Lease, Manager, Stage } from '../../types/lease';
 import { getErrorMessage } from '../../utils/errors';
+import { STAGE_ORDER, stageLabel } from '../../utils/stageColors';
 import './PropertyForm.css';
 
 interface PropertyFormProps {
@@ -24,8 +25,6 @@ interface FormErrors {
   name?: string;
   address?: string;
 }
-
-const STAGE_OPTIONS = ['New', 'Contacted', 'Qualified', 'Negotiating', 'Won', 'Lost'];
 
 const dateToUnixTimestamp = (dateStr: string): number | null => {
   const trimmed = dateStr.trim();
@@ -57,7 +56,7 @@ const unixTimestampToIso = (ts: number): string => {
   return `${year}-${month}-${day}`;
 };
 
-const dbLeaseToFrontend = (db: DbLease, managers: Manager[]): Lease => {
+const dbLeaseToFrontend = (db: DbLease, managers: Manager[], stage: Stage): Lease => {
   const expirationIso = db.expiration_date ? unixTimestampToIso(db.expiration_date) : '';
   let stat: 'qualified' | 'prospect';
   if (db.name && managers.length > 0 && db.address) {
@@ -68,6 +67,7 @@ const dbLeaseToFrontend = (db: DbLease, managers: Manager[]): Lease => {
   return {
     id: db.id,
     status: stat,
+    stage,
     name: db.name,
     businessAddr: db.address ?? undefined,
     leaseExpiration: expirationIso,
@@ -86,7 +86,7 @@ const dbLeaseToFrontend = (db: DbLease, managers: Manager[]): Lease => {
 const PropertyForm: FC<PropertyFormProps> = ({ initial, onClose, onCreated }): ReactElement => {
   const [name, setName] = useState<string>('');
   const [address, setAddress] = useState<string>('');
-  const [stage, setStage] = useState<string>('New');
+  const [stage, setStage] = useState<Stage>('new');
   const [size, setSize] = useState<string>('');
   const [decisionMaker, setDecisionMaker] = useState<string>('');
   const [expiration, setExpiration] = useState<string>('');
@@ -105,7 +105,7 @@ const PropertyForm: FC<PropertyFormProps> = ({ initial, onClose, onCreated }): R
     if (initial) {
       setName(initial.name);
       setAddress(initial.businessAddr ?? '');
-      setStage(initial.status === 'qualified' ? 'Qualified' : 'New'); // Map status appropriately
+      setStage(initial.stage);
       setSize(initial.size ?? '');
       setExpiration(initial.leaseExpiration ?? '');
       setNotes(initial.note ?? '');
@@ -157,6 +157,7 @@ const PropertyForm: FC<PropertyFormProps> = ({ initial, onClose, onCreated }): R
             size: size.trim() || null,
             expirationDate,
             notes: notes.trim() || null,
+            stage,
             lastModified: Date.now(),
           },
         });
@@ -186,6 +187,7 @@ const PropertyForm: FC<PropertyFormProps> = ({ initial, onClose, onCreated }): R
             email: decisionEmail.trim(),
             phoneNumbers: decisionPhone.trim() ? [decisionPhone.trim()] : [],
             verified: true,
+            isPrimary: true,
           }];
         }
       } else {
@@ -195,6 +197,9 @@ const PropertyForm: FC<PropertyFormProps> = ({ initial, onClose, onCreated }): R
           expirationDate,
           notes: notes.trim() || null,
           size: size.trim() || null,
+          // create_lease persists a required, lowercase stage. Defaults to
+          // 'new' unless the user picked otherwise in the form above.
+          stage,
         });
 
         if (decisionMaker.trim()) {
@@ -220,11 +225,12 @@ const PropertyForm: FC<PropertyFormProps> = ({ initial, onClose, onCreated }): R
             email: decisionEmail.trim(),
             phoneNumbers: decisionPhone.trim() ? [decisionPhone.trim()] : [],
             verified: true,
+            isPrimary: true,
           }];
         }
       }
 
-      const lease = dbLeaseToFrontend(dbLease, finalManagers);
+      const lease = dbLeaseToFrontend(dbLease, finalManagers, stage);
       onCreated(lease);
       onClose();
     } catch (err) {
@@ -284,10 +290,10 @@ const PropertyForm: FC<PropertyFormProps> = ({ initial, onClose, onCreated }): R
               id="f-stage"
               className="lb-form-input lb-form-select"
               value={stage}
-              onChange={e => setStage(e.target.value)}
+              onChange={e => setStage(e.target.value as Stage)}
             >
-              {STAGE_OPTIONS.map(opt => (
-                <option key={opt} value={opt}>{opt}</option>
+              {STAGE_ORDER.map(opt => (
+                <option key={opt} value={opt}>{stageLabel(opt)}</option>
               ))}
             </select>
           </div>

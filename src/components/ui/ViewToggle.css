@@ -1,0 +1,41 @@
+/* Segmented Cards/List switch — see ViewToggle.tsx */
+
+.lb-view-toggle {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px;
+  margin-right: 8px;
+  background: var(--lb-muted);
+  border-radius: var(--lb-radius-md);
+}
+
+.lb-view-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 30px;
+  padding: 0;
+  border: none;
+  border-radius: var(--lb-radius-sm);
+  cursor: pointer;
+  background: transparent;
+  color: color-mix(in srgb, var(--lb-text) 58%, var(--lb-surface));
+  box-shadow: none;
+}
+
+.lb-view-toggle-btn-active {
+  background: var(--lb-surface);
+  color: var(--lb-primary);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+.lb-view-toggle-btn:not(.lb-view-toggle-btn-active):hover {
+  color: var(--lb-text);
+}
+
+.lb-view-toggle-btn:focus-visible {
+  outline: 2px solid var(--lb-primary);
+  outline-offset: 1px;
+}

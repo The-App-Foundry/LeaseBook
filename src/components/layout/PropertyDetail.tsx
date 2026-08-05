@@ -9,8 +9,10 @@ import Underline from '@tiptap/extension-underline';
 import LinkExtension from '@tiptap/extension-link';
 import { Link2, Unlink } from 'lucide-react';
 import Modal from '../ui/Modal';
-import type { Lease, Manager } from '../../types/lease';
+import type { Lease, Manager, Stage } from '../../types/lease';
 import { getErrorMessage } from '../../utils/errors';
+import { getExpirationMeta } from '../../utils/leaseStatus';
+import { STAGE_COLORS, STAGE_ORDER, stageLabel } from '../../utils/stageColors';
 import './PropertyDetail.css';
 
 // ---------------------------------------------------------------------------
@@ -27,7 +29,7 @@ interface PropertyDetailProps {
 interface EditFields {
   name: string;
   address: string;
-  stage: string;
+  stage: Stage;
   leaseExpiration: string;
   propertySize: string;
   decisionMakerName: string;
@@ -49,26 +51,6 @@ interface DbLeaseResult {
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
-const STAGE_OPTIONS = ['New', 'Contacted', 'Qualified', 'Negotiating', 'Won', 'Lost'];
-
-const STAGE_COLORS: Record<string, { bg: string; abbr: string }> = {
-  New:         { bg: '#94A3B8', abbr: 'NW' },
-  Contacted:   { bg: '#3B82F6', abbr: 'CN' },
-  Qualified:   { bg: '#10B981', abbr: 'QL' },
-  Negotiating: { bg: '#F59E0B', abbr: 'NG' },
-  Won:         { bg: '#0D9488', abbr: 'WN' },
-  Lost:        { bg: '#94A3B8', abbr: 'LT' },
-};
-
-const getStageInfo = (status: string) => {
-  const v = status.toLowerCase();
-  if (v.includes('qualified')) return STAGE_COLORS['Qualified'];
-  if (v.includes('prospect') || v.includes('contact')) return STAGE_COLORS['Contacted'];
-  if (v.includes('negotiating')) return STAGE_COLORS['Negotiating'];
-  if (v.includes('won')) return STAGE_COLORS['Won'];
-  if (v.includes('lost')) return STAGE_COLORS['Lost'];
-  return STAGE_COLORS['New'];
-};
 
 // Detect if a string looks like plain text (no HTML tags) so we can render
 // it with white-space:pre-wrap instead of dangerouslySetInnerHTML.
@@ -180,10 +162,27 @@ const RtfToolbar = ({ editor, onLinkClick }: RtfToolbarProps) => {
 // Main Component
 // ---------------------------------------------------------------------------
 const PropertyDetail = ({ lease, onBack, onSaved, onDelete, initialEditMode }: Readonly<PropertyDetailProps>) => {
-  const { status, name, businessAddr, leaseExpiration, managers = [], size, note } = lease;
+  const { stage, name, businessAddr, leaseExpiration, size, note } = lease;
 
-  const stageInfo = getStageInfo(status);
-  const primaryManager = managers.length > 0 ? managers[0] : null;
+  const stageInfo = STAGE_COLORS[stage];
+
+  /**
+   * Locally-applied primary-contact flips, so the radio moves immediately.
+   * `onSaved` is NOT used for this: App's `handleLeaseSaved` navigates back to
+   * the grid when the detail was opened in edit mode, which would bounce the
+   * user out of the page just for picking a contact. The authoritative value
+   * is reconciled by the next `refresh()`.
+   */
+  const [localPrimaryId, setLocalPrimaryId] = useState<number | null>(null);
+
+  const managers: Manager[] =
+    localPrimaryId === null
+      ? (lease.managers ?? [])
+      : (lease.managers ?? []).map(m => ({ ...m, isPrimary: m.id === localPrimaryId }));
+
+  // `isPrimary` is authoritative; managers[0] is only a fallback for rows that
+  // predate the join-table flag.
+  const primaryManager = managers.find(m => m.isPrimary) ?? managers[0] ?? null;
 
   // ------------------------------------------------------------------
   // Edit state
@@ -194,7 +193,7 @@ const PropertyDetail = ({ lease, onBack, onSaved, onDelete, initialEditMode }: R
   const [editFields, setEditFields] = useState<EditFields>({
     name: '',
     address: '',
-    stage: 'Qualified',
+    stage: 'new',
     leaseExpiration: '',
     propertySize: '',
     decisionMakerName: '',
@@ -287,20 +286,11 @@ const PropertyDetail = ({ lease, onBack, onSaved, onDelete, initialEditMode }: R
   const startEdit = useCallback(() => {
     // Seed edit fields from current lease data
     const expIso = normaliseDate(leaseExpiration ?? '');
-    const stageLabel = (() => {
-      const v = status.toLowerCase();
-      if (v.includes('qualified')) return 'Qualified';
-      if (v.includes('prospect') || v.includes('contact')) return 'Contacted';
-      if (v.includes('negotiating')) return 'Negotiating';
-      if (v.includes('won')) return 'Won';
-      if (v.includes('lost')) return 'Lost';
-      return 'New';
-    })();
 
     setEditFields({
       name: name ?? '',
       address: businessAddr ?? '',
-      stage: stageLabel,
+      stage,
       leaseExpiration: expIso,
       propertySize: size ?? '',
       decisionMakerName: primaryManager?.name ?? lease.leaseManager ?? '',
@@ -320,7 +310,7 @@ const PropertyDetail = ({ lease, onBack, onSaved, onDelete, initialEditMode }: R
 
     setSaveError(null);
     setIsEditing(true);
-  }, [lease, name, businessAddr, status, leaseExpiration, size, primaryManager, note, editor]);
+  }, [lease, name, businessAddr, stage, leaseExpiration, size, primaryManager, note, editor]);
 
   const initializedRef = useRef(false);
   useEffect(() => {
@@ -372,6 +362,8 @@ const PropertyDetail = ({ lease, onBack, onSaved, onDelete, initialEditMode }: R
           expiration_date: expTs,
           notes: notesValue,
           misc_data: null,
+          // Lowercase canonical stage — see the list-view wire contract.
+          stage: editFields.stage,
           last_modified: nowSecs,
         },
       });
@@ -398,22 +390,22 @@ const PropertyDetail = ({ lease, onBack, onSaved, onDelete, initialEditMode }: R
       const updatedManagerName =
         editFields.decisionMakerName.trim() || (primaryManager?.name ?? lease.leaseManager ?? '');
 
+      // Replace the edited primary IN PLACE — collapsing to a single-element
+      // array would silently drop every other manager from the list.
       const updatedManagers: Manager[] = primaryManager
-        ? [
-            {
-              ...primaryManager,
-              name: editFields.decisionMakerName.trim() || primaryManager.name,
-              email: editFields.decisionEmail.trim() || undefined,
-              phoneNumbers: editFields.decisionPhone.trim()
-                ? [editFields.decisionPhone.trim()]
-                : primaryManager.phoneNumbers,
-            },
-          ]
+        ? managers.map(m =>
+            m.id === primaryManager.id
+              ? {
+                  ...m,
+                  name: editFields.decisionMakerName.trim() || m.name,
+                  email: editFields.decisionEmail.trim() || undefined,
+                  phoneNumbers: editFields.decisionPhone.trim()
+                    ? [editFields.decisionPhone.trim()]
+                    : m.phoneNumbers,
+                }
+              : m,
+          )
         : managers;
-
-      // Map DB stage field → UI status
-      const updatedStatus: 'qualified' | 'prospect' =
-        editFields.stage === 'Lost' ? 'prospect' : 'qualified';
 
       // Prefer the size string the user typed so "12,500 sq ft" is preserved;
       // fall back to the integer the DB echoes back.
@@ -429,7 +421,7 @@ const PropertyDetail = ({ lease, onBack, onSaved, onDelete, initialEditMode }: R
         leaseExpiration: updatedDbLease.expiration_date
           ? unixToIso(updatedDbLease.expiration_date)
           : editFields.leaseExpiration || '-',
-        status: updatedStatus,
+        stage: editFields.stage,
         leaseManager: updatedManagerName,
         managers: updatedManagers,
         note: notesValue ?? undefined,
@@ -453,16 +445,33 @@ const PropertyDetail = ({ lease, onBack, onSaved, onDelete, initialEditMode }: R
   );
 
   // ------------------------------------------------------------------
-  // Read-mode expiration banner
+  // Primary-manager selection
   // ------------------------------------------------------------------
-  const isExpired = status === 'prospect';
-  const expirationBadgeBg = isExpired ? '#FDECEC' : '#ECFDF5';
-  const expirationBadgeBorder = isExpired ? '#F7C9C9' : '#A7F3D0';
-  const expirationDateColor = isExpired ? '#C22B2B' : '#0F7A55';
-  const expirationLabelColor = isExpired ? '#C22B2B' : '#0F7A55';
-  const expirationTagBg = isExpired ? '#D64545' : '#FFFFFF';
-  const expirationTagColor = isExpired ? '#FFFFFF' : '#0F7A55';
-  const expirationBadgeText = isExpired ? 'EXPIRED' : 'ACTIVE';
+  const [settingPrimaryId, setSettingPrimaryId] = useState<number | null>(null);
+
+  const handleSetPrimary = useCallback(
+    async (managerId: number) => {
+      if (settingPrimaryId !== null) return;
+      setSettingPrimaryId(managerId);
+      setSaveError(null);
+      try {
+        await invoke('set_primary_manager', { leaseId: lease.id, managerId });
+        setLocalPrimaryId(managerId);
+      } catch (err) {
+        console.error('[PropertyDetail] set_primary_manager failed:', err);
+        setSaveError(getErrorMessage(err, 'Failed to set the primary contact.'));
+      } finally {
+        setSettingPrimaryId(null);
+      }
+    },
+    [settingPrimaryId, lease.id],
+  );
+
+  // ------------------------------------------------------------------
+  // Read-mode expiration banner — driven by the shared RULESET, so a won /
+  // lost lease can never show a contradictory EXPIRED/ACTIVE tag.
+  // ------------------------------------------------------------------
+  const expiration = getExpirationMeta(lease);
 
   // ------------------------------------------------------------------
   // Note rendering helpers
@@ -551,11 +560,11 @@ const PropertyDetail = ({ lease, onBack, onSaved, onDelete, initialEditMode }: R
                   <select
                     className="lb-edit-select"
                     value={editFields.stage}
-                    onChange={e => setField('stage', e.target.value)}
+                    onChange={e => setField('stage', e.target.value as Stage)}
                     id="edit-stage"
                   >
-                    {STAGE_OPTIONS.map(opt => (
-                      <option key={opt} value={opt}>{opt}</option>
+                    {STAGE_ORDER.map(opt => (
+                      <option key={opt} value={opt}>{stageLabel(opt)}</option>
                     ))}
                   </select>
                 </div>
@@ -688,8 +697,10 @@ const PropertyDetail = ({ lease, onBack, onSaved, onDelete, initialEditMode }: R
                   <div className="lb-detail-address">
                     <span>📍</span> {businessAddr || '-'}
                   </div>
+                  {/* Renders the real `stage`, NOT the derived `status` —
+                      the two disagree the moment a lease is won or lost. */}
                   <div className="lb-detail-stage">
-                    {status.toUpperCase()}
+                    {stageLabel(stage)}
                   </div>
                 </div>
               </div>
@@ -726,17 +737,17 @@ const PropertyDetail = ({ lease, onBack, onSaved, onDelete, initialEditMode }: R
             <div
               className="lb-detail-exp-banner"
               style={{
-                backgroundColor: expirationBadgeBg,
-                borderColor: expirationBadgeBorder,
+                backgroundColor: '#F4F5F7',
+                borderColor: '#E1E3E8',
               }}
             >
               <div className="lb-detail-exp-info">
                 <span className="lb-detail-emoji">📅</span>
                 <div>
-                  <div className="lb-detail-exp-label" style={{ color: expirationLabelColor }}>
+                  <div className="lb-detail-exp-label" style={{ color: '#6B7280' }}>
                     Lease Expiration
                   </div>
-                  <div className="lb-detail-exp-date" style={{ color: expirationDateColor }}>
+                  <div className="lb-detail-exp-date" style={{ color: expiration.dateColor }}>
                     {leaseExpiration}
                   </div>
                 </div>
@@ -744,11 +755,12 @@ const PropertyDetail = ({ lease, onBack, onSaved, onDelete, initialEditMode }: R
               <div
                 className="lb-detail-exp-tag"
                 style={{
-                  backgroundColor: expirationTagBg,
-                  color: expirationTagColor,
+                  backgroundColor: expiration.isPill ? expiration.tagBg : 'transparent',
+                  color: expiration.tagColor,
+                  padding: expiration.isPill ? undefined : 0,
                 }}
               >
-                {expirationBadgeText}
+                {expiration.tag}
               </div>
             </div>
 
@@ -769,6 +781,42 @@ const PropertyDetail = ({ lease, onBack, onSaved, onDelete, initialEditMode }: R
                   (!primaryManager?.phoneNumbers || primaryManager.phoneNumbers.length === 0) && (
                     <div className="lb-detail-box-sub">No contact information provided.</div>
                   )}
+
+                {/* Primary-contact picker. Only meaningful with 2+ managers.
+                    Styles are inline because the detail stylesheet is owned by
+                    another track in this PR. */}
+                {managers.length > 1 && (
+                  <fieldset
+                    className="lb-detail-primary-picker"
+                    style={{ border: 0, margin: '10px 0 0', padding: 0 }}
+                  >
+                    <legend className="lb-detail-box-label" style={{ float: 'none' }}>
+                      PRIMARY CONTACT
+                    </legend>
+                    {managers.map(m => (
+                      <label
+                        key={m.id}
+                        className="lb-detail-box-sub"
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 6,
+                          cursor: settingPrimaryId === null ? 'pointer' : 'progress',
+                        }}
+                      >
+                        <input
+                          type="radio"
+                          name={`primary-manager-${lease.id}`}
+                          value={m.id}
+                          checked={primaryManager?.id === m.id}
+                          disabled={settingPrimaryId !== null}
+                          onChange={() => handleSetPrimary(m.id)}
+                        />
+                        <span>{m.name}</span>
+                      </label>
+                    ))}
+                  </fieldset>
+                )}
               </div>
 
               <div className="lb-detail-box">
@@ -784,6 +832,10 @@ const PropertyDetail = ({ lease, onBack, onSaved, onDelete, initialEditMode }: R
               <div className="lb-detail-box-label">NOTES</div>
               {renderNote()}
             </div>
+
+            {/* set_primary_manager can fail in read mode, where the edit-mode
+                error slot is not mounted. */}
+            {saveError && <p className="lb-detail-save-error">{saveError}</p>}
           </>
         )}
         <Modal
