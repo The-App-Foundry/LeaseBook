@@ -95,8 +95,8 @@
     "semantic_hash": "0dc21e6362d256db5e9bec221c2a0155"
   },
   "package.json": {
-    "mtime": 1785962609.004748,
-    "ast_hash": "80410d05c066d3f56a9404531234dd27",
+    "mtime": 1785986137.4020424,
+    "ast_hash": "4c47d9b2b21a206109813247f8802a5c",
     "semantic_hash": ""
   },
   "playwright.config.ts": {
@@ -113,31 +113,6 @@
     "mtime": 1774317601.725996,
     "ast_hash": "b573cc831c1f37e01ad74676f7c579de",
     "semantic_hash": "b573cc831c1f37e01ad74676f7c579de"
-  },
-  "src-tauri/gen/android/app/build.gradle.kts": {
-    "mtime": 1785962057.7373395,
-    "ast_hash": "f435b53cf6ce6a5d384cc7ea0ae51143",
-    "semantic_hash": ""
-  },
-  "src-tauri/gen/android/build.gradle.kts": {
-    "mtime": 1785962057.7333393,
-    "ast_hash": "34b5dd707d61fa7f4a197eee123722b2",
-    "semantic_hash": "34b5dd707d61fa7f4a197eee123722b2"
-  },
-  "src-tauri/gen/android/buildSrc/build.gradle.kts": {
-    "mtime": 1785962057.820343,
-    "ast_hash": "0814415b6e7b2c6e126521dfe9960081",
-    "semantic_hash": "0814415b6e7b2c6e126521dfe9960081"
-  },
-  "src-tauri/gen/android/gradlew": {
-    "mtime": 1785962395.1410546,
-    "ast_hash": "02c16663c6f0aa37f98d94d698c22b8c",
-    "semantic_hash": "02c16663c6f0aa37f98d94d698c22b8c"
-  },
-  "src-tauri/gen/android/settings.gradle": {
-    "mtime": 1785962057.7353394,
-    "ast_hash": "abd11d894caa36e33edcd381ba11f330",
-    "semantic_hash": "abd11d894caa36e33edcd381ba11f330"
   },
   "src-tauri/migrations/2026-03-15-190245-0000_create_lease/down.sql": {
     "mtime": 1774317601.7278118,
@@ -255,8 +230,8 @@
     "semantic_hash": "71e4e8b69771fb026db9e8755d28a89a"
   },
   "src/App.tsx": {
-    "mtime": 1785957414.8453743,
-    "ast_hash": "c30e86c9036aaafde467fd502b93203e",
+    "mtime": 1785996593.730487,
+    "ast_hash": "5b1d1fbe3da42c95623180bc7657d512",
     "semantic_hash": ""
   },
   "src/components/layout/FilterBar.tsx": {
@@ -355,9 +330,9 @@
     "semantic_hash": "79111d43625977afe0c9b77fbf643f2b"
   },
   "src/context/FilterGridContext.tsx": {
-    "mtime": 1785916693.4629261,
-    "ast_hash": "28cb11035a6047badb0842d2f3477aee",
-    "semantic_hash": "28cb11035a6047badb0842d2f3477aee"
+    "mtime": 1785963698.2310112,
+    "ast_hash": "55dc7f33196cb677289ea3b57bda6f2a",
+    "semantic_hash": ""
   },
   "src/context/SearchContext.test.tsx": {
     "mtime": 1784326681.9144032,
@@ -528,81 +503,6 @@
     "mtime": 1766170055.4723096,
     "ast_hash": "8e3a10e157f75ada21ab742c022d5430",
     "semantic_hash": "8e3a10e157f75ada21ab742c022d5430"
-  },
-  "src-tauri/gen/android/app/src/main/res/mipmap-hdpi/ic_launcher.png": {
-    "mtime": 1785962057.7403398,
-    "ast_hash": "331411a21199dcbb3fd3e9dc180ff090",
-    "semantic_hash": ""
-  },
-  "src-tauri/gen/android/app/src/main/res/mipmap-hdpi/ic_launcher_foreground.png": {
-    "mtime": 1785962057.7403398,
-    "ast_hash": "c922c31dd0772e0569d6b9982345a3cc",
-    "semantic_hash": ""
-  },
-  "src-tauri/gen/android/app/src/main/res/mipmap-hdpi/ic_launcher_round.png": {
-    "mtime": 1785962057.7413397,
-    "ast_hash": "331411a21199dcbb3fd3e9dc180ff090",
-    "semantic_hash": ""
-  },
-  "src-tauri/gen/android/app/src/main/res/mipmap-mdpi/ic_launcher.png": {
-    "mtime": 1785962057.7413397,
-    "ast_hash": "c988238f35e59dcfa66d0402fcef5454",
-    "semantic_hash": ""
-  },
-  "src-tauri/gen/android/app/src/main/res/mipmap-mdpi/ic_launcher_foreground.png": {
-    "mtime": 1785962057.7413397,
-    "ast_hash": "b08cc46c43b78ade95ffa710f2c85ee9",
-    "semantic_hash": ""
-  },
-  "src-tauri/gen/android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png": {
-    "mtime": 1785962057.7413397,
-    "ast_hash": "c988238f35e59dcfa66d0402fcef5454",
-    "semantic_hash": ""
-  },
-  "src-tauri/gen/android/app/src/main/res/mipmap-xhdpi/ic_launcher.png": {
-    "mtime": 1785962057.7413397,
-    "ast_hash": "2bd12d99c8151b74c78129ad7ef78af8",
-    "semantic_hash": ""
-  },
-  "src-tauri/gen/android/app/src/main/res/mipmap-xhdpi/ic_launcher_foreground.png": {
-    "mtime": 1785962057.7413397,
-    "ast_hash": "8c4be6f31e044cc8a1ac39e45d50d9dd",
-    "semantic_hash": ""
-  },
-  "src-tauri/gen/android/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png": {
-    "mtime": 1785962057.7413397,
-    "ast_hash": "2bd12d99c8151b74c78129ad7ef78af8",
-    "semantic_hash": ""
-  },
-  "src-tauri/gen/android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png": {
-    "mtime": 1785962057.7423398,
-    "ast_hash": "7b9be1ceb98e9e2c1ac1562b705c679e",
-    "semantic_hash": ""
-  },
-  "src-tauri/gen/android/app/src/main/res/mipmap-xxhdpi/ic_launcher_foreground.png": {
-    "mtime": 1785962057.7423398,
-    "ast_hash": "023cdbfd0bd363e1da6b48eb91d873f2",
-    "semantic_hash": ""
-  },
-  "src-tauri/gen/android/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png": {
-    "mtime": 1785962057.7423398,
-    "ast_hash": "7b9be1ceb98e9e2c1ac1562b705c679e",
-    "semantic_hash": ""
-  },
-  "src-tauri/gen/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png": {
-    "mtime": 1785962057.7423398,
-    "ast_hash": "f83434b1cfc97752a5182da19b9869c8",
-    "semantic_hash": ""
-  },
-  "src-tauri/gen/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.png": {
-    "mtime": 1785962057.7423398,
-    "ast_hash": "56c4fd013ccd4ac84787fcba327abc37",
-    "semantic_hash": ""
-  },
-  "src-tauri/gen/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png": {
-    "mtime": 1785962057.820343,
-    "ast_hash": "f83434b1cfc97752a5182da19b9869c8",
-    "semantic_hash": ""
   },
   "src-tauri/icons/128x128.png": {
     "mtime": 1772901299.1341352,
@@ -790,13 +690,13 @@
     "semantic_hash": "c8418d98268c7ba576bfa2d4a0375dff"
   },
   "src/context/FilterGridContext.test.tsx": {
-    "mtime": 1785916693.461926,
-    "ast_hash": "eecebd2bd848539efdf60a2e0f3839df",
-    "semantic_hash": "eecebd2bd848539efdf60a2e0f3839df"
+    "mtime": 1785963722.2249794,
+    "ast_hash": "6f9543b74fdeba425ffd6db23f6ba91c",
+    "semantic_hash": ""
   },
   "src/App.test.tsx": {
-    "mtime": 1785957404.6629653,
-    "ast_hash": "b96d393a664cf7807a1e8a3eea2fa143",
+    "mtime": 1785996690.5633907,
+    "ast_hash": "53be74a42b43562a75b1b19419f5edab",
     "semantic_hash": ""
   },
   "src-tauri/src/error.rs": {
@@ -820,13 +720,13 @@
     "semantic_hash": "dcf98e03ff77afc3720b146c99e0a21f"
   },
   "src-tauri/src/auth.rs": {
-    "mtime": 1785957366.0524151,
-    "ast_hash": "1670f1577acb91397c4e9f08c1721fb0",
+    "mtime": 1785996593.0654602,
+    "ast_hash": "475eea37e9f5f9385419aa7d0c943e6b",
     "semantic_hash": ""
   },
   "src-tauri/src/auth_tests.rs": {
-    "mtime": 1785957458.721137,
-    "ast_hash": "0be8acc3530d0fbf4799c140bc28099b",
+    "mtime": 1785996593.3734727,
+    "ast_hash": "1adf055d2e797fa0c9caaf1821142b4d",
     "semantic_hash": ""
   },
   "src-tauri/src/passkey_browser.rs": {
@@ -903,20 +803,5 @@
     "mtime": 1784759912.1462843,
     "ast_hash": "d89fd1f1a635e9ab6d2bb570d0a5ef65",
     "semantic_hash": "d89fd1f1a635e9ab6d2bb570d0a5ef65"
-  },
-  "src-tauri/gen/android/app/src/main/java/com/openworldapps/leasebook/MainActivity.kt": {
-    "mtime": 1785962057.7383397,
-    "ast_hash": "5b5dc2e994a3a6385b646361ed35d093",
-    "semantic_hash": ""
-  },
-  "src-tauri/gen/android/buildSrc/src/main/java/com/openworldapps/leasebook/kotlin/BuildTask.kt": {
-    "mtime": 1785962057.821343,
-    "ast_hash": "c91577286e4bccd6f3af825da421df52",
-    "semantic_hash": ""
-  },
-  "src-tauri/gen/android/buildSrc/src/main/java/com/openworldapps/leasebook/kotlin/RustPlugin.kt": {
-    "mtime": 1785962057.821343,
-    "ast_hash": "27e9945f16c83be3c3e69f6b860bc9b5",
-    "semantic_hash": ""
   }
 }
