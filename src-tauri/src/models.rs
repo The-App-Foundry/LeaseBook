@@ -142,6 +142,7 @@ pub struct ManagerWithPrimary {
 pub struct NewLease<'a> {
     pub name: &'a str,
     pub address: Option<&'a str>,
+    pub size: Option<&'a i32>,
     pub expiration_date: Option<i32>,
     pub notes: Option<&'a str>,
     pub misc_data: Option<&'a str>,

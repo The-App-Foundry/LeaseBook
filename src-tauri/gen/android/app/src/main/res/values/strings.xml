@@ -1,4 +1,4 @@
 <resources>
-    <string name="app_name">leasemanagementsystem</string>
-    <string name="main_activity_title">leasemanagementsystem</string>
+    <string name="app_name">"LeaseBook"</string>
+    <string name="main_activity_title">"LeaseBook"</string>
 </resources>

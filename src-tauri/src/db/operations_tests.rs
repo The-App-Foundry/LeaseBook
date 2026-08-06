@@ -50,6 +50,20 @@ fn test_create_and_get_lease() {
 }
 
 #[test]
+fn clear_all_records_removes_leases_managers_and_relationships() {
+    let mut conn = setup_db();
+    let lease = seed_stage(&mut conn, "Clear me", Stage::New);
+    let manager = create_manager(&mut conn, "Clear manager", lease.id).unwrap();
+
+    clear_all_records(&mut conn).unwrap();
+
+    assert_eq!(count_leases(&mut conn, None, None).unwrap(), 0);
+    assert!(get_lease(&mut conn, lease.id).is_err());
+    assert!(get_manager(&mut conn, manager.id).is_err());
+    assert!(junction_rows(&mut conn, lease.id).is_empty());
+}
+
+#[test]
 fn test_create_lease_persists_stage() {
     let mut conn = setup_db();
 

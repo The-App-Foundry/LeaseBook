@@ -15,7 +15,7 @@
     "semantic_hash": "b78f1e8d6b23e5d934ab8747efa99adb"
   },
   ".storybook/stories/layout/GridContainer.stories.tsx": {
-    "mtime": 1784931832.529262,
+    "mtime": 1785916693.4489255,
     "ast_hash": "38ba214bfa5b1ace1635894b1eab7a53",
     "semantic_hash": "38ba214bfa5b1ace1635894b1eab7a53"
   },
@@ -25,7 +25,7 @@
     "semantic_hash": "806766729a2ac28c7fe5f90e91c0807d"
   },
   ".storybook/stories/layout/Property.stories.tsx": {
-    "mtime": 1784931880.9642284,
+    "mtime": 1785916693.4499257,
     "ast_hash": "fb3d2c52db8a511c46759483aaa64e64",
     "semantic_hash": "fb3d2c52db8a511c46759483aaa64e64"
   },
@@ -80,12 +80,12 @@
     "semantic_hash": "9939a44a9cb3104a493cafa66d615b86"
   },
   "e2e/lease-crud.spec.ts": {
-    "mtime": 1784932678.9535503,
+    "mtime": 1785916693.4499257,
     "ast_hash": "35bd44e237730f635a0047e13632870b",
     "semantic_hash": "35bd44e237730f635a0047e13632870b"
   },
   "e2e/search.spec.ts": {
-    "mtime": 1784932678.9535503,
+    "mtime": 1785916693.4499257,
     "ast_hash": "5719b1715edae36457bc04b2654eac0e",
     "semantic_hash": "5719b1715edae36457bc04b2654eac0e"
   },
@@ -95,9 +95,9 @@
     "semantic_hash": "0dc21e6362d256db5e9bec221c2a0155"
   },
   "package.json": {
-    "mtime": 1784754151.0963933,
-    "ast_hash": "3d4b1a7291429574be37666e0dc38124",
-    "semantic_hash": "3d4b1a7291429574be37666e0dc38124"
+    "mtime": 1785962609.004748,
+    "ast_hash": "80410d05c066d3f56a9404531234dd27",
+    "semantic_hash": ""
   },
   "playwright.config.ts": {
     "mtime": 1784326681.9116313,
@@ -115,42 +115,27 @@
     "semantic_hash": "b573cc831c1f37e01ad74676f7c579de"
   },
   "src-tauri/gen/android/app/build.gradle.kts": {
-    "mtime": 1766170833.7557783,
-    "ast_hash": "f942b64e431bdca2c8e824e4f333ed5b",
-    "semantic_hash": "f942b64e431bdca2c8e824e4f333ed5b"
-  },
-  "src-tauri/gen/android/app/src/main/java/com/openworldapps/lms/MainActivity.kt": {
-    "mtime": 1766170833.7567785,
-    "ast_hash": "5f8508beba424a73e85886020c9b1b92",
-    "semantic_hash": "5f8508beba424a73e85886020c9b1b92"
+    "mtime": 1785962057.7373395,
+    "ast_hash": "f435b53cf6ce6a5d384cc7ea0ae51143",
+    "semantic_hash": ""
   },
   "src-tauri/gen/android/build.gradle.kts": {
-    "mtime": 1766170833.7547784,
+    "mtime": 1785962057.7333393,
     "ast_hash": "34b5dd707d61fa7f4a197eee123722b2",
     "semantic_hash": "34b5dd707d61fa7f4a197eee123722b2"
   },
   "src-tauri/gen/android/buildSrc/build.gradle.kts": {
-    "mtime": 1766170833.7587786,
+    "mtime": 1785962057.820343,
     "ast_hash": "0814415b6e7b2c6e126521dfe9960081",
     "semantic_hash": "0814415b6e7b2c6e126521dfe9960081"
   },
-  "src-tauri/gen/android/buildSrc/src/main/java/com/openworldapps/lms/kotlin/BuildTask.kt": {
-    "mtime": 1766170833.7587786,
-    "ast_hash": "c91577286e4bccd6f3af825da421df52",
-    "semantic_hash": "c91577286e4bccd6f3af825da421df52"
-  },
-  "src-tauri/gen/android/buildSrc/src/main/java/com/openworldapps/lms/kotlin/RustPlugin.kt": {
-    "mtime": 1766170833.7597785,
-    "ast_hash": "27e9945f16c83be3c3e69f6b860bc9b5",
-    "semantic_hash": "27e9945f16c83be3c3e69f6b860bc9b5"
-  },
   "src-tauri/gen/android/gradlew": {
-    "mtime": 1766170833.7547784,
+    "mtime": 1785962395.1410546,
     "ast_hash": "02c16663c6f0aa37f98d94d698c22b8c",
     "semantic_hash": "02c16663c6f0aa37f98d94d698c22b8c"
   },
   "src-tauri/gen/android/settings.gradle": {
-    "mtime": 1766170833.7547784,
+    "mtime": 1785962057.7353394,
     "ast_hash": "abd11d894caa36e33edcd381ba11f330",
     "semantic_hash": "abd11d894caa36e33edcd381ba11f330"
   },
@@ -195,9 +180,9 @@
     "semantic_hash": "c9b6d9865f7ab2c75ce3f93f32d8ed38"
   },
   "src-tauri/src/commands.rs": {
-    "mtime": 1785185135.2095428,
-    "ast_hash": "f4c042f18972d54d8e18e1002e1d67ff",
-    "semantic_hash": "f4c042f18972d54d8e18e1002e1d67ff"
+    "mtime": 1785957366.350427,
+    "ast_hash": "619d933505e951431beccac64899db0e",
+    "semantic_hash": ""
   },
   "src-tauri/src/db/mod.rs": {
     "mtime": 1784740862.3972769,
@@ -205,19 +190,19 @@
     "semantic_hash": "b8a4d04f60d3112dc19a0ea5a9c7199c"
   },
   "src-tauri/src/db/operations.rs": {
-    "mtime": 1784929882.6175027,
-    "ast_hash": "8c92176bb3da3b90b659f6326c938aa4",
-    "semantic_hash": "8c92176bb3da3b90b659f6326c938aa4"
+    "mtime": 1785960338.7071836,
+    "ast_hash": "a70959521a7f4cc31f2c5136a8019652",
+    "semantic_hash": ""
   },
   "src-tauri/src/db/operations_tests.rs": {
-    "mtime": 1785184536.8125315,
-    "ast_hash": "af5d6fa0444961736e312ce991a079af",
-    "semantic_hash": "af5d6fa0444961736e312ce991a079af"
+    "mtime": 1785952317.863392,
+    "ast_hash": "dc91d56bae887cd647933b7b63e1bbda",
+    "semantic_hash": ""
   },
   "src-tauri/src/lib.rs": {
-    "mtime": 1785185140.6917627,
-    "ast_hash": "a7ee9cbbc4c7dfeca613d1de6af446ae",
-    "semantic_hash": "a7ee9cbbc4c7dfeca613d1de6af446ae"
+    "mtime": 1785956764.536262,
+    "ast_hash": "51249424cf91636c7803bee757c8377c",
+    "semantic_hash": ""
   },
   "src-tauri/src/main.rs": {
     "mtime": 1772901299.2441397,
@@ -225,37 +210,37 @@
     "semantic_hash": "683fea16c3c1b9757d93e578f1f3e928"
   },
   "src-tauri/src/models.rs": {
-    "mtime": 1784928748.0781114,
-    "ast_hash": "a615c89ce4a193e25ba339d9f6293752",
-    "semantic_hash": "a615c89ce4a193e25ba339d9f6293752"
+    "mtime": 1785960338.4101717,
+    "ast_hash": "65ccc216353ea06300969652729c6ce8",
+    "semantic_hash": ""
   },
   "src-tauri/src/parser.rs": {
-    "mtime": 1784754151.0963933,
-    "ast_hash": "a5eaa61318e50ba1fe39ba5a8d0cbf33",
-    "semantic_hash": "a5eaa61318e50ba1fe39ba5a8d0cbf33"
+    "mtime": 1785959367.4919333,
+    "ast_hash": "d6eb6f5f25563ea1bbff16797de801ba",
+    "semantic_hash": ""
   },
   "src-tauri/src/parser_tests.rs": {
-    "mtime": 1784754151.0973935,
-    "ast_hash": "c9ee514bd253ee63c517a4eaaac5a669",
-    "semantic_hash": "c9ee514bd253ee63c517a4eaaac5a669"
+    "mtime": 1785959367.5099342,
+    "ast_hash": "7381d6d1abf53602aa9e01fa9071a5e2",
+    "semantic_hash": ""
   },
   "src-tauri/src/prop_map.rs": {
-    "mtime": 1784740862.398277,
-    "ast_hash": "605f4657d0b4cb6e635effe3334d5625",
-    "semantic_hash": "605f4657d0b4cb6e635effe3334d5625"
+    "mtime": 1785960403.5288053,
+    "ast_hash": "29e4ce11a3e291471604efa4acff0f8c",
+    "semantic_hash": ""
   },
   "src-tauri/src/prop_map_tests.rs": {
-    "mtime": 1784740862.398277,
-    "ast_hash": "7c082100f3c055559118d03c2d7112d1",
-    "semantic_hash": "7c082100f3c055559118d03c2d7112d1"
+    "mtime": 1785960403.8148167,
+    "ast_hash": "15fbb0dd2c74da60224321b9008b2a88",
+    "semantic_hash": ""
   },
   "src-tauri/src/property.rs": {
-    "mtime": 1784740862.398277,
-    "ast_hash": "d8c0115a9a139fa8c729296bfb3c385a",
-    "semantic_hash": "d8c0115a9a139fa8c729296bfb3c385a"
+    "mtime": 1785960337.8291483,
+    "ast_hash": "59ce449f6ff30ed5579f71b85e775f71",
+    "semantic_hash": ""
   },
   "src-tauri/src/schema.rs": {
-    "mtime": 1784928690.7878227,
+    "mtime": 1785916693.4601786,
     "ast_hash": "68d4d7c5a1e1698ec05cf296c40a8284",
     "semantic_hash": "68d4d7c5a1e1698ec05cf296c40a8284"
   },
@@ -270,17 +255,17 @@
     "semantic_hash": "71e4e8b69771fb026db9e8755d28a89a"
   },
   "src/App.tsx": {
-    "mtime": 1785185145.4109523,
-    "ast_hash": "01a4ecb2008d3ceeaf1cce09ae092e00",
-    "semantic_hash": "01a4ecb2008d3ceeaf1cce09ae092e00"
+    "mtime": 1785957414.8453743,
+    "ast_hash": "c30e86c9036aaafde467fd502b93203e",
+    "semantic_hash": ""
   },
   "src/components/layout/FilterBar.tsx": {
-    "mtime": 1784930428.9764771,
+    "mtime": 1785916693.460926,
     "ast_hash": "d21972c5a831e207cfa7ec9b388f9457",
     "semantic_hash": "d21972c5a831e207cfa7ec9b388f9457"
   },
   "src/components/layout/GridContainer.tsx": {
-    "mtime": 1784929954.7943914,
+    "mtime": 1785916693.460926,
     "ast_hash": "755e6a18a2adacb8f7dbe05ce3612083",
     "semantic_hash": "755e6a18a2adacb8f7dbe05ce3612083"
   },
@@ -290,17 +275,17 @@
     "semantic_hash": "9548b4f0825cdb1b2a7055c775785093"
   },
   "src/components/layout/Property.tsx": {
-    "mtime": 1784929867.458896,
+    "mtime": 1785916693.460926,
     "ast_hash": "d56ba881c572b60e239c2d3bbfaee3bf",
     "semantic_hash": "d56ba881c572b60e239c2d3bbfaee3bf"
   },
   "src/components/layout/PropertyDetail.tsx": {
-    "mtime": 1784929228.7173326,
+    "mtime": 1785916693.461926,
     "ast_hash": "7b62c97d9b933c1fed1198fc3b89dded",
     "semantic_hash": "7b62c97d9b933c1fed1198fc3b89dded"
   },
   "src/components/layout/PropertyForm.tsx": {
-    "mtime": 1784928921.5929506,
+    "mtime": 1785916693.461926,
     "ast_hash": "3d0fd7cdfdf33a3502c69bf2fd728441",
     "semantic_hash": "3d0fd7cdfdf33a3502c69bf2fd728441"
   },
@@ -310,12 +295,12 @@
     "semantic_hash": "2c1ff2987ce7c9623b8c8df375478b53"
   },
   "src/components/layout/WorkbookImportFlow.tsx": {
-    "mtime": 1784929545.6970186,
-    "ast_hash": "c75a1d34d3343da0d989fb02d0398c50",
-    "semantic_hash": "c75a1d34d3343da0d989fb02d0398c50"
+    "mtime": 1785960338.9931953,
+    "ast_hash": "0fe98d33740940cc37d5e8ef9f386f55",
+    "semantic_hash": ""
   },
   "src/components/layout/index.ts": {
-    "mtime": 1784929934.4695778,
+    "mtime": 1785916693.461926,
     "ast_hash": "1bdcaf24b64b4ab630c1efba8b27ba7b",
     "semantic_hash": "1bdcaf24b64b4ab630c1efba8b27ba7b"
   },
@@ -365,12 +350,12 @@
     "semantic_hash": "8a5a25756e280486095a1bcbf0d49327"
   },
   "src/components/ui/index.ts": {
-    "mtime": 1784929934.4535773,
+    "mtime": 1785916693.461926,
     "ast_hash": "79111d43625977afe0c9b77fbf643f2b",
     "semantic_hash": "79111d43625977afe0c9b77fbf643f2b"
   },
   "src/context/FilterGridContext.tsx": {
-    "mtime": 1784928715.5378115,
+    "mtime": 1785916693.4629261,
     "ast_hash": "28cb11035a6047badb0842d2f3477aee",
     "semantic_hash": "28cb11035a6047badb0842d2f3477aee"
   },
@@ -400,7 +385,7 @@
     "semantic_hash": "00e47f7b9836e8f731101981fa2bb2de"
   },
   "src/types/lease.ts": {
-    "mtime": 1784928635.371609,
+    "mtime": 1785916693.4629261,
     "ast_hash": "6d986dc73d5f7f3d94937b5bb895ab0c",
     "semantic_hash": "6d986dc73d5f7f3d94937b5bb895ab0c"
   },
@@ -410,7 +395,7 @@
     "semantic_hash": "f08ee24aa55b6f8b5e4fd2fc4b4d34cf"
   },
   "src/utils/managerDetect.ts": {
-    "mtime": 1784929551.098235,
+    "mtime": 1785916693.4629261,
     "ast_hash": "886cef8e90a6a96baebadef47d6d85fb",
     "semantic_hash": "886cef8e90a6a96baebadef47d6d85fb"
   },
@@ -420,7 +405,7 @@
     "semantic_hash": "0352474ba2918efe13895edbc3780d94"
   },
   "tsconfig.json": {
-    "mtime": 1784932211.7566133,
+    "mtime": 1785916693.4629261,
     "ast_hash": "8afa3c6923f72aeb5d123760de35edfe",
     "semantic_hash": "8afa3c6923f72aeb5d123760de35edfe"
   },
@@ -474,21 +459,6 @@
     "ast_hash": "7f02fa6b0e900cf7fa4a9c86d1005803",
     "semantic_hash": "7f02fa6b0e900cf7fa4a9c86d1005803"
   },
-  ".claude/agent-memory/leasebook-fullstack-engineer/MEMORY.md": {
-    "mtime": 1784929765.909832,
-    "ast_hash": "41aa83dd777d49e4fb83829ba2244bf8",
-    "semantic_hash": "41aa83dd777d49e4fb83829ba2244bf8"
-  },
-  ".claude/agent-memory/leasebook-fullstack-engineer/feedback_bootstrap_migration.md": {
-    "mtime": 1784224076.139715,
-    "ast_hash": "40ce4ec91bcfdb2550f6b9b21062bd46",
-    "semantic_hash": "40ce4ec91bcfdb2550f6b9b21062bd46"
-  },
-  ".claude/agents/leasebook-fullstack-engineer.md": {
-    "mtime": 1775153357.0103898,
-    "ast_hash": "f2dbe71e15f379919b43832143c9a613",
-    "semantic_hash": "f2dbe71e15f379919b43832143c9a613"
-  },
   ".github/agents/Lead Engineer.agent.md": {
     "mtime": 1772901298.951128,
     "ast_hash": "40939a5d096d720afadc2b79d91e8be7",
@@ -525,12 +495,12 @@
     "semantic_hash": "ae73f9b9b2e78e3eb895b2b294ca4148"
   },
   "AGENTS.md": {
-    "mtime": 1785252424.9585493,
+    "mtime": 1785916693.4499257,
     "ast_hash": "bf625d6f8c3d09b2958d97073c377001",
     "semantic_hash": "bf625d6f8c3d09b2958d97073c377001"
   },
   "CLAUDE.md": {
-    "mtime": 1785252481.2759562,
+    "mtime": 1785916693.4499257,
     "ast_hash": "6734f1299eab621e582ba9f75e37937a",
     "semantic_hash": "6734f1299eab621e582ba9f75e37937a"
   },
@@ -560,79 +530,79 @@
     "semantic_hash": "8e3a10e157f75ada21ab742c022d5430"
   },
   "src-tauri/gen/android/app/src/main/res/mipmap-hdpi/ic_launcher.png": {
-    "mtime": 1772901299.0551322,
-    "ast_hash": "bed1c3d826894bcc7f4adfc26e3d838d",
-    "semantic_hash": "bed1c3d826894bcc7f4adfc26e3d838d"
+    "mtime": 1785962057.7403398,
+    "ast_hash": "331411a21199dcbb3fd3e9dc180ff090",
+    "semantic_hash": ""
   },
   "src-tauri/gen/android/app/src/main/res/mipmap-hdpi/ic_launcher_foreground.png": {
-    "mtime": 1772901299.056132,
-    "ast_hash": "61a4b1359cf00911a461b1f5e2bd64eb",
-    "semantic_hash": "61a4b1359cf00911a461b1f5e2bd64eb"
+    "mtime": 1785962057.7403398,
+    "ast_hash": "c922c31dd0772e0569d6b9982345a3cc",
+    "semantic_hash": ""
   },
   "src-tauri/gen/android/app/src/main/res/mipmap-hdpi/ic_launcher_round.png": {
-    "mtime": 1772901299.0571322,
-    "ast_hash": "abd68c81189e976c076660f5b5b4c0e2",
-    "semantic_hash": "abd68c81189e976c076660f5b5b4c0e2"
+    "mtime": 1785962057.7413397,
+    "ast_hash": "331411a21199dcbb3fd3e9dc180ff090",
+    "semantic_hash": ""
   },
   "src-tauri/gen/android/app/src/main/res/mipmap-mdpi/ic_launcher.png": {
-    "mtime": 1772901299.0571322,
-    "ast_hash": "5debf3aadabb0ee18bdee57f85013c05",
-    "semantic_hash": "5debf3aadabb0ee18bdee57f85013c05"
+    "mtime": 1785962057.7413397,
+    "ast_hash": "c988238f35e59dcfa66d0402fcef5454",
+    "semantic_hash": ""
   },
   "src-tauri/gen/android/app/src/main/res/mipmap-mdpi/ic_launcher_foreground.png": {
-    "mtime": 1772901299.0581322,
-    "ast_hash": "c17cc19871196841921d1121d831d42d",
-    "semantic_hash": "c17cc19871196841921d1121d831d42d"
+    "mtime": 1785962057.7413397,
+    "ast_hash": "b08cc46c43b78ade95ffa710f2c85ee9",
+    "semantic_hash": ""
   },
   "src-tauri/gen/android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png": {
-    "mtime": 1772901299.0581322,
-    "ast_hash": "1c935186f76d44fb3a3351ddea6b2dc1",
-    "semantic_hash": "1c935186f76d44fb3a3351ddea6b2dc1"
+    "mtime": 1785962057.7413397,
+    "ast_hash": "c988238f35e59dcfa66d0402fcef5454",
+    "semantic_hash": ""
   },
   "src-tauri/gen/android/app/src/main/res/mipmap-xhdpi/ic_launcher.png": {
-    "mtime": 1772901299.0581322,
-    "ast_hash": "050267252d2412be8fda0d4d9a29c63f",
-    "semantic_hash": "050267252d2412be8fda0d4d9a29c63f"
+    "mtime": 1785962057.7413397,
+    "ast_hash": "2bd12d99c8151b74c78129ad7ef78af8",
+    "semantic_hash": ""
   },
   "src-tauri/gen/android/app/src/main/res/mipmap-xhdpi/ic_launcher_foreground.png": {
-    "mtime": 1772901299.0591323,
-    "ast_hash": "6c3684a84f84ae4879d03b12c80811f5",
-    "semantic_hash": "6c3684a84f84ae4879d03b12c80811f5"
+    "mtime": 1785962057.7413397,
+    "ast_hash": "8c4be6f31e044cc8a1ac39e45d50d9dd",
+    "semantic_hash": ""
   },
   "src-tauri/gen/android/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png": {
-    "mtime": 1772901299.0591323,
-    "ast_hash": "1b932e2c03927d645c194f8a91934228",
-    "semantic_hash": "1b932e2c03927d645c194f8a91934228"
+    "mtime": 1785962057.7413397,
+    "ast_hash": "2bd12d99c8151b74c78129ad7ef78af8",
+    "semantic_hash": ""
   },
   "src-tauri/gen/android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png": {
-    "mtime": 1772901299.0721328,
-    "ast_hash": "61422c9f9917b6b3e144bba4e49aafea",
-    "semantic_hash": "61422c9f9917b6b3e144bba4e49aafea"
+    "mtime": 1785962057.7423398,
+    "ast_hash": "7b9be1ceb98e9e2c1ac1562b705c679e",
+    "semantic_hash": ""
   },
   "src-tauri/gen/android/app/src/main/res/mipmap-xxhdpi/ic_launcher_foreground.png": {
-    "mtime": 1772901299.0841334,
-    "ast_hash": "87cdc1f8ca1d12377bd12dda9e8a687a",
-    "semantic_hash": "87cdc1f8ca1d12377bd12dda9e8a687a"
+    "mtime": 1785962057.7423398,
+    "ast_hash": "023cdbfd0bd363e1da6b48eb91d873f2",
+    "semantic_hash": ""
   },
   "src-tauri/gen/android/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png": {
-    "mtime": 1772901299.0961337,
-    "ast_hash": "e32ab3935b800de2c520d1f784e46d75",
-    "semantic_hash": "e32ab3935b800de2c520d1f784e46d75"
+    "mtime": 1785962057.7423398,
+    "ast_hash": "7b9be1ceb98e9e2c1ac1562b705c679e",
+    "semantic_hash": ""
   },
   "src-tauri/gen/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png": {
-    "mtime": 1772901299.1071343,
-    "ast_hash": "9ed1abb94d206379a1bc9e80264d9560",
-    "semantic_hash": "9ed1abb94d206379a1bc9e80264d9560"
+    "mtime": 1785962057.7423398,
+    "ast_hash": "f83434b1cfc97752a5182da19b9869c8",
+    "semantic_hash": ""
   },
   "src-tauri/gen/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.png": {
-    "mtime": 1772901299.124135,
-    "ast_hash": "98906df12247e0e9ae2248ab04ec9925",
-    "semantic_hash": "98906df12247e0e9ae2248ab04ec9925"
+    "mtime": 1785962057.7423398,
+    "ast_hash": "56c4fd013ccd4ac84787fcba327abc37",
+    "semantic_hash": ""
   },
   "src-tauri/gen/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png": {
-    "mtime": 1772901299.125135,
-    "ast_hash": "8e5a23447fd821698243930ed52ac815",
-    "semantic_hash": "8e5a23447fd821698243930ed52ac815"
+    "mtime": 1785962057.820343,
+    "ast_hash": "f83434b1cfc97752a5182da19b9869c8",
+    "semantic_hash": ""
   },
   "src-tauri/icons/128x128.png": {
     "mtime": 1772901299.1341352,
@@ -820,14 +790,14 @@
     "semantic_hash": "c8418d98268c7ba576bfa2d4a0375dff"
   },
   "src/context/FilterGridContext.test.tsx": {
-    "mtime": 1784931715.1184952,
+    "mtime": 1785916693.461926,
     "ast_hash": "eecebd2bd848539efdf60a2e0f3839df",
     "semantic_hash": "eecebd2bd848539efdf60a2e0f3839df"
   },
   "src/App.test.tsx": {
-    "mtime": 1785185447.373072,
-    "ast_hash": "8a5563ac9421316892583740ffdf25bb",
-    "semantic_hash": "8a5563ac9421316892583740ffdf25bb"
+    "mtime": 1785957404.6629653,
+    "ast_hash": "b96d393a664cf7807a1e8a3eea2fa143",
+    "semantic_hash": ""
   },
   "src-tauri/src/error.rs": {
     "mtime": 1784467575.733101,
@@ -850,14 +820,14 @@
     "semantic_hash": "dcf98e03ff77afc3720b146c99e0a21f"
   },
   "src-tauri/src/auth.rs": {
-    "mtime": 1785185128.8832889,
-    "ast_hash": "b895e43abf8f78b5a87bba77430e3bb2",
-    "semantic_hash": "b895e43abf8f78b5a87bba77430e3bb2"
+    "mtime": 1785957366.0524151,
+    "ast_hash": "1670f1577acb91397c4e9f08c1721fb0",
+    "semantic_hash": ""
   },
   "src-tauri/src/auth_tests.rs": {
-    "mtime": 1785185161.3175907,
-    "ast_hash": "f2e9fcfc8e34972c26aab9c789eada7d",
-    "semantic_hash": "f2e9fcfc8e34972c26aab9c789eada7d"
+    "mtime": 1785957458.721137,
+    "ast_hash": "0be8acc3530d0fbf4799c140bc28099b",
+    "semantic_hash": ""
   },
   "src-tauri/src/passkey_browser.rs": {
     "mtime": 1784740862.398277,
@@ -865,88 +835,88 @@
     "semantic_hash": "44c8d2ff05437ed7fe3cf2eb676623e3"
   },
   "src-tauri/migrations/2026-07-24-213026-0000_add_lease_stage/down.sql": {
-    "mtime": 1784928654.7853847,
+    "mtime": 1785916693.459942,
     "ast_hash": "bb96c461903c80c79a7acdc5a8dcee4e",
     "semantic_hash": "bb96c461903c80c79a7acdc5a8dcee4e"
   },
   "src-tauri/migrations/2026-07-24-213026-0000_add_lease_stage/up.sql": {
-    "mtime": 1784928653.2753243,
+    "mtime": 1785916693.460004,
     "ast_hash": "5a9c83e329749f8c2d4b76fd6220703d",
     "semantic_hash": "5a9c83e329749f8c2d4b76fd6220703d"
   },
   "src-tauri/migrations/2026-07-24-213026-0001_add_manager_primary/down.sql": {
-    "mtime": 1784928664.0007527,
+    "mtime": 1785916693.4601228,
     "ast_hash": "98521e9e76b5f30708d97e1cd491e85c",
     "semantic_hash": "98521e9e76b5f30708d97e1cd491e85c"
   },
   "src-tauri/migrations/2026-07-24-213026-0001_add_manager_primary/up.sql": {
-    "mtime": 1784928663.3617272,
+    "mtime": 1785916693.4601786,
     "ast_hash": "df0d76572533bd3233c0f30dab216249",
     "semantic_hash": "df0d76572533bd3233c0f30dab216249"
   },
   "src/components/layout/LeaseList.test.tsx": {
-    "mtime": 1784932277.119248,
+    "mtime": 1785916693.460926,
     "ast_hash": "4821a6005ede10eca5ad8fea74e0089f",
     "semantic_hash": "4821a6005ede10eca5ad8fea74e0089f"
   },
   "src/components/layout/LeaseList.tsx": {
-    "mtime": 1784932243.7849042,
+    "mtime": 1785916693.460926,
     "ast_hash": "e0a2ed4c32684cad8bf4d2aa927a114d",
     "semantic_hash": "e0a2ed4c32684cad8bf4d2aa927a114d"
   },
   "src/components/ui/ViewToggle.test.tsx": {
-    "mtime": 1785183432.8072696,
+    "mtime": 1785916693.461926,
     "ast_hash": "55b2f0cc000babfa49ebe8c99f78ead1",
     "semantic_hash": "55b2f0cc000babfa49ebe8c99f78ead1"
   },
   "src/components/ui/ViewToggle.tsx": {
-    "mtime": 1785183431.8542314,
+    "mtime": 1785916693.461926,
     "ast_hash": "f25368b80dad0b884ebd8745e921a3bb",
     "semantic_hash": "f25368b80dad0b884ebd8745e921a3bb"
   },
   "src/test/filterGridValue.ts": {
-    "mtime": 1784931420.9475527,
+    "mtime": 1785916693.4629261,
     "ast_hash": "1fff1cfcaaf67d276e00270686f85baf",
     "semantic_hash": "1fff1cfcaaf67d276e00270686f85baf"
   },
   "src/test/localStorageStub.ts": {
-    "mtime": 1784931617.618537,
+    "mtime": 1785916693.4629261,
     "ast_hash": "5dc1aa4a6fb4fd3762b77357d85169bd",
     "semantic_hash": "5dc1aa4a6fb4fd3762b77357d85169bd"
   },
   "src/utils/leaseStatus.test.ts": {
-    "mtime": 1784931475.1887546,
+    "mtime": 1785916693.4629261,
     "ast_hash": "d5cd4a194e273389180d18cf4d10af57",
     "semantic_hash": "d5cd4a194e273389180d18cf4d10af57"
   },
   "src/utils/leaseStatus.ts": {
-    "mtime": 1784929862.0566797,
+    "mtime": 1785916693.4629261,
     "ast_hash": "0f26adeff97a61467012bb951b5dce9a",
     "semantic_hash": "0f26adeff97a61467012bb951b5dce9a"
   },
   "src/utils/stageColors.ts": {
-    "mtime": 1784928625.3452084,
+    "mtime": 1785916693.4629261,
     "ast_hash": "670f762462bd36928049fb6bb6bfbbd5",
     "semantic_hash": "670f762462bd36928049fb6bb6bfbbd5"
-  },
-  ".claude/agent-memory/leasebook-fullstack-engineer/diesel_query_gotchas.md": {
-    "mtime": 1784929759.1295605,
-    "ast_hash": "ad69a43183435d510460f840c43b1d1d",
-    "semantic_hash": "ad69a43183435d510460f840c43b1d1d"
-  },
-  ".claude/agent-memory/leasebook-fullstack-engineer/project_sqlite_migrations.md": {
-    "mtime": 1784929747.6361005,
-    "ast_hash": "53cf6ac310da35302f6a54241911cba6",
-    "semantic_hash": "53cf6ac310da35302f6a54241911cba6"
-  },
-  ".claude/list-view-wire-contract.md": {
-    "mtime": 1784928176.0772605,
-    "ast_hash": "2b0a04a5a0c0dbb54a811f82be2f4c84",
-    "semantic_hash": "2b0a04a5a0c0dbb54a811f82be2f4c84"
   },
   ".github/workflows/release.yml": {
     "mtime": 1784759912.1462843,
     "ast_hash": "d89fd1f1a635e9ab6d2bb570d0a5ef65",
     "semantic_hash": "d89fd1f1a635e9ab6d2bb570d0a5ef65"
+  },
+  "src-tauri/gen/android/app/src/main/java/com/openworldapps/leasebook/MainActivity.kt": {
+    "mtime": 1785962057.7383397,
+    "ast_hash": "5b5dc2e994a3a6385b646361ed35d093",
+    "semantic_hash": ""
+  },
+  "src-tauri/gen/android/buildSrc/src/main/java/com/openworldapps/leasebook/kotlin/BuildTask.kt": {
+    "mtime": 1785962057.821343,
+    "ast_hash": "c91577286e4bccd6f3af825da421df52",
+    "semantic_hash": ""
+  },
+  "src-tauri/gen/android/buildSrc/src/main/java/com/openworldapps/leasebook/kotlin/RustPlugin.kt": {
+    "mtime": 1785962057.821343,
+    "ast_hash": "27e9945f16c83be3c3e69f6b860bc9b5",
+    "semantic_hash": ""
   }
 }

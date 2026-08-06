@@ -17,8 +17,16 @@ vi.mock('@tauri-apps/api/core', () => ({
 }));
 
 const TestConsumer = () => {
-  const { leases, loading, totalCount, setActiveStage, setSortDirection, viewMode, setViewMode } =
-    useContext(FilterGridContext);
+  const {
+    leases,
+    loading,
+    totalCount,
+    setActiveStage,
+    setSortOption,
+    setSortDirection,
+    viewMode,
+    setViewMode,
+  } = useContext(FilterGridContext);
 
   return (
     <div>
@@ -35,6 +43,9 @@ const TestConsumer = () => {
       <div data-testid="view-mode">{viewMode}</div>
       <button type="button" onClick={() => setSortDirection('desc')}>
         Sort descending
+      </button>
+      <button type="button" onClick={() => setSortOption('size')}>
+        Sort by property size
       </button>
       <button type="button" onClick={() => setActiveStage('contacted')}>
         Show contacted
@@ -158,10 +169,12 @@ describe('FilterGridProvider', () => {
       page: 1,
       pageSize: 50,
       searchQuery: null,
+      sortBy: 'expiration',
+      sortDirection: 'asc',
     });
   });
 
-  it('reorders loaded leases when sort direction changes without reloading data', async () => {
+  it('reloads using the selected property-size sort instead of retaining the current name order', async () => {
     const user = userEvent.setup();
 
     vi.mocked(invoke).mockImplementation(command => {
@@ -170,8 +183,8 @@ describe('FilterGridProvider', () => {
       }
       return Promise.resolve({
         leases: [
-          leaseRow(1, 'Early Office', 1_700_000_000),
-          leaseRow(2, 'Late Office', 1_800_000_000),
+          leaseRow(1, 'Zeta Office', 1_700_000_000),
+          leaseRow(2, 'Acme Office', 1_800_000_000),
         ],
         total_count: 2,
       });
@@ -186,20 +199,19 @@ describe('FilterGridProvider', () => {
     );
 
     await waitFor(() => expect(screen.getByTestId('loading')).toHaveTextContent('loaded'));
-    expect(screen.getByTestId('lease-names')).toHaveTextContent('Early Office,Late Office');
+    expect(screen.getByTestId('lease-names')).toHaveTextContent('Zeta Office,Acme Office');
 
-    const paginatedCallsBeforeSort = vi
-      .mocked(invoke)
-      .mock.calls.filter(([command]) => command === 'leases_with_managers_paginated').length;
+    await user.click(screen.getByRole('button', { name: 'Sort by property size' }));
 
-    await user.click(screen.getByRole('button', { name: 'Sort descending' }));
-
-    expect(screen.getByTestId('lease-names')).toHaveTextContent('Late Office,Early Office');
-
-    const paginatedCallsAfterSort = vi
-      .mocked(invoke)
-      .mock.calls.filter(([command]) => command === 'leases_with_managers_paginated').length;
-    expect(paginatedCallsAfterSort).toBe(paginatedCallsBeforeSort);
+    await waitFor(() =>
+      expect(invoke).toHaveBeenLastCalledWith('leases_with_managers_paginated', {
+        page: 1,
+        pageSize: 50,
+        searchQuery: null,
+        sortBy: 'size',
+        sortDirection: 'asc',
+      }),
+    );
   });
 
   it('reloads leases with the selected stage when a filter is selected, without refetching pill counts', async () => {
@@ -248,6 +260,8 @@ describe('FilterGridProvider', () => {
       pageSize: 50,
       searchQuery: null,
       stage: 'contacted',
+      sortBy: 'expiration',
+      sortDirection: 'asc',
     });
 
     // Selecting a filter pill must not re-trigger the independent stage-counts fetch.

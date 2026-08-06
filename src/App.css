@@ -417,6 +417,30 @@ button {
   background: var(--lb-surface);
 }
 
+.lb-settings-danger-section {
+  border-color: var(--lb-danger);
+}
+
+.lb-clear-all-data-form {
+  display: grid;
+  gap: 12px;
+}
+
+.lb-clear-all-data-form label {
+  display: grid;
+  gap: 6px;
+  color: var(--lb-text);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.lb-clear-all-data-form input {
+  height: 38px;
+  padding: 0 10px;
+  border: 1px solid var(--lb-border);
+  border-radius: var(--lb-radius-md);
+}
+
 .lb-settings-section-header {
   display: flex;
   justify-content: space-between;

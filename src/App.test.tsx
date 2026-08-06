@@ -38,7 +38,7 @@ describe('App list empty states', () => {
     vi.mocked(invoke).mockImplementation(command => {
       if (command === 'auth_status') {
         return Promise.resolve({
-          password_enabled: false,
+          password_enabled: true,
           passkey_enabled: false,
           authenticated: true,
         });
@@ -352,7 +352,67 @@ describe('App auth flow', () => {
     expect(await screen.findByText('No auth setup')).toBeInTheDocument();
   });
 
-  it('offers browser passkey setup when the app window lacks WebAuthn support', async () => {
+  it('does not offer password removal while passkeys are enabled', async () => {
+    const user = userEvent.setup();
+
+    vi.mocked(invoke).mockImplementation(command => {
+      if (command === 'auth_status') {
+        return Promise.resolve({
+          password_enabled: true,
+          passkey_enabled: true,
+          authenticated: true,
+        });
+      }
+
+      return Promise.resolve({
+        leases: [],
+        total_count: 0,
+      });
+    });
+
+    renderApp();
+
+    await user.click(await screen.findByRole('button', { name: /Settings/i }));
+    expect(screen.getByRole('button', { name: /Remove password protection/i })).toBeDisabled();
+    expect(screen.getByText('Remove passkeys before removing password protection.')).toBeInTheDocument();
+  });
+
+  it('clears all app data from an authenticated Settings session', async () => {
+    const user = userEvent.setup();
+
+    vi.mocked(invoke).mockImplementation(command => {
+      if (command === 'auth_status') {
+        return Promise.resolve({
+          password_enabled: true,
+          passkey_enabled: false,
+          authenticated: true,
+        });
+      }
+
+      return Promise.resolve({
+        leases: [],
+        total_count: 0,
+      });
+    });
+
+    renderApp();
+
+    await user.click(await screen.findByRole('button', { name: /Settings/i }));
+    await user.click(screen.getByRole('button', { name: /^Clear all data$/i }));
+    await user.type(screen.getByLabelText('Password'), 'correct-password');
+    await user.type(screen.getByLabelText(/Type delete all data to confirm/i), 'delete all data');
+    await user.click(screen.getByRole('button', { name: /Permanently clear all data/i }));
+
+    await waitFor(() =>
+      expect(invoke).toHaveBeenCalledWith('clear_all_data', {
+        password: 'correct-password',
+        confirmation: 'delete all data',
+      }),
+    );
+    expect(await screen.findByText('Authentication is enabled.')).toBeInTheDocument();
+  });
+
+  it('requires a password before offering passkey setup', async () => {
     const user = userEvent.setup();
 
     vi.mocked(invoke).mockImplementation(command => {
@@ -374,9 +434,9 @@ describe('App auth flow', () => {
 
     await user.click(await screen.findByRole('button', { name: /Settings/i }));
 
-    expect(screen.getByText('Add a passkey with your browser.')).toBeInTheDocument();
-    expect(screen.getByText('A browser tab will open to finish setup.')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Create passkey/i })).toBeEnabled();
+    expect(screen.getByText('Create a password to enable passkeys.')).toBeInTheDocument();
+    expect(screen.getByText('Passkeys require password authentication.')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Create passkey/i })).toBeDisabled();
     expect(screen.queryByRole('button', { name: /Google SSO/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Microsoft SSO/i })).not.toBeInTheDocument();
     expect(invoke).not.toHaveBeenCalledWith('start_passkey_registration');
@@ -388,7 +448,7 @@ describe('App auth flow', () => {
     vi.mocked(invoke).mockImplementation(command => {
       if (command === 'auth_status') {
         return Promise.resolve({
-          password_enabled: false,
+          password_enabled: true,
           passkey_enabled: false,
           authenticated: true,
         });
@@ -396,7 +456,7 @@ describe('App auth flow', () => {
 
       if (command === 'browser_passkey_registration') {
         return Promise.resolve({
-          password_enabled: false,
+          password_enabled: true,
           passkey_enabled: true,
           authenticated: true,
         });
@@ -476,5 +536,32 @@ describe('App auth flow', () => {
     expect(invoke).toHaveBeenCalledWith('browser_passkey_login');
     expect(invoke).toHaveBeenCalledWith('disable_auth_passkeys');
     expect(await screen.findByText('Add a passkey with your browser.')).toBeInTheDocument();
+  });
+
+  it('requires adding a password before passkeys can be removed', async () => {
+    const user = userEvent.setup();
+
+    vi.mocked(invoke).mockImplementation(command => {
+      if (command === 'auth_status') {
+        return Promise.resolve({
+          password_enabled: false,
+          passkey_enabled: true,
+          authenticated: true,
+        });
+      }
+
+      return Promise.resolve({
+        leases: [],
+        total_count: 0,
+      });
+    });
+
+    renderApp();
+
+    await user.click(await screen.findByRole('button', { name: /Settings/i }));
+    await user.click(screen.getByRole('button', { name: /Remove passkeys/i }));
+
+    expect(await screen.findByText('Add a password before removing passkeys.')).toBeInTheDocument();
+    expect(invoke).not.toHaveBeenCalledWith('disable_auth_passkeys');
   });
 });

@@ -11,6 +11,7 @@ import './WorkbookImportFlow.css';
 type LeaseFieldKey =
   | 'name'
   | 'address'
+  | 'size'
   | 'manager'
   | 'manager_email'
   | 'manager_phone_number'
@@ -43,6 +44,7 @@ interface BackendLeaseManager {
 interface BackendLease {
   name: string;
   address: string;
+  size: number | null;
   lease_manager: BackendLeaseManager;
   expiration_date: string | null;
   days_to_expire: number | null;
@@ -54,6 +56,7 @@ interface BackendLease {
 const FIELDS: Array<{ key: LeaseFieldKey; label: string }> = [
   { key: 'name', label: 'Name' },
   { key: 'address', label: 'Address' },
+  { key: 'size', label: 'Square Footage' },
   { key: 'manager', label: 'Manager' },
   { key: 'manager_email', label: 'Manager Email' },
   { key: 'manager_phone_number', label: 'Manager Phone' },
@@ -66,6 +69,7 @@ const FIELDS: Array<{ key: LeaseFieldKey; label: string }> = [
 const ALIASES: Record<LeaseFieldKey, string[]> = {
   name: ['name', 'property', 'property name', 'company name'],
   address: ['address', 'location', 'business address', 'business addr'],
+  size: ['size', 'sqft', 'sq ft', 'square feet', 'square footage'],
   manager: ['manager', 'decision maker', 'lease manager', 'contact'],
   manager_email: ['manager email', 'email'],
   manager_phone_number: ['manager phone', 'phone', 'phone number'],
@@ -125,6 +129,7 @@ const convertBackendLeasesToUi = (rows: BackendLease[]): Lease[] =>
       stage: 'new',
       name: item.name || 'Unnamed',
       businessAddr: item.address || '-',
+      size: item.size?.toString(),
       leaseExpiration: item.expiration_date ? formatExpirationDate(item.expiration_date) : '-',
       leaseManager: displayName,
       managers: finalManagers,
