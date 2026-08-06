@@ -28,6 +28,7 @@ pub fn create_lease(
     let new_lease = NewLease {
         name,
         address,
+        size: None,
         expiration_date,
         notes,
         misc_data,
@@ -380,6 +381,19 @@ pub fn delete_manager(
     })
 }
 
+/// Removes every user-owned record while preserving the migration history and
+/// database structure needed to start using the app again.
+pub fn clear_all_records(conn: &mut SqliteConnection) -> Result<(), diesel::result::Error> {
+    use crate::schema::{lease_managers, leases, leases_managers};
+
+    conn.transaction(|conn| {
+        diesel::delete(leases_managers::table).execute(conn)?;
+        diesel::delete(lease_managers::table).execute(conn)?;
+        diesel::delete(leases::table).execute(conn)?;
+        Ok(())
+    })
+}
+
 /// Per-stage lease counts, one field per filter pill.
 ///
 /// Being a fixed-field struct rather than a map is what guarantees the wire
@@ -625,6 +639,7 @@ pub fn import_leases(
                 let new_lease = NewLease {
                     name: &lease.name,
                     address: Some(lease.address.as_str()),
+                    size: lease.size.as_ref(),
                     expiration_date: lease.expiration_date.map(|dt| dt.timestamp() as i32),
                     notes: Some(&lease.notes)
                         .filter(|s| !s.is_empty())

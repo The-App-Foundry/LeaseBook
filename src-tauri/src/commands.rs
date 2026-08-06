@@ -66,6 +66,23 @@ pub fn verify_auth_password(
 }
 
 #[tauri::command]
+pub fn clear_all_data(
+    pool: State<'_, DbPool>,
+    auth: State<'_, AuthManager>,
+    password: Option<String>,
+    confirmation: String,
+) -> CommandResult<()> {
+    if confirmation.trim() != "delete all data" {
+        return Err(AppError::validation("Type 'delete all data' to confirm.").into());
+    }
+    auth.authorize_data_clear(password.as_deref())
+        .map_err(ErrorResponse::from)?;
+    let mut conn = pool.get().map_err(pool_error)?;
+    clear_all_records(&mut conn)?;
+    Ok(())
+}
+
+#[tauri::command]
 pub fn start_passkey_registration(
     auth: State<'_, AuthManager>,
 ) -> CommandResult<CreationChallengeResponse> {

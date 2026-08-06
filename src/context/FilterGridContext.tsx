@@ -274,13 +274,22 @@ export const FilterGridProvider: React.FC<{ children: ReactNode }> = ({ children
   );
 
   const fetchPage = useCallback(
-    (page: number, size: number, query: string, stage: Stage | null) => {
+    (
+      page: number,
+      size: number,
+      query: string,
+      stage: Stage | null,
+      sortBy: SortOption,
+      direction: SortDirection,
+    ) => {
       setLoading(true);
       invoke<PaginatedResponse>('leases_with_managers_paginated', {
         page,
         pageSize: size,
         searchQuery: query || null,
         ...(stage ? { stage } : {}),
+        sortBy,
+        sortDirection: direction,
       })
         .then(resp => {
           setLeases(resp.leases.map(row => dbLeaseToUi(row, row.managers)));
@@ -296,8 +305,8 @@ export const FilterGridProvider: React.FC<{ children: ReactNode }> = ({ children
 
   // Fetch when dependencies change
   useEffect(() => {
-    fetchPage(currentPage, pageSize, searchQuery, activeStage);
-  }, [currentPage, pageSize, searchQuery, activeStage, fetchPage]);
+    fetchPage(currentPage, pageSize, searchQuery, activeStage, sortOption, sortDirection);
+  }, [currentPage, pageSize, searchQuery, activeStage, sortOption, sortDirection, fetchPage]);
 
   const fetchStageCounts = useCallback((query: string) => {
     invoke<StageCounts>('lease_stage_counts', { searchQuery: query || null })
@@ -362,9 +371,18 @@ export const FilterGridProvider: React.FC<{ children: ReactNode }> = ({ children
   }, []);
 
   const refresh = useCallback(() => {
-    fetchPage(currentPage, pageSize, searchQuery, activeStage);
+    fetchPage(currentPage, pageSize, searchQuery, activeStage, sortOption, sortDirection);
     fetchStageCounts(searchQuery);
-  }, [currentPage, pageSize, searchQuery, activeStage, fetchPage, fetchStageCounts]);
+  }, [
+    currentPage,
+    pageSize,
+    searchQuery,
+    activeStage,
+    sortOption,
+    sortDirection,
+    fetchPage,
+    fetchStageCounts,
+  ]);
 
   return (
     <FilterGridContext.Provider

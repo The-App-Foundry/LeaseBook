@@ -45,6 +45,29 @@ fn maps_headers_to_lease_fields_and_collects_misc_data() {
 }
 
 #[test]
+fn maps_a_sqft_column_to_property_size() {
+    let spreadsheet = Spreadsheet {
+        sheets: vec![Sheet {
+            name: "Leases".to_string(),
+            headers: vec!["Property".to_string(), "Sqft".to_string()],
+            rows: vec![Row {
+                cells: vec![Cell::String("Sunset Villas".to_string()), Cell::Int(12_500)],
+            }],
+        }],
+    };
+
+    let mapping = HashMap::from([
+        ("Property".to_string(), "name".to_string()),
+        ("Sqft".to_string(), "size".to_string()),
+    ]);
+
+    let leases = map_spreadsheet_to_leases(&spreadsheet, &mapping, None);
+
+    assert_eq!(leases[0].size, Some(12_500));
+    assert_eq!(leases[0].misc_data, "");
+}
+
+#[test]
 fn supports_field_to_header_mapping_direction() {
     let spreadsheet = Spreadsheet {
         sheets: vec![Sheet {

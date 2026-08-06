@@ -41,7 +41,8 @@ interface AuthenticatedAppProps {
   onChangePassword: (currentPassword: string, newPassword: string) => Promise<void>;
   onDisablePassword: (currentPassword: string) => Promise<void>;
   onCreatePasskey: () => Promise<void>;
-  onDisablePasskeys: (currentPassword?: string) => Promise<void>;
+  onDisablePasskeys: (currentPassword: string) => Promise<void>;
+  onClearAllData: (password: string | undefined, confirmation: string) => Promise<void>;
   onLogout: () => Promise<void>;
 }
 
@@ -303,7 +304,8 @@ interface SettingsPageProps {
   onChangePassword: (currentPassword: string, newPassword: string) => Promise<void>;
   onDisablePassword: (currentPassword: string) => Promise<void>;
   onCreatePasskey: () => Promise<void>;
-  onDisablePasskeys: (currentPassword?: string) => Promise<void>;
+  onDisablePasskeys: (currentPassword: string) => Promise<void>;
+  onClearAllData: (password: string | undefined, confirmation: string) => Promise<void>;
 }
 
 const SettingsPage = ({
@@ -313,13 +315,19 @@ const SettingsPage = ({
   onDisablePassword,
   onCreatePasskey,
   onDisablePasskeys,
+  onClearAllData,
 }: Readonly<SettingsPageProps>) => {
   const [showCreatePassword, setShowCreatePassword] = useState(false);
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [showDisablePassword, setShowDisablePassword] = useState(false);
   const [showDisablePasskeys, setShowDisablePasskeys] = useState(false);
+  const [showClearAllData, setShowClearAllData] = useState(false);
+  const [clearAllDataPassword, setClearAllDataPassword] = useState('');
+  const [clearAllDataConfirmation, setClearAllDataConfirmation] = useState('');
   const [passkeySubmitting, setPasskeySubmitting] = useState(false);
   const [passkeyError, setPasskeyError] = useState<string | null>(null);
+  const [clearAllDataSubmitting, setClearAllDataSubmitting] = useState(false);
+  const [clearAllDataError, setClearAllDataError] = useState<string | null>(null);
 
   const handleCreatePassword = useCallback(
     async (password: string) => {
@@ -359,19 +367,22 @@ const SettingsPage = ({
     }
   }, [onCreatePasskey]);
 
-  const handleDisablePasskeys = useCallback(async (currentPassword?: string) => {
-    setPasskeySubmitting(true);
-    setPasskeyError(null);
+  const handleDisablePasskeys = useCallback(
+    async (currentPassword: string) => {
+      setPasskeySubmitting(true);
+      setPasskeyError(null);
 
-    try {
-      await onDisablePasskeys(currentPassword);
-      setShowDisablePasskeys(false);
-    } catch (err) {
-      setPasskeyError(getErrorMessage(err, 'Unable to remove passkeys. Please try again.'));
-    } finally {
-      setPasskeySubmitting(false);
-    }
-  }, [onDisablePasskeys]);
+      try {
+        await onDisablePasskeys(currentPassword);
+        setShowDisablePasskeys(false);
+      } catch (err) {
+        setPasskeyError(getErrorMessage(err, 'Unable to remove passkeys. Please try again.'));
+      } finally {
+        setPasskeySubmitting(false);
+      }
+    },
+    [onDisablePasskeys],
+  );
 
   const handleRemovePasskeysClick = useCallback(() => {
     setPasskeyError(null);
@@ -380,8 +391,32 @@ const SettingsPage = ({
       return;
     }
 
-    void handleDisablePasskeys();
+    setPasskeyError('Add a password before removing passkeys.');
   }, [authStatus.password_enabled, handleDisablePasskeys]);
+
+  const handleClearAllData = useCallback(async () => {
+    setClearAllDataSubmitting(true);
+    setClearAllDataError(null);
+
+    try {
+      await onClearAllData(
+        authStatus.password_enabled ? clearAllDataPassword : undefined,
+        clearAllDataConfirmation,
+      );
+      setShowClearAllData(false);
+    } catch (err) {
+      setClearAllDataError(getErrorMessage(err, 'Unable to clear all data. Please try again.'));
+    } finally {
+      setClearAllDataSubmitting(false);
+    }
+  }, [authStatus.password_enabled, clearAllDataConfirmation, clearAllDataPassword, onClearAllData]);
+
+  const handleClearAllDataClick = useCallback(() => {
+    setClearAllDataError(null);
+    setClearAllDataPassword('');
+    setClearAllDataConfirmation('');
+    setShowClearAllData(value => !value);
+  }, []);
 
   const authSummary =
     authStatus.password_enabled || authStatus.passkey_enabled
@@ -425,11 +460,18 @@ const SettingsPage = ({
                 <Pencil size={15} />
                 Change password
               </Button>
-              <Button type="button" onClick={() => setShowDisablePassword(value => !value)}>
+              <Button
+                type="button"
+                onClick={() => setShowDisablePassword(value => !value)}
+                disabled={authStatus.passkey_enabled}
+              >
                 <ShieldOff size={15} />
                 Remove password protection
               </Button>
             </div>
+            {authStatus.passkey_enabled && (
+              <div className="lb-auth-note">Remove passkeys before removing password protection.</div>
+            )}
             {showChangePassword && <ChangePasswordForm onSubmit={handleChangePassword} />}
             {showDisablePassword && (
               <PasswordForm submitLabel="Remove protection" onSubmit={handleDisablePassword} />
@@ -445,7 +487,9 @@ const SettingsPage = ({
             <p>
               {authStatus.passkey_enabled
                 ? 'Passkey login is enabled.'
-                : 'Add a passkey with your browser.'}
+                : authStatus.password_enabled
+                  ? 'Add a passkey with your browser.'
+                  : 'Create a password to enable passkeys.'}
             </p>
           </div>
         </div>
@@ -459,7 +503,9 @@ const SettingsPage = ({
           <button
             type="button"
             onClick={authStatus.passkey_enabled ? handleRemovePasskeysClick : handleCreatePasskey}
-            disabled={passkeySubmitting}
+            disabled={
+              passkeySubmitting || (!authStatus.passkey_enabled && !authStatus.password_enabled)
+            }
           >
             {authStatus.passkey_enabled ? 'Remove passkeys' : 'Create passkey'}
           </button>
@@ -472,9 +518,71 @@ const SettingsPage = ({
           />
         )}
         {!authStatus.passkey_enabled && (
-          <div className="lb-auth-note">A browser tab will open to finish setup.</div>
+          <div className="lb-auth-note">
+            {authStatus.password_enabled
+              ? 'A browser tab will open to finish setup.'
+              : 'Passkeys require password authentication.'}
+          </div>
         )}
         {passkeyError && <div className="lb-auth-error">{passkeyError}</div>}
+      </div>
+
+      <div className="lb-settings-section lb-settings-danger-section">
+        <div className="lb-settings-section-header">
+          <div>
+            <h2>Clear all data</h2>
+            <p>Permanently remove every property and contact. Authentication remains enabled.</p>
+          </div>
+          <ShieldOff size={22} />
+        </div>
+        <Button
+          type="button"
+          $variant="destructive"
+          onClick={() => void handleClearAllDataClick()}
+          disabled={clearAllDataSubmitting}
+        >
+          Clear all data
+        </Button>
+        {showClearAllData && (
+          <form
+            className="lb-clear-all-data-form"
+            onSubmit={event => {
+              event.preventDefault();
+              void handleClearAllData();
+            }}
+          >
+            {authStatus.password_enabled && (
+              <label>
+                Password
+                <input
+                  type="password"
+                  value={clearAllDataPassword}
+                  onChange={event => setClearAllDataPassword(event.target.value)}
+                  autoComplete="current-password"
+                  required
+                />
+              </label>
+            )}
+            <label>
+              Type <code>delete all data</code> to confirm
+              <input
+                type="text"
+                value={clearAllDataConfirmation}
+                onChange={event => setClearAllDataConfirmation(event.target.value)}
+                autoComplete="off"
+                required
+              />
+            </label>
+            <Button
+              type="submit"
+              $variant="destructive"
+              disabled={clearAllDataSubmitting || clearAllDataConfirmation !== 'delete all data'}
+            >
+              {clearAllDataSubmitting ? 'Clearing data' : 'Permanently clear all data'}
+            </Button>
+          </form>
+        )}
+        {clearAllDataError && <div className="lb-auth-error">{clearAllDataError}</div>}
       </div>
     </section>
   );
@@ -487,6 +595,7 @@ const AuthenticatedApp = ({
   onDisablePassword,
   onCreatePasskey,
   onDisablePasskeys,
+  onClearAllData,
   onLogout,
 }: Readonly<AuthenticatedAppProps>) => {
   const { leases, totalCount, loading, activeStage, removeLease, updateLease, refresh } =
@@ -608,6 +717,7 @@ const AuthenticatedApp = ({
             onDisablePassword={onDisablePassword}
             onCreatePasskey={onCreatePasskey}
             onDisablePasskeys={onDisablePasskeys}
+            onClearAllData={onClearAllData}
           />
         </div>
       )}
@@ -654,6 +764,7 @@ const AuthenticatedApp = ({
 
 const App = () => {
   const [authStatus, setAuthStatus] = useState<AuthStatus | null>(null);
+  const [appSessionKey, setAppSessionKey] = useState(0);
 
   useEffect(() => {
     invoke<AuthStatus>('auth_status')
@@ -693,19 +804,25 @@ const App = () => {
   }, []);
 
   const handleDisablePasskeys = useCallback(
-    async (currentPassword?: string) => {
-      if (authStatus?.password_enabled) {
-        if (currentPassword === undefined) {
-          throw new Error('Password is required before removing passkeys.');
-        }
-        await invoke<AuthStatus>('verify_auth_password', { password: currentPassword });
+    async (currentPassword: string) => {
+      if (!authStatus?.password_enabled) {
+        throw new Error('Password authentication must be enabled before removing passkeys.');
       }
+      await invoke<AuthStatus>('verify_auth_password', { password: currentPassword });
 
       await invoke<AuthStatus>('browser_passkey_login');
       const nextStatus = await invoke<AuthStatus>('disable_auth_passkeys');
       setAuthStatus(nextStatus);
     },
     [authStatus?.password_enabled],
+  );
+
+  const handleClearAllData = useCallback(
+    async (password: string | undefined, confirmation: string) => {
+      await invoke('clear_all_data', { password, confirmation });
+      setAppSessionKey(key => key + 1);
+    },
+    [],
   );
 
   const handleLogin = useCallback(async (password: string) => {
@@ -758,7 +875,7 @@ const App = () => {
 
   return (
     <SearchProvider>
-      <FilterGridProvider>
+      <FilterGridProvider key={appSessionKey}>
         <AuthenticatedApp
           authStatus={authStatus}
           onCreatePassword={handleCreatePassword}
@@ -766,6 +883,7 @@ const App = () => {
           onDisablePassword={handleDisablePassword}
           onCreatePasskey={handleCreatePasskey}
           onDisablePasskeys={handleDisablePasskeys}
+          onClearAllData={handleClearAllData}
           onLogout={handleLogout}
         />
       </FilterGridProvider>

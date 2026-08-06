@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 pub struct Lease {
     pub name: String,
     pub address: String,
+    pub size: Option<i32>,
     pub lease_manager: LeaseManager,
     pub expiration_date: Option<DateTime<Utc>>,
     pub days_to_expire: Option<i64>,
@@ -25,6 +26,7 @@ impl Default for Lease {
         Self {
             name: String::new(),
             address: String::new(),
+            size: None,
             lease_manager: LeaseManager::default(),
             expiration_date: None,
             days_to_expire: None,

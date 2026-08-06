@@ -78,6 +78,7 @@ pub fn run() {
             commands::change_auth_password,
             commands::disable_auth_password,
             commands::verify_auth_password,
+            commands::clear_all_data,
             commands::start_passkey_registration,
             commands::finish_passkey_registration,
             commands::browser_passkey_registration,

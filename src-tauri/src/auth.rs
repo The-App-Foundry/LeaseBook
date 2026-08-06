@@ -108,6 +108,11 @@ impl AuthManager {
     pub fn disable_password(&self, current_password: &str) -> Result<AuthStatus, AppError> {
         let mut config = self.read_config()?.unwrap_or_default();
         if config.password_hash.is_some() {
+            if config.has_passkey_factor() {
+                return Err(AppError::validation(
+                    "Remove passkeys before removing password protection.",
+                ));
+            }
             self.verify_password(current_password)?;
             config.password_hash = None;
             self.write_or_remove_config(&config)?;
@@ -123,9 +128,34 @@ impl AuthManager {
         self.status()
     }
 
+    /// Guards destructive data operations while keeping the configured
+    /// authentication method intact for future sessions.
+    pub fn authorize_data_clear(&self, password: Option<&str>) -> Result<(), AppError> {
+        self.require_authenticated()?;
+
+        let config = self.read_config()?;
+        if config
+            .as_ref()
+            .and_then(|config| config.password_hash.as_ref())
+            .is_some()
+        {
+            let password = password.ok_or_else(|| {
+                AppError::validation("Password confirmation is required before clearing all data.")
+            })?;
+            self.verify_password(password)?;
+        }
+
+        Ok(())
+    }
+
     pub fn start_passkey_registration(&self) -> Result<CreationChallengeResponse, AppError> {
         self.require_authenticated()?;
         let config = self.read_config()?.unwrap_or_default();
+        if config.password_hash.is_none() {
+            return Err(AppError::validation(
+                "Password authentication must be enabled before adding passkeys.",
+            ));
+        }
         let exclude_credentials = config
             .passkeys
             .iter()
@@ -154,6 +184,12 @@ impl AuthManager {
         credential: RegisterPublicKeyCredential,
     ) -> Result<AuthStatus, AppError> {
         self.require_authenticated()?;
+        let mut config = self.read_config()?.unwrap_or_default();
+        if config.password_hash.is_none() {
+            return Err(AppError::validation(
+                "Password authentication must be enabled before adding passkeys.",
+            ));
+        }
         let state = self
             .passkey_registration
             .lock()
@@ -164,7 +200,6 @@ impl AuthManager {
             .webauthn
             .finish_passkey_registration(&credential, &state)
             .map_err(auth_error)?;
-        let mut config = self.read_config()?.unwrap_or_default();
         config.passkeys.push(passkey);
         self.write_config(&config)?;
         self.set_authenticated(true)?;
@@ -174,7 +209,12 @@ impl AuthManager {
     pub fn disable_passkeys(&self) -> Result<AuthStatus, AppError> {
         let mut config = self.read_config()?.unwrap_or_default();
         if config.has_passkey_factor() {
-            if config.password_hash.is_some() && !self.is_password_factor_verified()? {
+            if config.password_hash.is_none() {
+                return Err(AppError::validation(
+                    "Password authentication must be enabled before removing passkeys.",
+                ));
+            }
+            if !self.is_password_factor_verified()? {
                 return Err(AppError::validation(
                     "Password is required before removing passkeys.",
                 ));

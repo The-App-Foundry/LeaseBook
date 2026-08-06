@@ -169,6 +169,55 @@ fn disable_password_requires_current_password_and_removes_config() {
 }
 
 #[test]
+fn disabling_password_is_rejected_while_passkeys_are_enabled() {
+    let path = test_auth_path("disable-password-with-passkey");
+    let manager = AuthManager::new(path.clone());
+    manager.create_password("correct password").unwrap();
+    manager.enable_test_passkey_factor().unwrap();
+
+    assert!(manager.disable_password("correct password").is_err());
+    assert_eq!(
+        manager.status().unwrap(),
+        AuthStatus {
+            password_enabled: true,
+            passkey_enabled: true,
+            authenticated: true,
+            next_factor: None,
+        }
+    );
+
+    let _ = fs::remove_file(path);
+}
+
+#[test]
+fn clearing_data_requires_an_authenticated_session() {
+    let path = test_auth_path("clear-data");
+    let manager = AuthManager::new(path.clone());
+    manager.create_password("correct password").unwrap();
+    manager.logout().unwrap();
+
+    assert!(
+        manager
+            .authorize_data_clear(Some("correct password"))
+            .is_err()
+    );
+    manager.login("correct password").unwrap();
+    assert!(manager.authorize_data_clear(None).is_err());
+    assert!(
+        manager
+            .authorize_data_clear(Some("wrong password"))
+            .is_err()
+    );
+    assert!(
+        manager
+            .authorize_data_clear(Some("correct password"))
+            .is_ok()
+    );
+
+    assert!(path.exists());
+}
+
+#[test]
 fn passkey_registration_requires_authenticated_session() {
     let path = test_auth_path("passkey-locked");
     let manager = AuthManager::new(path.clone());
@@ -176,6 +225,19 @@ fn passkey_registration_requires_authenticated_session() {
     manager.logout().unwrap();
 
     assert!(manager.start_passkey_registration().is_err());
+
+    let _ = fs::remove_file(path);
+}
+
+#[test]
+fn passkey_registration_requires_password_authentication() {
+    let path = test_auth_path("passkey-password-required");
+    let manager = AuthManager::new(path.clone());
+
+    assert!(manager.start_passkey_registration().is_err());
+
+    manager.create_password("correct password").unwrap();
+    assert!(manager.start_passkey_registration().is_ok());
 
     let _ = fs::remove_file(path);
 }
@@ -277,7 +339,7 @@ fn disabling_passkeys_requires_password_then_passkey_when_password_is_enabled() 
 }
 
 #[test]
-fn disabling_passkeys_requires_passkey_when_passkey_is_the_only_factor() {
+fn disabling_passkeys_requires_password_even_when_passkey_is_the_only_factor() {
     let path = test_auth_path("disable-passkey-only");
     let manager = AuthManager::new(path.clone());
     manager.enable_test_passkey_factor().unwrap();
@@ -285,16 +347,8 @@ fn disabling_passkeys_requires_passkey_when_passkey_is_the_only_factor() {
     assert!(manager.disable_passkeys().is_err());
 
     manager.verify_test_passkey_factor().unwrap();
-    assert_eq!(
-        manager.disable_passkeys().unwrap(),
-        AuthStatus {
-            password_enabled: false,
-            passkey_enabled: false,
-            authenticated: true,
-            next_factor: None,
-        }
-    );
-    assert!(!path.exists());
+    assert!(manager.disable_passkeys().is_err());
+    assert!(path.exists());
 
     let _ = fs::remove_file(path);
 }

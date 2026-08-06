@@ -1,7 +1,7 @@
 use std::fmt;
 use std::path::Path;
 
-use calamine::{Data, Reader, Sheets, open_workbook_auto};
+use calamine::{open_workbook_auto, Data, Reader, Sheets};
 
 use crate::spreadsheet::{Cell, Row, Sheet, Spreadsheet};
 
@@ -9,7 +9,6 @@ pub(crate) const MAX_IMPORT_FILE_BYTES: u64 = 25 * 1024 * 1024;
 pub(crate) const MAX_IMPORT_SHEETS: usize = 32;
 pub(crate) const MAX_IMPORT_COLUMNS: usize = 256;
 pub(crate) const MAX_IMPORT_DATA_ROWS: usize = 10_000;
-pub(crate) const MAX_IMPORT_CELL_TEXT_CHARS: usize = 4_096;
 
 #[derive(Debug)]
 pub enum ParserError {
@@ -199,17 +198,6 @@ fn convert_cell(cell: &Data) -> Result<Cell, ParserError> {
 }
 
 fn sanitize_text(value: &str, neutralize_formula: bool) -> Result<String, ParserError> {
-    if value
-        .chars()
-        .take(MAX_IMPORT_CELL_TEXT_CHARS.saturating_add(1))
-        .count()
-        > MAX_IMPORT_CELL_TEXT_CHARS
-    {
-        return Err(ParserError::InputLimit(format!(
-            "spreadsheet text values must be {MAX_IMPORT_CELL_TEXT_CHARS} characters or fewer"
-        )));
-    }
-
     let mut sanitized = String::with_capacity(value.len());
     let mut chars = value.chars().peekable();
 
@@ -234,11 +222,6 @@ fn sanitize_text(value: &str, neutralize_formula: bool) -> Result<String, Parser
             .next()
             .is_some_and(|ch| matches!(ch, '=' | '+' | '-' | '@'))
     {
-        if sanitized.chars().count() >= MAX_IMPORT_CELL_TEXT_CHARS {
-            return Err(ParserError::InputLimit(format!(
-                "spreadsheet text values must be {MAX_IMPORT_CELL_TEXT_CHARS} characters or fewer"
-            )));
-        }
         sanitized.insert(0, '\'');
     }
 

@@ -6,8 +6,8 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use rust_xlsxwriter::{ExcelDateTime, Format, Workbook};
 
 use crate::parser::{
-    MAX_IMPORT_CELL_TEXT_CHARS, MAX_IMPORT_COLUMNS, MAX_IMPORT_DATA_ROWS, MAX_IMPORT_FILE_BYTES,
-    MAX_IMPORT_SHEETS, ParserError, parse_spreadsheet_from_path,
+    parse_spreadsheet_from_path, ParserError, MAX_IMPORT_COLUMNS, MAX_IMPORT_DATA_ROWS,
+    MAX_IMPORT_FILE_BYTES, MAX_IMPORT_SHEETS,
 };
 use crate::spreadsheet::Cell;
 
@@ -181,7 +181,7 @@ fn rejects_spreadsheets_with_too_many_data_rows() {
 }
 
 #[test]
-fn rejects_spreadsheets_with_cell_text_longer_than_import_limit() {
+fn imports_spreadsheets_with_cell_text_longer_than_4096_characters() {
     let mut workbook = Workbook::new();
     let sheet = workbook.add_worksheet();
     sheet
@@ -191,7 +191,7 @@ fn rejects_spreadsheets_with_cell_text_longer_than_import_limit() {
         .write_string(0, 0, "Property")
         .expect("write string should succeed");
     sheet
-        .write_string(1, 0, "A".repeat(MAX_IMPORT_CELL_TEXT_CHARS + 1))
+        .write_string(1, 0, "A".repeat(4_097))
         .expect("write string should succeed");
 
     let bytes = workbook
@@ -200,11 +200,12 @@ fn rejects_spreadsheets_with_cell_text_longer_than_import_limit() {
     let file_path = unique_temp_path("too-much-text", "xlsx");
     fs::write(&file_path, bytes).expect("workbook bytes should be written");
 
-    let result = parse_spreadsheet_from_path(&file_path);
-    assert!(
-        matches!(result, Err(ParserError::InputLimit(_))),
-        "expected InputLimit error for spreadsheet with too much cell text"
-    );
+    let spreadsheet = parse_spreadsheet_from_path(&file_path)
+        .expect("spreadsheet with long cell text should import successfully");
+    assert!(matches!(
+        spreadsheet.sheets[0].rows[0].cells[0],
+        Cell::String(ref value) if value.len() == 4_097
+    ));
 
     fs::remove_file(file_path).expect("test workbook should be removed");
 }

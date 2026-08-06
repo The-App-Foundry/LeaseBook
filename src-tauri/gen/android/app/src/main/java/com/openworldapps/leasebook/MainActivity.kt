@@ -1,4 +1,4 @@
-package com.openworldapps.lms
+package com.openworldapps.leasebook
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge

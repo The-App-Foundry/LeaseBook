@@ -33,6 +33,11 @@ fn map_sheet_to_leases(sheet: &Sheet, column_mapping: &HashMap<String, String>) 
         column_mapping,
         &["address", "location", "business_addr", "business_address"],
     );
+    let size_header = resolve_header_for_field(
+        sheet,
+        column_mapping,
+        &["size", "sqft", "sq_ft", "square_feet", "square_footage"],
+    );
     let manager_header = resolve_header_for_field(
         sheet,
         column_mapping,
@@ -73,6 +78,7 @@ fn map_sheet_to_leases(sheet: &Sheet, column_mapping: &HashMap<String, String>) 
     let mapped_headers: HashSet<String> = [
         name_header.as_deref(),
         address_header.as_deref(),
+        size_header.as_deref(),
         manager_header.as_deref(),
         manager_email_header.as_deref(),
         manager_phone_header.as_deref(),
@@ -95,6 +101,9 @@ fn map_sheet_to_leases(sheet: &Sheet, column_mapping: &HashMap<String, String>) 
             lease.name = read_cell_by_header(row.cells.as_slice(), sheet, name_header.as_deref());
             lease.address =
                 read_cell_by_header(row.cells.as_slice(), sheet, address_header.as_deref());
+            lease.size =
+                read_raw_cell_by_header(row.cells.as_slice(), sheet, size_header.as_deref())
+                    .and_then(parse_size_from_cell);
             lease.lease_manager.name =
                 read_cell_by_header(row.cells.as_slice(), sheet, manager_header.as_deref());
             lease.lease_manager.email =
@@ -191,6 +200,23 @@ fn parse_days_to_expire(cell: &Cell) -> Option<i64> {
         Cell::Int(value) => Some(*value),
         Cell::Float(value) => Some(*value as i64),
         Cell::String(value) => value.trim().parse::<i64>().ok(),
+        _ => None,
+    }
+}
+
+fn parse_size_from_cell(cell: &Cell) -> Option<i32> {
+    match cell {
+        Cell::Int(value) => i32::try_from(*value).ok().filter(|value| *value >= 0),
+        Cell::Float(value) if value.is_finite() && *value >= 0.0 && *value <= i32::MAX as f64 => {
+            Some(*value as i32)
+        }
+        Cell::String(value) => value
+            .trim()
+            .replace(',', "")
+            .parse::<f64>()
+            .ok()
+            .filter(|value| value.is_finite() && *value >= 0.0 && *value <= i32::MAX as f64)
+            .map(|value| value as i32),
         _ => None,
     }
 }
